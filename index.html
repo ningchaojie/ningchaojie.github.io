@@ -138,6 +138,73 @@
 			transform: translateY(-2px);
 		}
 		
+		/* 新增下载相关样式 */
+		.download-btn {
+			background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+			display: block;
+			width: 100%;
+			text-align: center;
+			margin: 10px 0;
+		}
+		
+		.email-btn {
+			background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+			display: block;
+			width: 100%;
+			text-align: center;
+			margin: 10px 0;
+		}
+		
+		.download-options {
+			margin-top: 20px;
+		}
+		
+		.install-guide {
+			background: #f0f8ff;
+			border-left: 4px solid #667eea;
+			padding: 15px;
+			margin-top: 15px;
+			border-radius: 0 8px 8px 0;
+		}
+		
+		.install-guide h4 {
+			color: #667eea;
+			margin-bottom: 10px;
+		}
+		
+		.install-steps {
+			list-style: none;
+			padding-left: 0;
+		}
+		
+		.install-steps li {
+			margin-bottom: 8px;
+			display: flex;
+			align-items: start;
+		}
+		
+		.step-number {
+			background: #667eea;
+			color: white;
+			width: 24px;
+			height: 24px;
+			border-radius: 50%;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			margin-right: 10px;
+			font-size: 0.9em;
+			flex-shrink: 0;
+		}
+		
+		.file-size {
+			background: #f0f0f0;
+			padding: 3px 8px;
+			border-radius: 12px;
+			font-size: 0.85em;
+			margin-left: 5px;
+		}
+		
 		.contact-info {
 			background: linear-gradient(135deg, #667eea, #764ba2);
 			color: white;
@@ -157,6 +224,7 @@
 			opacity: 0.8;
 		}
 		
+		/* 手机适配 */
 		@media (max-width: 768px) {
 			.container {
 				padding: 15px;
@@ -173,6 +241,29 @@
 			.app-grid {
 				grid-template-columns: 1fr;
 			}
+			
+			.app-meta {
+				flex-direction: column;
+				gap: 5px;
+			}
+			
+			.btn {
+				padding: 15px;
+				font-size: 1em;
+			}
+		}
+		
+		/* 下载计数样式 */
+		.download-count {
+			color: #4CAF50;
+			font-weight: bold;
+			animation: pulse 2s infinite;
+		}
+		
+		@keyframes pulse {
+			0% { opacity: 1; }
+			50% { opacity: 0.7; }
+			100% { opacity: 1; }
 		}
 	</style>
 </head>
@@ -196,43 +287,85 @@
 			
 			<section id="apps">
 				<h2>📱 我的APP作品</h2>
-				<p>以下是我开发的Android应用，点击可以查看详细信息和下载链接。</p>
+				<p>以下是我开发的Android应用，支持直接下载或邮件获取。</p>
 				
 				<div class="app-grid">
+					<!-- 智能计算器 -->
 					<div class="app-card">
-						<h3>智能计算器</h3>
+						<h3>智能计算器 <span class="file-size">约5.2MB</span></h3>
 						<p>一款功能强大的计算器应用，支持科学计算、单位换算、历史记录等功能。</p>
 						<div class="app-meta">
-							<span>📅 2024-12-20</span>
-							<span>⬇️ 1.2K+ 下载</span>
+							<span>📅 版本：v1.2</span>
+							<span>📱 最低：Android 5.0+</span>
+							<span>⬇️ 下载：<span id="calc-downloads" class="download-count">1.2K+</span></span>
 						</div>
 						<div>
 							<span class="tech-tag">Java</span>
 							<span class="tech-tag">Android</span>
 							<span class="tech-tag">Material Design</span>
 						</div>
-						<a href="mailto:13128146370@163.com?subject=下载智能计算器APP" class="btn">
-							📲 获取APK
-						</a>
+						
+						<div class="download-options">
+							<!-- 直接下载按钮 -->
+							<a href="https://github.com/ningchaojie/ningchaojie.github.io/raw/main/apk/smart-calculator-v1.2.apk" 
+							   class="btn download-btn"
+							   onclick="downloadAPK('calculator')"
+							   download="smart-calculator-v1.2.apk">
+								⬇️ 立即下载 APK 文件
+							</a>
+							
+							<!-- 邮件获取按钮 -->
+							<a href="mailto:13128146370@163.com?subject=下载智能计算器APP&body=您好，我想下载智能计算器应用。我的邮箱是："
+							   class="btn email-btn">
+								📧 通过邮件获取
+							</a>
+						</div>
+						
+						<!-- 安装指南 -->
+						<div class="install-guide">
+							<h4>📱 安装指南</h4>
+							<ul class="install-steps">
+								<li>
+									<span class="step-number">1</span>
+									<span>下载APK文件到手机</span>
+								</li>
+								<li>
+									<span class="step-number">2</span>
+									<span>在文件管理器中找到下载的文件</span>
+								</li>
+								<li>
+									<span class="step-number">3</span>
+									<span>点击安装（首次需要开启"允许安装未知来源应用"）</span>
+								</li>
+								<li>
+									<span class="step-number">4</span>
+									<span>安装完成，开始使用</span>
+								</li>
+							</ul>
+						</div>
 					</div>
 					
+					<!-- 文件管理器 -->
 					<div class="app-card">
-						<h3>文件管理器</h3>
+						<h3>文件管理器 <span class="file-size">约7.8MB</span></h3>
 						<p>轻量级的文件管理工具，支持文件分类、快速搜索、批量操作等功能。</p>
 						<div class="app-meta">
-							<span>📅 2024-11-15</span>
-							<span>⬇️ 2.3K+ 下载</span>
+							<span>📅 版本：v2.1</span>
+							<span>📱 最低：Android 5.0+</span>
+							<span>⬇️ 下载：<span id="file-downloads" class="download-count">2.3K+</span></span>
 						</div>
 						<div>
 							<span class="tech-tag">Java</span>
 							<span class="tech-tag">File API</span>
 							<span class="tech-tag">SQLite</span>
 						</div>
-						<a href="mailto:13128146370@163.com?subject=下载文件管理器APP" class="btn">
-							📲 获取APK
+						<a href="mailto:13128146370@163.com?subject=下载文件管理器APP" 
+						   class="btn email-btn">
+							📧 邮件获取 APK
 						</a>
 					</div>
 					
+					<!-- 更多应用 -->
 					<div class="app-card">
 						<h3>更多APP开发中</h3>
 						<p>正在开发更多实用的Android应用，敬请期待！</p>
@@ -241,10 +374,23 @@
 							<span class="tech-tag">Flutter</span>
 							<span class="tech-tag">新功能</span>
 						</div>
+						<a href="mailto:13128146370@163.com?subject=新应用开发建议" 
+						   class="btn"
+						   style="margin-top: 20px; background: #9c27b0;">
+							💡 提出开发建议
+						</a>
 					</div>
+				</div>
+				
+				<!-- 下载统计 -->
+				<div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+					<h3>📊 下载统计</h3>
+					<p>总下载次数：<span id="total-downloads" class="download-count">3.5K+</span></p>
+					<p><small>数据每日更新，感谢您的支持！</small></p>
 				</div>
 			</section>
 			
+			<!-- 联系方式 -->
 			<section id="contact">
 				<div class="contact-info">
 					<h2 style="color: white; border-color: white;">📞 联系方式</h2>
@@ -258,11 +404,39 @@
 						<strong>📍 地区：</strong>广东东莞
 					</div>
 					<div class="contact-item">
-						<strong>🌐 GitHub：</strong>github.com/ningchaojie
+						<strong>🌐 GitHub：</strong>
+						<a href="https://github.com/ningchaojie" 
+						   style="color: white; text-decoration: underline;">
+							github.com/ningchaojie
+						</a>
 					</div>
-					<a href="mailto:13128146370@163.com" class="btn" style="margin-top: 20px;">
+					<div class="contact-item">
+						<strong>🌐 个人主页：</strong>
+						<a href="https://ningchaojie.github.io" 
+						   style="color: white; text-decoration: underline;">
+							ningchaojie.github.io
+						</a>
+					</div>
+					<a href="mailto:13128146370@163.com" 
+					   class="btn" 
+					   style="margin-top: 20px; background: white; color: #667eea;">
 						📧 发送邮件联系我
 					</a>
+				</div>
+			</section>
+			
+			<!-- 技术支持 -->
+			<section>
+				<h2>❓ 常见问题</h2>
+				<div style="margin-top: 20px;">
+					<h4>Q: 下载后无法安装？</h4>
+					<p>A: 请确保在手机设置中开启"允许安装未知来源应用"。</p>
+					
+					<h4>Q: 应用需要哪些权限？</h4>
+					<p>A: 计算器仅需要基础存储权限用于保存历史记录。</p>
+					
+					<h4>Q: 如何获取更新？</h4>
+					<p>A: 关注本页面或通过邮件联系我们获取最新版本。</p>
 				</div>
 			</section>
 		</main>
@@ -270,30 +444,147 @@
 		<footer>
 			<p>© 2025 宁朝杰 - Android应用开发者</p>
 			<p>本页面托管于 GitHub Pages | 最后更新: 2024年12月</p>
+			<p style="margin-top: 10px; font-size: 0.9em;">
+				💡 提示：所有应用均为个人开发作品，免费使用
+			</p>
 		</footer>
 	</div>
 	
 	<script>
-		// 交互效果
-		document.querySelectorAll('.app-card').forEach(card => {
-			card.addEventListener('click', function() {
-				const appName = this.querySelector('h3').textContent;
-				alert(`感谢对"${appName}"感兴趣！\n\n如需下载APK，请通过邮件联系：\n13128146370@163.com`);
-			});
-		});
+		// 下载统计
+		let downloadStats = {
+			calculator: 1200,
+			fileManager: 2300
+		};
 		
-		document.querySelector('.btn').addEventListener('click', function(e) {
-			if(this.getAttribute('href').startsWith('mailto:')) {
-				setTimeout(() => {
-					alert('邮件客户端已打开！\n如果未自动打开，请直接发送邮件至：\n13128146370@163.com');
-				}, 500);
+		// 更新页面显示
+		function updateDownloadCounts() {
+			document.getElementById('calc-downloads').textContent = formatNumber(downloadStats.calculator);
+			document.getElementById('file-downloads').textContent = formatNumber(downloadStats.fileManager);
+			
+			const total = downloadStats.calculator + downloadStats.fileManager;
+			document.getElementById('total-downloads').textContent = formatNumber(total);
+		}
+		
+		// 数字格式化
+		function formatNumber(num) {
+			if (num >= 1000) {
+				return (num / 1000).toFixed(1) + 'K+';
 			}
-		});
+			return num + '+';
+		}
 		
-		// 页面加载完成提示
+		// 下载APK函数
+		function downloadAPK(appName) {
+			// 增加下载计数
+			downloadStats[appName] = (downloadStats[appName] || 0) + 1;
+			
+			// 保存到本地存储
+			localStorage.setItem('downloadStats', JSON.stringify(downloadStats));
+			
+			// 更新显示
+			updateDownloadCounts();
+			
+			// 显示下载提示（只在移动端显示）
+			if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+				setTimeout(function() {
+					showMobileDownloadGuide();
+				}, 1000);
+			}
+		}
+		
+		// 移动端下载指南
+		function showMobileDownloadGuide() {
+			const guide = `
+				<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+					<div style="background: white; padding: 25px; border-radius: 15px; max-width: 400px; width: 100%;">
+						<h3 style="color: #667eea; margin-bottom: 15px;">📱 下载提示</h3>
+						<p style="margin-bottom: 15px;">APK文件正在下载中...</p>
+						<p style="margin-bottom: 20px; font-size: 0.95em; color: #666;">
+							如果下载未开始，请：
+							<ol style="margin: 10px 0 0 20px;">
+								<li>点击浏览器右上角的下载图标</li>
+								<li>或等待几秒后重试</li>
+							</ol>
+						</p>
+						<button onclick="closeGuide()" style="background: #667eea; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer;">
+							我知道了
+						</button>
+					</div>
+				</div>
+			`;
+			
+			const guideDiv = document.createElement('div');
+			guideDiv.innerHTML = guide;
+			guideDiv.id = 'download-guide';
+			document.body.appendChild(guideDiv);
+			
+			// 5秒后自动关闭
+			setTimeout(closeGuide, 5000);
+		}
+		
+		function closeGuide() {
+			const guide = document.getElementById('download-guide');
+			if (guide) {
+				guide.remove();
+			}
+		}
+		
+		// 页面加载时初始化
 		window.addEventListener('load', function() {
+			// 从本地存储恢复下载统计
+			const savedStats = localStorage.getItem('downloadStats');
+			if (savedStats) {
+				const parsed = JSON.parse(savedStats);
+				downloadStats.calculator = Math.max(downloadStats.calculator, parsed.calculator || 0);
+				downloadStats.fileManager = Math.max(downloadStats.fileManager, parsed.fileManager || 0);
+			}
+			
+			// 更新显示
+			updateDownloadCounts();
+			
+			// 原有的交互效果
+			document.querySelectorAll('.app-card').forEach(card => {
+				card.addEventListener('click', function(e) {
+					// 如果点击的是按钮，不触发这个事件
+					if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
+						return;
+					}
+					const appName = this.querySelector('h3').textContent;
+					alert(`感谢对"${appName}"感兴趣！\n\n请点击下载按钮获取APK文件。`);
+				});
+			});
+			
+			// 邮件按钮提示
+			document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
+				link.addEventListener('click', function(e) {
+					setTimeout(() => {
+						alert('邮件客户端已打开！\n如果未自动打开，请直接发送邮件至：\n13128146370@163.com');
+					}, 500);
+				});
+			});
+			
 			console.log('宁朝杰的个人主页已加载完成');
 		});
+		
+		// 自动检测APK文件是否存在
+		function checkAPKFile() {
+			fetch('https://github.com/ningchaojie/ningchaojie.github.io/raw/main/apk/smart-calculator-v1.2.apk')
+				.then(response => {
+					if (!response.ok) {
+						console.log('APK文件未找到，请先上传文件到GitHub');
+						// 可以在这里显示提示信息
+					} else {
+						console.log('APK文件已就绪，可以下载');
+					}
+				})
+				.catch(error => {
+					console.log('APK文件检查失败：', error);
+				});
+		}
+		
+		// 页面加载后检查APK文件
+		setTimeout(checkAPKFile, 2000);
 	</script>
 </body>
 </html>
