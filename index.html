@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 	<meta charset="UTF-8">
@@ -49,7 +49,6 @@
 			opacity: 0.8;
 		}
 		
-		/* 控制栏 */
 		.controls {
 			background: white;
 			padding: 15px;
@@ -99,7 +98,6 @@
 			color: #666;
 		}
 		
-		/* 应用网格 */
 		.apps-grid {
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -154,7 +152,6 @@
 			padding: 20px;
 		}
 		
-		/* 图片展示区 */
 		.image-section {
 			margin-bottom: 20px;
 		}
@@ -205,7 +202,6 @@
 			transform: scale(1.05);
 		}
 		
-		/* 下载按钮 */
 		.download-btn {
 			display: block;
 			width: 100%;
@@ -233,7 +229,6 @@
 			margin-right: 8px;
 		}
 		
-		/* 图片模态框 */
 		.image-modal {
 			display: none;
 			position: fixed;
@@ -269,7 +264,6 @@
 			z-index: 1001;
 		}
 		
-		/* 空状态 */
 		.empty-state {
 			text-align: center;
 			padding: 60px 20px;
@@ -317,7 +311,6 @@
 			100% { transform: rotate(360deg); }
 		}
 		
-		/* 页脚 */
 		footer {
 			text-align: center;
 			padding: 30px 0;
@@ -326,7 +319,6 @@
 			font-size: 0.9em;
 		}
 		
-		/* 响应式设计 */
 		@media (max-width: 768px) {
 			.apps-grid {
 				grid-template-columns: 1fr;
@@ -360,7 +352,6 @@
 			}
 		}
 		
-		/* 错误提示 */
 		.error-message {
 			background: #ffebee;
 			color: #c62828;
@@ -374,7 +365,6 @@
 			margin-right: 10px;
 		}
 		
-		/* 文件信息 */
 		.file-info {
 			background: #f8f9fa;
 			padding: 15px;
@@ -396,6 +386,19 @@
 		.file-info-value {
 			font-weight: 500;
 		}
+		
+		.github-link {
+			text-decoration: none;
+			color: #667eea;
+			display: inline-flex;
+			align-items: center;
+			gap: 5px;
+			margin-top: 5px;
+		}
+		
+		.github-link:hover {
+			text-decoration: underline;
+		}
 	</style>
 </head>
 <body>
@@ -406,7 +409,6 @@
 			<p class="update-time">最后更新: <span id="current-time">正在检测...</span></p>
 		</header>
 		
-		<!-- 控制栏 -->
 		<div class="controls">
 			<div class="search-box">
 				<input type="text" id="search-input" placeholder="搜索应用名称或描述...">
@@ -420,28 +422,26 @@
 			</div>
 		</div>
 		
-		<!-- 错误提示区 -->
 		<div id="error-container" style="display: none;"></div>
 		
-		<!-- 加载动画 -->
 		<div id="loading" class="loading">
 			<div class="spinner"></div>
 			<p>正在检测GitHub仓库中的APK文件...</p>
 			<p style="font-size: 0.9em; margin-top: 10px;">正在连接到: https://github.com/ningchaojie/ningchaojie.github.io</p>
 		</div>
 		
-		<!-- 应用展示区 -->
 		<div id="apps-container" class="apps-grid" style="display: none;"></div>
 		
-		<!-- 空状态 -->
 		<div id="empty-state" class="empty-state" style="display: none;">
 			<div class="empty-icon">📱</div>
 			<h3>未检测到APK文件</h3>
 			<p>你的GitHub仓库中还没有APK文件。请上传APK文件到仓库根目录，文件名格式如：应用名称.apk</p>
 			<p>如需展示应用信息，可以上传配套图片：应用名称_描述.jpg、应用名称_基本信息.jpg、应用名称_界面_1.jpg 等</p>
+			<a href="https://github.com/ningchaojie/ningchaojie.github.io/upload" class="download-btn" style="margin-top: 20px; max-width: 300px; margin-left: auto; margin-right: auto;">
+				📤 前往GitHub上传文件
+			</a>
 		</div>
 		
-		<!-- 图片模态框 -->
 		<div id="image-modal" class="image-modal">
 			<span class="close-modal" onclick="closeImageModal()">&times;</span>
 			<div class="modal-content">
@@ -453,6 +453,7 @@
 			<p>© 2025 宁朝杰 - Android应用下载站</p>
 			<p>本页面自动检测 <a href="https://github.com/ningchaojie/ningchaojie.github.io" style="color: white; text-decoration: underline;">GitHub仓库</a> 中的APK文件并提供下载</p>
 			<p style="margin-top: 10px; font-size: 0.85em;">检测规则：自动查找所有.apk文件，并匹配对应的描述和截图图片</p>
+			<p style="margin-top: 5px; font-size: 0.85em;">当前显示: <span id="file-count">0</span> 个APK文件 | 页面版本: 2024.12.24.v2</p>
 		</footer>
 	</div>
 	
@@ -461,7 +462,7 @@
 		let allApps = [];
 		let filteredApps = [];
 		
-		// 格式化文件大小
+		// 修复时间格式化函数
 		function formatFileSize(bytes) {
 			if (bytes === 0 || bytes === undefined) return '未知大小';
 			const units = ['B', 'KB', 'MB', 'GB'];
@@ -476,28 +477,39 @@
 			return size.toFixed(2) + ' ' + units[unitIndex];
 		}
 		
-		// 格式化时间
+		// 修复时间格式化函数
 		function formatTime(dateString) {
-			const date = new Date(dateString);
-			return date.toLocaleDateString('zh-CN') + ' ' + date.toLocaleTimeString('zh-CN', { 
-				hour: '2-digit', 
-				minute: '2-digit' 
-			});
+			if (!dateString) return '未知时间';
+			
+			try {
+				const date = new Date(dateString);
+				if (isNaN(date.getTime())) {
+					return '未知时间';
+				}
+				return date.toLocaleDateString('zh-CN') + ' ' + date.toLocaleTimeString('zh-CN', { 
+					hour: '2-digit', 
+					minute: '2-digit' 
+				});
+			} catch (e) {
+				return '未知时间';
+			}
 		}
 		
-		// 从文件名提取应用名称（去掉.apk扩展名）
+		// 从文件名提取应用名称
 		function extractAppName(filename) {
-			return filename.replace('.apk', '');
+			// 去掉.apk扩展名
+			let name = filename.replace('.apk', '');
+			
+			// 尝试去掉版本号（如果有）
+			name = name.replace(/[vV]?\d+(\.\d+)*$/, '').replace(/[_\-\s]+$/, '');
+			
+			return name || filename.replace('.apk', '');
 		}
 		
 		// 获取文件名前缀（用于匹配图片）
 		function getFilePrefix(filename) {
-			// 处理多种可能的命名方式
-			const name = extractAppName(filename);
-			
-			// 如果文件名包含版本号，可能需要特殊处理
-			// 这里简单返回去掉.apk的名称
-			return name;
+			// 对于中文文件名，直接返回去掉.apk的部分
+			return filename.replace('.apk', '');
 		}
 		
 		// 显示图片模态框
@@ -508,7 +520,6 @@
 			modalImage.src = imageUrl;
 			modal.style.display = 'flex';
 			
-			// 点击模态框背景关闭
 			modal.onclick = function(event) {
 				if (event.target === modal) {
 					closeImageModal();
@@ -547,7 +558,6 @@
 			const emptyState = document.getElementById('empty-state');
 			const loading = document.getElementById('loading');
 			
-			// 隐藏加载动画
 			loading.style.display = 'none';
 			
 			if (filteredApps.length === 0) {
@@ -559,25 +569,34 @@
 			emptyState.style.display = 'none';
 			container.style.display = 'grid';
 			
-			// 清空容器
 			container.innerHTML = '';
 			
-			// 更新统计信息
 			document.getElementById('total-apps').textContent = `应用数量: ${filteredApps.length}`;
+			document.getElementById('file-count').textContent = filteredApps.length;
 			
-			// 计算总大小
 			const totalSize = filteredApps.reduce((sum, app) => {
 				return sum + (app.size || 0);
 			}, 0);
 			
 			document.getElementById('total-size').textContent = `总大小: ${formatFileSize(totalSize)}`;
 			
-			// 生成应用卡片
+			// 按文件名排序，中文优先
+			filteredApps.sort((a, b) => {
+				// 中文文件名排在前面
+				const isChineseA = /[\u4e00-\u9fff]/.test(a.filename);
+				const isChineseB = /[\u4e00-\u9fff]/.test(b.filename);
+				
+				if (isChineseA && !isChineseB) return -1;
+				if (!isChineseA && isChineseB) return 1;
+				
+				// 都中文或都英文，按字母顺序
+				return a.filename.localeCompare(b.filename, 'zh-CN');
+			});
+			
 			filteredApps.forEach(app => {
 				const appCard = document.createElement('div');
 				appCard.className = 'app-card';
 				
-				// 构建图片HTML
 				let infoImageHtml = '';
 				let descImageHtml = '';
 				let screenshotsHtml = '';
@@ -648,10 +667,15 @@
 							<span class="file-info-label">上传时间:</span>
 							<span class="file-info-value">${formatTime(app.updated)}</span>
 						</div>
+						<div class="file-info-row">
+							<span class="file-info-label">GitHub链接:</span>
+							<a href="${app.html_url}" target="_blank" class="github-link">
+								🔗 查看文件
+							</a>
+						</div>
 					</div>
 				`;
 				
-				// 构建完整卡片
 				appCard.innerHTML = `
 					<div class="app-header">
 						<div class="app-name">${app.name}</div>
@@ -695,25 +719,30 @@
 		// 下载跟踪
 		function trackDownload(filename) {
 			console.log(`开始下载: ${filename}`);
-			// 这里可以添加下载统计代码
+			
+			// 可以在这里添加下载统计
+			try {
+				const downloads = JSON.parse(localStorage.getItem('download_stats') || '{}');
+				downloads[filename] = (downloads[filename] || 0) + 1;
+				localStorage.setItem('download_stats', JSON.stringify(downloads));
+			} catch (e) {
+				console.log('下载统计保存失败:', e);
+			}
 		}
 		
 		// 主函数：从GitHub仓库获取文件
 		async function loadAppsFromGitHub() {
 			try {
-				// 更新当前时间
 				document.getElementById('current-time').textContent = new Date().toLocaleString('zh-CN');
 				
-				// 你的GitHub用户名和仓库名
 				const username = 'ningchaojie';
 				const repo = 'ningchaojie.github.io';
 				
-				// GitHub API URL
+				// 使用代理或直接访问GitHub API
 				const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/`;
 				
 				console.log('正在请求GitHub API:', apiUrl);
 				
-				// 获取仓库文件列表
 				const response = await fetch(apiUrl);
 				
 				if (!response.ok) {
@@ -728,7 +757,6 @@
 				
 				console.log(`获取到${files.length}个文件`);
 				
-				// 筛选APK文件
 				const apkFiles = files.filter(file => 
 					file.type === 'file' && 
 					file.name.toLowerCase().endsWith('.apk')
@@ -743,8 +771,8 @@
 					return;
 				}
 				
-				// 为每个APK文件查找相关图片
 				const apps = [];
+				let latestUpdate = null;
 				
 				for (const apkFile of apkFiles) {
 					const appName = extractAppName(apkFile.name);
@@ -770,23 +798,30 @@
 							return false;
 						}
 						
-						// 匹配 前缀_界面_数字.jpg
 						const pattern = new RegExp(`^${prefix}_界面_\\d+\\.jpg$`, 'i');
 						return pattern.test(file.name);
 					}).sort((a, b) => {
-						// 按数字排序
 						const numA = parseInt(a.name.match(/_界面_(\d+)/i)?.[1] || 0);
 						const numB = parseInt(b.name.match(/_界面_(\d+)/i)?.[1] || 0);
 						return numA - numB;
 					});
 					
-					// 添加到应用列表
+					// 更新时间处理
+					let updatedTime = apkFile.updated_at || apkFile.created_at;
+					if (updatedTime) {
+						const updateDate = new Date(updatedTime);
+						if (!latestUpdate || updateDate > latestUpdate) {
+							latestUpdate = updateDate;
+						}
+					}
+					
 					apps.push({
 						name: appName,
 						filename: apkFile.name,
 						size: apkFile.size,
 						download_url: apkFile.download_url,
-						updated: apkFile.updated_at || apkFile.created_at,
+						html_url: apkFile.html_url,
+						updated: updatedTime,
 						infoImage: infoImage,
 						descImage: descImage,
 						screenshots: screenshots
@@ -795,22 +830,16 @@
 					console.log(`  - 找到 ${screenshots.length} 张截图`);
 				}
 				
-				// 按文件名排序
-				apps.sort((a, b) => a.filename.localeCompare(b.filename));
-				
-				// 更新全局变量
 				allApps = apps;
 				filteredApps = [...apps];
 				
 				// 更新最后更新时间
-				const latestUpdate = apps.reduce((latest, app) => {
-					const appTime = new Date(app.updated);
-					return appTime > latest ? appTime : latest;
-				}, new Date(0));
+				if (latestUpdate) {
+					document.getElementById('last-update').textContent = `最后更新: ${formatTime(latestUpdate.toISOString())}`;
+				} else {
+					document.getElementById('last-update').textContent = `最后更新: ${new Date().toLocaleDateString('zh-CN')}`;
+				}
 				
-				document.getElementById('last-update').textContent = `最后更新: ${formatTime(latestUpdate)}`;
-				
-				// 显示应用
 				displayApps();
 				
 			} catch (error) {
@@ -821,25 +850,26 @@
 		
 		// 页面加载完成后执行
 		window.addEventListener('DOMContentLoaded', () => {
-			// 设置当前时间
 			document.getElementById('current-time').textContent = new Date().toLocaleString('zh-CN');
 			
-			// 加载应用
 			loadAppsFromGitHub();
 			
-			// 监听搜索输入
 			document.getElementById('search-input').addEventListener('keyup', (event) => {
 				if (event.key === 'Enter') {
 					searchApps();
 				}
 			});
 			
-			// 监听模态框ESC键关闭
 			document.addEventListener('keydown', (event) => {
 				if (event.key === 'Escape') {
 					closeImageModal();
 				}
 			});
+			
+			// 添加自动刷新功能（每小时刷新一次）
+			setInterval(() => {
+				loadAppsFromGitHub();
+			}, 3600000); // 1小时
 		});
 	</script>
 </body>
