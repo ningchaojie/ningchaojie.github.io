@@ -3,468 +3,1815 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>宁朝杰的Android应用下载站</title>
+	<title>宁朝杰 - 应用与文档下载站</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 	<style>
+		:root {
+			--primary: #667eea;
+			--primary-dark: #5a67d8;
+			--secondary: #764ba2;
+			--success: #4CAF50;
+			--success-dark: #45a049;
+			--light: #f8f9fa;
+			--dark: #343a40;
+			--gray: #6c757d;
+			--light-gray: #e9ecef;
+			--border-radius: 12px;
+			--shadow: 0 8px 30px rgba(0,0,0,0.08);
+			--transition: all 0.3s ease;
+		}
+		
 		* {
 			margin: 0;
 			padding: 0;
 			box-sizing: border-box;
-			font-family: 'Microsoft YaHei', Arial, sans-serif;
 		}
 		
 		body {
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			color: #333;
+			font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+			background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+			color: var(--dark);
+			line-height: 1.6;
 			min-height: 100vh;
 			padding: 20px;
 		}
 		
 		.container {
-			max-width: 1200px;
+			max-width: 1400px;
 			margin: 0 auto;
 		}
 		
+		/* 头部样式 */
 		header {
 			text-align: center;
 			padding: 30px 20px;
+			background: linear-gradient(135deg, var(--primary), var(--secondary));
 			color: white;
-			margin-bottom: 20px;
+			border-radius: var(--border-radius);
+			margin-bottom: 30px;
+			box-shadow: var(--shadow);
+		}
+		
+		.logo {
+			font-size: 2.8rem;
+			margin-bottom: 15px;
+			display: inline-block;
+			background: rgba(255,255,255,0.1);
+			width: 80px;
+			height: 80px;
+			line-height: 80px;
+			border-radius: 50%;
 		}
 		
 		h1 {
-			font-size: 2.5em;
+			font-size: 2.2rem;
 			margin-bottom: 10px;
-			text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+			font-weight: 700;
 		}
 		
 		.subtitle {
-			font-size: 1.2em;
+			font-size: 1.1rem;
 			opacity: 0.9;
-			margin-bottom: 5px;
+			max-width: 600px;
+			margin: 0 auto 20px;
 		}
 		
-		.update-time {
-			margin-top: 15px;
-			font-size: 0.9em;
-			opacity: 0.8;
-		}
-		
+		/* 控制栏样式 */
 		.controls {
-			background: white;
-			padding: 15px;
-			border-radius: 10px;
-			margin-bottom: 20px;
-			box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 			display: flex;
-			justify-content: space-between;
-			align-items: center;
 			flex-wrap: wrap;
-			gap: 10px;
+			gap: 15px;
+			background: white;
+			padding: 20px;
+			border-radius: var(--border-radius);
+			margin-bottom: 25px;
+			box-shadow: var(--shadow);
+			align-items: center;
 		}
 		
 		.search-box {
-			display: flex;
 			flex: 1;
-			min-width: 200px;
+			min-width: 250px;
+			position: relative;
 		}
 		
 		.search-box input {
-			flex: 1;
-			padding: 10px 15px;
-			border: 2px solid #667eea;
-			border-radius: 25px 0 0 25px;
-			font-size: 1em;
+			width: 100%;
+			padding: 12px 20px 12px 45px;
+			border: 2px solid var(--light-gray);
+			border-radius: 30px;
+			font-size: 1rem;
+			transition: var(--transition);
 		}
 		
-		.search-btn {
-			background: #667eea;
-			color: white;
-			border: none;
-			padding: 10px 20px;
-			border-radius: 0 25px 25px 0;
+		.search-box input:focus {
+			outline: none;
+			border-color: var(--primary);
+			box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+		}
+		
+		.search-icon {
+			position: absolute;
+			left: 15px;
+			top: 50%;
+			transform: translateY(-50%);
+			color: var(--gray);
+			font-size: 1.2rem;
+		}
+		
+		.filter-buttons {
+			display: flex;
+			gap: 10px;
+			flex-wrap: wrap;
+		}
+		
+		.filter-btn {
+			padding: 10px 18px;
+			border: 2px solid var(--light-gray);
+			background: white;
+			border-radius: 30px;
 			cursor: pointer;
+			font-weight: 500;
+			transition: var(--transition);
+		}
+		
+		.filter-btn:hover {
+			border-color: var(--primary);
+			color: var(--primary);
+		}
+		
+		.filter-btn.active {
+			background: var(--primary);
+			color: white;
+			border-color: var(--primary);
 		}
 		
 		.stats {
 			display: flex;
 			gap: 15px;
-			font-size: 0.9em;
+			margin-left: auto;
+			flex-wrap: wrap;
 		}
 		
 		.stat-item {
-			background: #f8f9fa;
-			padding: 5px 10px;
-			border-radius: 15px;
-			color: #666;
+			background: var(--light);
+			padding: 8px 15px;
+			border-radius: 20px;
+			font-size: 0.9rem;
+			color: var(--dark);
+			display: flex;
+			align-items: center;
+			gap: 5px;
 		}
 		
-		.apps-grid {
+		/* 加载动画 */
+		.loading {
+			text-align: center;
+			padding: 60px 20px;
+		}
+		
+		.spinner {
+			width: 60px;
+			height: 60px;
+			border: 5px solid rgba(102, 126, 234, 0.2);
+			border-top-color: var(--primary);
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+			margin: 0 auto 20px;
+		}
+		
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+		
+		/* 文件卡片网格 */
+		.files-grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+			grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
 			gap: 25px;
 			margin-bottom: 40px;
 		}
 		
-		.app-card {
+		@media (max-width: 768px) {
+			.files-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+		
+		/* 文件卡片样式 */
+		.file-card {
 			background: white;
-			border-radius: 15px;
+			border-radius: var(--border-radius);
 			overflow: hidden;
-			box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-			transition: transform 0.3s, box-shadow 0.3s;
+			box-shadow: var(--shadow);
+			transition: var(--transition);
+			height: 100%;
+			display: flex;
+			flex-direction: column;
 		}
 		
-		.app-card:hover {
-			transform: translateY(-5px);
-			box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+		.file-card:hover {
+			transform: translateY(-8px);
+			box-shadow: 0 15px 40px rgba(0,0,0,0.12);
 		}
 		
-		.app-header {
-			background: linear-gradient(135deg, #667eea, #764ba2);
+		.card-header {
+			background: linear-gradient(135deg, var(--primary), var(--secondary));
 			color: white;
 			padding: 20px;
 			position: relative;
 		}
 		
-		.app-name {
-			font-size: 1.5em;
-			font-weight: bold;
-			margin-bottom: 5px;
-			word-break: break-word;
-		}
-		
-		.app-filename {
-			font-size: 0.85em;
-			opacity: 0.9;
-			margin-bottom: 10px;
-		}
-		
-		.app-size {
+		.file-type {
 			position: absolute;
 			top: 15px;
 			right: 15px;
 			background: rgba(255,255,255,0.2);
-			padding: 3px 10px;
-			border-radius: 12px;
-			font-size: 0.85em;
+			padding: 5px 12px;
+			border-radius: 20px;
+			font-size: 0.85rem;
+			font-weight: 500;
 		}
 		
-		.app-content {
+		.file-name {
+			font-size: 1.4rem;
+			font-weight: 700;
+			margin-bottom: 8px;
+			word-break: break-word;
+		}
+		
+		.file-filename {
+			font-size: 0.9rem;
+			opacity: 0.9;
+		}
+		
+		.card-body {
 			padding: 20px;
+			flex-grow: 1;
+			display: flex;
+			flex-direction: column;
 		}
 		
-		.image-section {
+		.file-meta {
+			background: var(--light);
+			padding: 15px;
+			border-radius: 10px;
 			margin-bottom: 20px;
 		}
 		
+		.meta-row {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 8px;
+			font-size: 0.95rem;
+		}
+		
+		.meta-label {
+			color: var(--gray);
+			font-weight: 500;
+		}
+		
+		.meta-value {
+			font-weight: 600;
+		}
+		
+		/* 图片展示区 */
+		.images-section {
+			margin-top: 15px;
+		}
+		
 		.section-title {
+			font-size: 1.1rem;
+			font-weight: 600;
+			margin-bottom: 12px;
+			color: var(--primary);
 			display: flex;
 			align-items: center;
-			margin-bottom: 10px;
-			color: #667eea;
-			font-size: 1.1em;
+			gap: 8px;
 		}
 		
-		.section-title i {
-			margin-right: 8px;
+		/* 横向滚动容器 */
+		.scroll-container {
+			position: relative;
+			margin-bottom: 20px;
 		}
 		
-		.info-image, .desc-image {
-			width: 100%;
-			border-radius: 10px;
-			margin-bottom: 10px;
-			border: 1px solid #eee;
-			cursor: pointer;
-			transition: transform 0.3s;
-		}
-		
-		.info-image:hover, .desc-image:hover {
-			transform: scale(1.02);
-		}
-		
-		.screenshots-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+		.scroll-wrapper {
+			display: flex;
+			overflow-x: auto;
+			scroll-behavior: smooth;
+			padding: 10px 5px;
 			gap: 10px;
-			margin-top: 10px;
+			scrollbar-width: none; /* Firefox */
+			-ms-overflow-style: none; /* IE/Edge */
 		}
 		
-		.screenshot {
-			width: 100%;
-			height: 120px;
+		.scroll-wrapper::-webkit-scrollbar {
+			display: none; /* Chrome/Safari */
+		}
+		
+		.scroll-content {
+			display: flex;
+			gap: 10px;
+		}
+		
+		.scroll-image {
+			flex: 0 0 auto;
+			width: 180px;
+			height: 135px;
 			object-fit: cover;
 			border-radius: 8px;
-			border: 1px solid #eee;
 			cursor: pointer;
-			transition: transform 0.3s;
+			transition: var(--transition);
+			border: 2px solid transparent;
 		}
 		
-		.screenshot:hover {
-			transform: scale(1.05);
+		.scroll-image:hover {
+			transform: scale(1.03);
+			border-color: var(--primary);
+			box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 		}
 		
+		.scroll-btn {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			background: rgba(255,255,255,0.9);
+			border: none;
+			width: 36px;
+			height: 36px;
+			border-radius: 50%;
+			cursor: pointer;
+			font-size: 1.2rem;
+			color: var(--primary);
+			box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+			z-index: 10;
+			transition: var(--transition);
+		}
+		
+		.scroll-btn:hover {
+			background: white;
+			box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+			transform: translateY(-50%) scale(1.1);
+		}
+		
+		.scroll-left {
+			left: 10px;
+		}
+		
+		.scroll-right {
+			right: 10px;
+		}
+		
+		.scroll-btn.hidden {
+			display: none;
+		}
+		
+		/* 下载按钮 */
 		.download-btn {
 			display: block;
 			width: 100%;
-			background: linear-gradient(135deg, #4CAF50, #45a049);
+			background: linear-gradient(135deg, var(--success), var(--success-dark));
 			color: white;
 			text-align: center;
 			padding: 15px;
 			border-radius: 10px;
 			text-decoration: none;
-			font-weight: bold;
-			font-size: 1.1em;
+			font-weight: 700;
+			font-size: 1.1rem;
 			margin-top: 20px;
-			transition: all 0.3s;
+			transition: var(--transition);
 			border: none;
 			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
 		}
 		
 		.download-btn:hover {
-			background: linear-gradient(135deg, #45a049, #3d8b40);
+			background: linear-gradient(135deg, var(--success-dark), #3d8b40);
 			transform: translateY(-2px);
-			box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+			box-shadow: 0 7px 20px rgba(76, 175, 80, 0.3);
 		}
 		
-		.download-btn i {
+		.download-count {
+			margin-left: auto;
+			background: rgba(255,255,255,0.2);
+			padding: 3px 10px;
+			border-radius: 15px;
+			font-size: 0.9rem;
+		}
+		
+		/* 空状态 */
+		.empty-state {
+			text-align: center;
+			padding: 80px 20px;
+			background: white;
+			border-radius: var(--border-radius);
+			margin-bottom: 40px;
+			box-shadow: var(--shadow);
+		}
+		
+		.empty-icon {
+			font-size: 4rem;
+			color: var(--light-gray);
+			margin-bottom: 20px;
+		}
+		
+		.empty-state h3 {
+			color: var(--dark);
+			margin-bottom: 15px;
+			font-size: 1.5rem;
+		}
+		
+		.empty-state p {
+			color: var(--gray);
+			max-width: 500px;
+			margin: 0 auto 25px;
+			line-height: 1.7;
+		}
+		
+		/* 页脚 */
+		footer {
+			text-align: center;
+			padding: 30px 0;
+			color: var(--dark);
+			opacity: 0.8;
+			font-size: 0.95rem;
+		}
+		
+		footer a {
+			color: var(--primary);
+			text-decoration: none;
+		}
+		
+		footer a:hover {
+			text-decoration: underline;
+		}
+		
+		/* 错误提示 */
+		.error-message {
+			background: #ffebee;
+			color: #c62828;
+			padding: 20px;
+			border-radius: var(--border-radius);
+			margin-bottom: 25px;
+			border-left: 5px solid #c62828;
+			display: none;
+		}
+		
+		.error-icon {
+			margin-right: 10px;
+			font-size: 1.2rem;
+		}
+		
+		/* 懒加载图片样式 */
+		.lazy-image {
+			background: var(--light-gray);
+			border-radius: 8px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: var(--gray);
+			font-size: 0.9rem;
+		}
+		
+		/* 更新信息 */
+		.update-info {
+			text-align: center;
+			color: var(--gray);
+			font-size: 0.9rem;
+			margin-top: 15px;
+		}
+		
+		/* 文件图标 */
+		.file-icon {
 			margin-right: 8px;
+			font-size: 1.1rem;
 		}
 		
-		.image-modal {
+		/* 文档卡片特殊样式 */
+		.document-card .card-header {
+			background: linear-gradient(135deg, #3498db, #2980b9);
+		}
+		
+		.document-card .file-type {
+			background: rgba(255,255,255,0.25);
+		}
+		
+		/* 工具提示 */
+		.tooltip {
+			position: relative;
+			display: inline-block;
+		}
+		
+		.tooltip .tooltiptext {
+			visibility: hidden;
+			width: 200px;
+			background-color: var(--dark);
+			color: white;
+			text-align: center;
+			border-radius: 6px;
+			padding: 8px;
+			position: absolute;
+			z-index: 1;
+			bottom: 125%;
+			left: 50%;
+			transform: translateX(-50%);
+			opacity: 0;
+			transition: opacity 0.3s;
+			font-size: 0.85rem;
+			font-weight: normal;
+		}
+		
+		.tooltip .tooltiptext::after {
+			content: "";
+			position: absolute;
+			top: 100%;
+			left: 50%;
+			margin-left: -5px;
+			border-width: 5px;
+			border-style: solid;
+			border-color: var(--dark) transparent transparent transparent;
+		}
+		
+		.tooltip:hover .tooltiptext {
+			visibility: visible;
+			opacity: 1;
+		}
+		
+		/* ====== 图片浏览器模态框样式 ====== */
+		.image-browser-modal {
 			display: none;
 			position: fixed;
 			top: 0;
 			left: 0;
 			width: 100%;
 			height: 100%;
-			background: rgba(0,0,0,0.9);
-			z-index: 1000;
+			background: rgba(0, 0, 0, 0.95);
+			z-index: 2000;
+			flex-direction: column;
+			backdrop-filter: blur(5px);
+		}
+		
+		.modal-header {
+			padding: 15px 20px;
+			background: rgba(0, 0, 0, 0.8);
+			color: white;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		}
+		
+		.modal-title {
+			font-size: 1.2rem;
+			font-weight: 600;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+		
+		.modal-body {
+			flex: 1;
+			display: flex;
 			align-items: center;
 			justify-content: center;
+			position: relative;
 			padding: 20px;
+			overflow: hidden;
 		}
 		
-		.modal-content {
-			max-width: 90%;
-			max-height: 90%;
+		.image-container {
+			max-width: 95%;
+			max-height: 85%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: relative;
 		}
 		
-		.modal-image {
+		.browser-image {
 			max-width: 100%;
-			max-height: 90vh;
-			border-radius: 10px;
+			max-height: 100%;
+			object-fit: contain;
+			border-radius: 4px;
+			box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+		
+		.browser-image.loaded {
+			opacity: 1;
+		}
+		
+		.nav-btn {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			background: rgba(255, 255, 255, 0.15);
+			color: white;
+			border: none;
+			width: 56px;
+			height: 56px;
+			border-radius: 50%;
+			font-size: 28px;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: all 0.3s;
+			z-index: 10;
+			backdrop-filter: blur(10px);
+			border: 1px solid rgba(255, 255, 255, 0.2);
+		}
+		
+		.nav-btn:hover {
+			background: rgba(255, 255, 255, 0.25);
+			transform: translateY(-50%) scale(1.1);
+			border-color: rgba(255, 255, 255, 0.3);
+		}
+		
+		.nav-btn:active {
+			transform: translateY(-50%) scale(0.95);
+		}
+		
+		.prev-btn {
+			left: 20px;
+		}
+		
+		.next-btn {
+			right: 20px;
+		}
+		
+		.nav-btn.hidden {
+			display: none;
+		}
+		
+		.modal-footer {
+			padding: 15px 20px;
+			background: rgba(0, 0, 0, 0.8);
+			color: white;
+			border-top: 1px solid rgba(255, 255, 255, 0.1);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		
+		.image-counter {
+			font-size: 1rem;
+			font-weight: 600;
+			background: rgba(255, 255, 255, 0.1);
+			padding: 5px 15px;
+			border-radius: 20px;
+		}
+		
+		.image-info {
+			flex: 1;
+			text-align: center;
+			font-size: 0.95rem;
+			padding: 0 20px;
+			opacity: 0.9;
+		}
+		
+		.image-actions {
+			display: flex;
+			gap: 10px;
+		}
+		
+		.action-btn {
+			background: rgba(102, 126, 234, 0.8);
+			color: white;
+			border: none;
+			padding: 8px 16px;
+			border-radius: 6px;
+			cursor: pointer;
+			font-size: 0.95rem;
+			transition: all 0.3s;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+		
+		.action-btn:hover {
+			background: rgba(102, 126, 234, 1);
+			transform: translateY(-2px);
 		}
 		
 		.close-modal {
-			position: absolute;
-			top: 20px;
-			right: 30px;
+			background: none;
+			border: none;
 			color: white;
-			font-size: 40px;
+			font-size: 32px;
 			cursor: pointer;
-			z-index: 1001;
+			padding: 0;
+			width: 40px;
+			height: 40px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: color 0.3s;
 		}
 		
-		.empty-state {
-			text-align: center;
-			padding: 60px 20px;
-			background: white;
-			border-radius: 15px;
-			margin-bottom: 40px;
+		.close-modal:hover {
+			color: #ff6b6b;
 		}
 		
-		.empty-icon {
-			font-size: 60px;
-			margin-bottom: 20px;
-			opacity: 0.5;
-		}
-		
-		.empty-state h3 {
-			color: #666;
-			margin-bottom: 10px;
-		}
-		
-		.empty-state p {
-			color: #888;
-			max-width: 500px;
-			margin: 0 auto 20px;
-		}
-		
-		.loading {
-			text-align: center;
-			padding: 40px;
-			color: white;
-			font-size: 1.2em;
-		}
-		
-		.spinner {
-			border: 5px solid rgba(255,255,255,0.3);
-			border-top: 5px solid white;
-			border-radius: 50%;
+		/* 加载指示器 */
+		.loader {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
 			width: 50px;
 			height: 50px;
+			border: 3px solid rgba(255, 255, 255, 0.3);
+			border-top-color: white;
+			border-radius: 50%;
 			animation: spin 1s linear infinite;
-			margin: 0 auto 20px;
 		}
 		
-		@keyframes spin {
-			0% { transform: rotate(0deg); }
-			100% { transform: rotate(360deg); }
-		}
-		
-		footer {
-			text-align: center;
-			padding: 30px 0;
-			color: white;
-			opacity: 0.8;
-			font-size: 0.9em;
-		}
-		
+		/* 响应式调整 */
 		@media (max-width: 768px) {
-			.apps-grid {
-				grid-template-columns: 1fr;
+			.nav-btn {
+				width: 46px;
+				height: 46px;
+				font-size: 24px;
 			}
 			
-			.controls {
+			.prev-btn {
+				left: 10px;
+			}
+			
+			.next-btn {
+				right: 10px;
+			}
+			
+			.modal-footer {
 				flex-direction: column;
-				align-items: stretch;
+				gap: 15px;
+				text-align: center;
 			}
 			
-			.search-box {
+			.image-info {
+				order: -1;
 				width: 100%;
-				margin-bottom: 10px;
+				padding: 0;
 			}
 			
-			.stats {
+			.image-actions {
+				width: 100%;
 				justify-content: center;
-				width: 100%;
 			}
 			
-			h1 {
-				font-size: 2em;
-			}
-			
-			.screenshots-grid {
-				grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-			}
-			
-			.screenshot {
-				height: 100px;
+			.modal-title {
+				font-size: 1rem;
 			}
 		}
 		
-		.error-message {
-			background: #ffebee;
-			color: #c62828;
-			padding: 15px;
-			border-radius: 10px;
-			margin-bottom: 20px;
-			border-left: 4px solid #c62828;
+		/* 触摸提示 */
+		.touch-hint {
+			position: absolute;
+			bottom: 30px;
+			left: 50%;
+			transform: translateX(-50%);
+			background: rgba(0, 0, 0, 0.6);
+			color: white;
+			padding: 8px 15px;
+			border-radius: 20px;
+			font-size: 0.85rem;
+			opacity: 0;
+			transition: opacity 0.3s;
+			pointer-events: none;
 		}
 		
-		.error-message i {
-			margin-right: 10px;
-		}
-		
-		.file-info {
-			background: #f8f9fa;
-			padding: 15px;
-			border-radius: 10px;
-			margin-bottom: 15px;
-			font-size: 0.9em;
-		}
-		
-		.file-info-row {
-			display: flex;
-			justify-content: space-between;
-			margin-bottom: 5px;
-		}
-		
-		.file-info-label {
-			color: #666;
-		}
-		
-		.file-info-value {
-			font-weight: 500;
-		}
-		
-		.github-link {
-			text-decoration: none;
-			color: #667eea;
-			display: inline-flex;
-			align-items: center;
-			gap: 5px;
-			margin-top: 5px;
-		}
-		
-		.github-link:hover {
-			text-decoration: underline;
+		.touch-hint.show {
+			opacity: 1;
 		}
 	</style>
 </head>
 <body>
 	<div class="container">
+		<!-- 头部 -->
 		<header>
-			<h1>宁朝杰的Android应用下载站</h1>
-			<p class="subtitle">自动检测GitHub仓库中的APK文件，提供一键下载</p>
-			<p class="update-time">最后更新: <span id="current-time">正在检测...</span></p>
+			<div class="logo">📱</div>
+			<h1>宁朝杰的下载站</h1>
+			<p class="subtitle">自动检测GitHub仓库中的APK应用与文档，提供一键下载与图片预览</p>
+			<div class="update-info">
+				<span id="current-time">正在连接...</span> | 
+				<span id="github-status">GitHub API正常</span>
+			</div>
 		</header>
 		
+		<!-- 控制栏 -->
 		<div class="controls">
 			<div class="search-box">
-				<input type="text" id="search-input" placeholder="搜索应用名称或描述...">
-				<button class="search-btn" onclick="searchApps()">🔍 搜索</button>
+				<i class="fas fa-search search-icon"></i>
+				<input type="text" id="search-input" placeholder="搜索文件名称或描述...">
+			</div>
+			
+			<div class="filter-buttons">
+				<button class="filter-btn active" data-filter="all">全部文件</button>
+				<button class="filter-btn" data-filter="apk">APK应用</button>
+				<button class="filter-btn" data-filter="document">文档</button>
 			</div>
 			
 			<div class="stats">
-				<div class="stat-item" id="total-apps">应用数量: 0</div>
-				<div class="stat-item" id="total-size">总大小: 0 MB</div>
-				<div class="stat-item" id="last-update">更新中...</div>
+				<div class="stat-item">
+					<i class="fas fa-file-alt"></i>
+					<span id="total-files">0个文件</span>
+				</div>
+				<div class="stat-item">
+					<i class="fas fa-download"></i>
+					<span id="total-downloads">0次下载</span>
+				</div>
+				<div class="stat-item">
+					<i class="fas fa-sync-alt"></i>
+					<span id="last-update">更新中...</span>
+				</div>
 			</div>
 		</div>
 		
-		<div id="error-container" style="display: none;"></div>
-		
-		<div id="loading" class="loading">
-			<div class="spinner"></div>
-			<p>正在检测GitHub仓库中的APK文件...</p>
-			<p style="font-size: 0.9em; margin-top: 10px;">正在连接到: https://github.com/ningchaojie/ningchaojie.github.io</p>
+		<!-- 错误提示 -->
+		<div id="error-container" class="error-message">
+			<i class="fas fa-exclamation-triangle error-icon"></i>
+			<span id="error-text">发生错误，请稍后重试</span>
 		</div>
 		
-		<div id="apps-container" class="apps-grid" style="display: none;"></div>
+		<!-- 加载动画 -->
+		<div id="loading" class="loading">
+			<div class="spinner"></div>
+			<p>正在从GitHub仓库加载文件列表...</p>
+			<p style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+				仓库: <strong>ningchaojie/ningchaojie.github.io</strong>
+			</p>
+		</div>
 		
+		<!-- 文件展示区 -->
+		<div id="files-container" class="files-grid" style="display: none;"></div>
+		
+		<!-- 空状态 -->
 		<div id="empty-state" class="empty-state" style="display: none;">
-			<div class="empty-icon">📱</div>
-			<h3>未检测到APK文件</h3>
-			<p>你的GitHub仓库中还没有APK文件。请上传APK文件到仓库根目录，文件名格式如：应用名称.apk</p>
-			<p>如需展示应用信息，可以上传配套图片：应用名称_描述.jpg、应用名称_基本信息.jpg、应用名称_界面_1.jpg 等</p>
-			<a href="https://github.com/ningchaojie/ningchaojie.github.io/upload" class="download-btn" style="margin-top: 20px; max-width: 300px; margin-left: auto; margin-right: auto;">
-				📤 前往GitHub上传文件
+			<div class="empty-icon">📁</div>
+			<h3>未找到任何文件</h3>
+			<p>你的GitHub仓库中还没有APK或文档文件，或者当前筛选条件没有匹配的文件。</p>
+			<p>请上传文件到仓库根目录，文件名格式参考：</p>
+			<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; max-width: 400px; margin: 20px auto; text-align: left;">
+				<div><strong>APK文件:</strong> 应用名.apk</div>
+				<div><strong>描述图片:</strong> 应用名_描述_1.jpg</div>
+				<div><strong>界面截图:</strong> 应用名_界面_1.jpg</div>
+				<div><strong>文档文件:</strong> 文档名.pdf</div>
+				<div><strong>引言图片:</strong> 文档名_引言_1.jpg</div>
+				<div><strong>目录图片:</strong> 文档名_目录_1.jpg</div>
+			</div>
+			<a href="https://github.com/ningchaojie/ningchaojie.github.io/upload" 
+			   class="download-btn" style="max-width: 300px; margin: 0 auto;">
+				<i class="fas fa-upload"></i> 前往GitHub上传文件
 			</a>
 		</div>
 		
-		<div id="image-modal" class="image-modal">
-			<span class="close-modal" onclick="closeImageModal()">&times;</span>
-			<div class="modal-content">
-				<img id="modal-image" class="modal-image" src="" alt="预览图片">
+		<!-- 图片浏览器模态框 -->
+		<div id="image-browser-modal" class="image-browser-modal">
+			<div class="modal-header">
+				<div class="modal-title">
+					<i class="fas fa-images"></i>
+					<span id="modal-title-text">图片浏览器</span>
+				</div>
+				<button class="close-modal" id="close-browser-modal">&times;</button>
+			</div>
+			
+			<div class="modal-body">
+				<!-- 加载指示器 -->
+				<div class="loader" id="image-loader"></div>
+				
+				<!-- 图片显示区域 -->
+				<div class="image-container">
+					<img id="browser-image" class="browser-image" src="" alt="">
+				</div>
+				
+				<!-- 导航按钮 -->
+				<button class="nav-btn prev-btn" id="prev-image-btn">
+					<i class="fas fa-chevron-left"></i>
+				</button>
+				
+				<button class="nav-btn next-btn" id="next-image-btn">
+					<i class="fas fa-chevron-right"></i>
+				</button>
+				
+				<!-- 触摸提示 -->
+				<div class="touch-hint" id="touch-hint">左右滑动切换图片</div>
+			</div>
+			
+			<div class="modal-footer">
+				<div class="image-counter">
+					<span id="current-image-index">1</span> / <span id="total-images-count">1</span>
+				</div>
+				
+				<div class="image-info" id="image-info-text">
+					图片信息
+				</div>
+				
+				<div class="image-actions">
+					<button class="action-btn" id="download-image-btn">
+						<i class="fas fa-download"></i> 下载
+					</button>
+				</div>
 			</div>
 		</div>
 		
+		<!-- 页脚 -->
 		<footer>
-			<p>© 2025 宁朝杰 - Android应用下载站</p>
-			<p>本页面自动检测 <a href="https://github.com/ningchaojie/ningchaojie.github.io" style="color: white; text-decoration: underline;">GitHub仓库</a> 中的APK文件并提供下载</p>
-			<p style="margin-top: 10px; font-size: 0.85em;">检测规则：自动查找所有.apk文件，并匹配对应的描述和截图图片</p>
-			<p style="margin-top: 5px; font-size: 0.85em;">当前显示: <span id="file-count">0</span> 个APK文件 | 页面版本: 2024.12.24.v2</p>
+			<p>© 2024 宁朝杰 | 本页面自动检测 <a href="https://github.com/ningchaojie/ningchaojie.github.io" target="_blank">GitHub仓库</a> 中的文件</p>
+			<p style="margin-top: 10px; font-size: 0.85rem;">
+				文件命名规则: 名称_类型_序号.扩展名 | 支持类型: 描述, 界面, 引言, 目录
+			</p>
+			<p style="margin-top: 5px; font-size: 0.85rem;">
+				页面版本: 3.0 | 专业图片浏览器 | 最后更新: 2024-12-25
+			</p>
 		</footer>
 	</div>
-	
+
 	<script>
 		// 全局变量
-		let allApps = [];
-		let filteredApps = [];
+		let allFilesData = [];
+		let filteredFilesData = [];
+		let currentFilter = 'all';
+		let downloadStats = {};
 		
-		// 修复时间格式化函数
+		// 图片浏览器状态管理
+		const imageBrowser = {
+			isOpen: false,
+			scrollPosition: 0,
+			currentGroupIndex: -1,
+			currentImageType: '',
+			currentImageIndex: 0,
+			images: [],
+			touchStartX: 0,
+			touchStartY: 0
+		};
+		
+		// 页面加载完成后初始化
+		document.addEventListener('DOMContentLoaded', function() {
+			// 设置当前时间
+			document.getElementById('current-time').textContent = new Date().toLocaleString('zh-CN');
+			
+			// 加载下载统计
+			loadDownloadStats();
+			
+			// 从GitHub加载文件
+			loadFilesFromGitHub();
+			
+			// 绑定事件监听器
+			bindEventListeners();
+			
+			// 每30分钟自动刷新一次
+			setInterval(loadFilesFromGitHub, 30 * 60 * 1000);
+		});
+		
+		// 绑定事件监听器
+		function bindEventListeners() {
+			// 搜索框输入事件
+			document.getElementById('search-input').addEventListener('input', searchFiles);
+			
+			// 筛选按钮点击事件
+			document.querySelectorAll('.filter-btn').forEach(btn => {
+				btn.addEventListener('click', function() {
+					// 移除所有按钮的active类
+					document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+					// 给当前按钮添加active类
+					this.classList.add('active');
+					// 更新当前筛选器
+					currentFilter = this.getAttribute('data-filter');
+					// 应用筛选
+					applyFilter();
+				});
+			});
+			
+			// 图片浏览器按钮事件
+			document.getElementById('close-browser-modal').addEventListener('click', closeImageBrowser);
+			document.getElementById('prev-image-btn').addEventListener('click', showPrevImage);
+			document.getElementById('next-image-btn').addEventListener('click', showNextImage);
+			document.getElementById('download-image-btn').addEventListener('click', downloadCurrentImage);
+			
+			// 图片浏览器触摸事件
+			const modalBody = document.querySelector('.modal-body');
+			modalBody.addEventListener('touchstart', handleTouchStart);
+			modalBody.addEventListener('touchmove', handleTouchMove);
+			modalBody.addEventListener('touchend', handleTouchEnd);
+			
+			// 键盘事件
+			document.addEventListener('keydown', handleKeyDown);
+			
+			// 点击模态框背景关闭
+			document.getElementById('image-browser-modal').addEventListener('click', function(e) {
+				if (e.target === this) {
+					closeImageBrowser();
+				}
+			});
+			
+			// 防止右键菜单和开发者工具（基本保护）
+			document.addEventListener('contextmenu', function(e) {
+				if (e.target.tagName === 'IMG') {
+					e.preventDefault();
+				}
+			});
+			
+			document.addEventListener('keydown', function(e) {
+				// 禁用F12、Ctrl+Shift+I、Ctrl+U
+				if (e.key === 'F12' || 
+					(e.ctrlKey && e.shiftKey && e.key === 'I') ||
+					(e.ctrlKey && e.key === 'u')) {
+					e.preventDefault();
+				}
+			});
+		}
+		
+		// 从GitHub仓库加载文件
+		async function loadFilesFromGitHub() {
+			try {
+				// 显示加载动画
+				document.getElementById('loading').style.display = 'block';
+				document.getElementById('files-container').style.display = 'none';
+				document.getElementById('empty-state').style.display = 'none';
+				document.getElementById('error-container').style.display = 'none';
+				
+				// GitHub API URL
+				const username = 'ningchaojie';
+				const repo = 'ningchaojie.github.io';
+				const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/`;
+				
+				console.log('正在请求GitHub API:', apiUrl);
+				
+				// 获取仓库文件列表
+				const response = await fetch(apiUrl);
+				
+				if (!response.ok) {
+					throw new Error(`GitHub API错误: ${response.status} ${response.statusText}`);
+				}
+				
+				const files = await response.json();
+				
+				if (!Array.isArray(files)) {
+					throw new Error('GitHub API返回的数据格式不正确');
+				}
+				
+				console.log(`成功获取到${files.length}个文件`);
+				
+				// 处理文件数据
+				processFiles(files);
+				
+				// 更新状态
+				document.getElementById('github-status').textContent = 'GitHub API正常';
+				document.getElementById('github-status').style.color = '';
+				
+			} catch (error) {
+				console.error('从GitHub加载文件时出错:', error);
+				showError(`无法加载文件列表: ${error.message}`);
+				document.getElementById('github-status').textContent = 'GitHub API错误';
+				document.getElementById('github-status').style.color = '#c62828';
+			}
+		}
+		
+		// 处理文件数据
+		function processFiles(files) {
+			// 清空数据
+			allFilesData = [];
+			
+			// 按文件名分组
+			const fileGroups = {};
+			
+			// 首先按基础名称分组
+			files.forEach(file => {
+				if (file.type !== 'file') return;
+				
+				const parsed = parseFileName(file.name);
+				const baseName = parsed.baseName;
+				
+				if (!fileGroups[baseName]) {
+					fileGroups[baseName] = {
+						mainFile: null,
+						images: {
+							'描述': [],
+							'界面': [],
+							'引言': [],
+							'目录': []
+						},
+						parsedName: parsed
+					};
+				}
+				
+				if (parsed.type === 'main') {
+					fileGroups[baseName].mainFile = file;
+				} else if (['描述', '界面', '引言', '目录'].includes(parsed.type)) {
+					// 添加到对应类型的数组中，并记录序号
+					fileGroups[baseName].images[parsed.type].push({
+						...file,
+						index: parsed.index,
+						type: parsed.type
+					});
+				}
+			});
+			
+			// 对每种类型的图片按序号排序（允许跳序）
+			Object.values(fileGroups).forEach(group => {
+				Object.keys(group.images).forEach(type => {
+					group.images[type].sort((a, b) => a.index - b.index);
+				});
+			});
+			
+			// 转换为数组并过滤掉没有主文件的组
+			allFilesData = Object.values(fileGroups).filter(group => group.mainFile);
+			
+			// 如果没有文件，显示空状态
+			if (allFilesData.length === 0) {
+				document.getElementById('loading').style.display = 'none';
+				document.getElementById('empty-state').style.display = 'block';
+				updateStats();
+				return;
+			}
+			
+			// 应用当前筛选
+			applyFilter();
+			
+			// 隐藏加载动画
+			document.getElementById('loading').style.display = 'none';
+		}
+		
+		// 解析文件名
+		function parseFileName(filename) {
+			const parts = filename.split('.');
+			const ext = parts.pop().toLowerCase();
+			const nameWithoutExt = parts.join('.');
+			
+			// 匹配：名称_类型_序号
+			const pattern = /^(.+?)_(.+?)_(\d+)$/;
+			const match = nameWithoutExt.match(pattern);
+			
+			if (match) {
+				return {
+					baseName: match[1],
+					type: match[2],
+					index: parseInt(match[3]),
+					ext: ext,
+					isImage: ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)
+				};
+			}
+			
+			// 不是图片，是主文件
+			return {
+				baseName: nameWithoutExt,
+				type: 'main',
+				index: null,
+				ext: ext,
+				isImage: false
+			};
+		}
+		
+		// 获取文件类型
+		function getFileType(file) {
+			const ext = file.name.split('.').pop().toLowerCase();
+			
+			if (ext === 'apk') return 'apk';
+			if (['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'xls', 'xlsx'].includes(ext)) return 'document';
+			if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return 'image';
+			return 'other';
+		}
+		
+		// 应用筛选
+		function applyFilter() {
+			const searchTerm = document.getElementById('search-input').value.toLowerCase();
+			
+			// 先根据类型筛选
+			if (currentFilter === 'all') {
+				filteredFilesData = [...allFilesData];
+			} else {
+				filteredFilesData = allFilesData.filter(group => {
+					const fileType = getFileType(group.mainFile);
+					return fileType === currentFilter;
+				});
+			}
+			
+			// 再根据搜索词筛选
+			if (searchTerm) {
+				filteredFilesData = filteredFilesData.filter(group => {
+					const fileName = group.mainFile.name.toLowerCase();
+					const baseName = group.parsedName.baseName.toLowerCase();
+					return fileName.includes(searchTerm) || baseName.includes(searchTerm);
+				});
+			}
+			
+			// 显示文件
+			displayFiles();
+		}
+		
+		// 搜索文件
+		function searchFiles() {
+			applyFilter();
+		}
+		
+		// 显示文件
+		function displayFiles() {
+			const container = document.getElementById('files-container');
+			const emptyState = document.getElementById('empty-state');
+			
+			// 如果没有文件，显示空状态
+			if (filteredFilesData.length === 0) {
+				container.style.display = 'none';
+				emptyState.style.display = 'block';
+				updateStats();
+				return;
+			}
+			
+			// 清空容器
+			container.innerHTML = '';
+			
+			// 生成文件卡片
+			filteredFilesData.forEach((group, index) => {
+				const fileType = getFileType(group.mainFile);
+				const card = createFileCard(group, fileType, index);
+				container.appendChild(card);
+			});
+			
+			// 显示容器
+			container.style.display = 'grid';
+			emptyState.style.display = 'none';
+			
+			// 初始化横向滚动
+			initHorizontalScrolls();
+			
+			// 初始化图片懒加载
+			initLazyLoading();
+			
+			// 初始化图片点击事件
+			initImageClickEvents();
+			
+			// 更新统计信息
+			updateStats();
+		}
+		
+		// 创建文件卡片
+		function createFileCard(group, fileType, cardIndex) {
+			const mainFile = group.mainFile;
+			const baseName = group.parsedName.baseName;
+			const fileExt = mainFile.name.split('.').pop().toUpperCase();
+			
+			// 创建卡片元素
+			const card = document.createElement('div');
+			card.className = `file-card ${fileType === 'document' ? 'document-card' : ''}`;
+			card.dataset.index = cardIndex;
+			
+			// 文件类型显示文本
+			let typeText = '';
+			let typeIcon = '';
+			if (fileType === 'apk') {
+				typeText = 'Android应用';
+				typeIcon = '<i class="fas fa-mobile-alt"></i>';
+			} else if (fileType === 'document') {
+				typeText = '文档文件';
+				typeIcon = '<i class="fas fa-file-alt"></i>';
+			} else {
+				typeText = '其他文件';
+				typeIcon = '<i class="fas fa-file"></i>';
+			}
+			
+			// 下载次数
+			const downloadCount = downloadStats[mainFile.name] || 0;
+			
+			// 文件大小格式化
+			const fileSize = formatFileSize(mainFile.size);
+			
+			// 更新时间格式化
+			const updateTime = formatTime(mainFile.updated_at || mainFile.created_at);
+			
+			// 构建图片HTML
+			let imagesHtml = '';
+			const imageTypes = ['描述', '界面', '引言', '目录'];
+			
+			imageTypes.forEach(type => {
+				const images = group.images[type];
+				if (images.length > 0) {
+					imagesHtml += createImageScrollHtml(type, images, cardIndex, baseName);
+				}
+			});
+			
+			// 构建卡片HTML
+			card.innerHTML = `
+				<div class="card-header">
+					<div class="file-type">${typeIcon} ${typeText}</div>
+					<div class="file-name">${baseName}</div>
+					<div class="file-filename">${mainFile.name}</div>
+				</div>
+				
+				<div class="card-body">
+					<div class="file-meta">
+						<div class="meta-row">
+							<span class="meta-label"><i class="fas fa-hdd file-icon"></i>文件大小:</span>
+							<span class="meta-value">${fileSize}</span>
+						</div>
+						<div class="meta-row">
+							<span class="meta-label"><i class="fas fa-calendar-alt file-icon"></i>更新时间:</span>
+							<span class="meta-value">${updateTime}</span>
+						</div>
+						<div class="meta-row">
+							<span class="meta-label"><i class="fas fa-download file-icon"></i>下载次数:</span>
+							<span class="meta-value">${downloadCount}</span>
+						</div>
+						<div class="meta-row">
+							<span class="meta-label"><i class="fas fa-code file-icon"></i>文件格式:</span>
+							<span class="meta-value">${fileExt}</span>
+						</div>
+					</div>
+					
+					${imagesHtml}
+					
+					<a href="${mainFile.download_url}" 
+					   class="download-btn" 
+					   onclick="trackDownload('${mainFile.name}')"
+					   download="${mainFile.name}">
+						<i class="fas fa-download"></i> 下载文件
+						<span class="download-count">${downloadCount}次</span>
+					</a>
+				</div>
+			`;
+			
+			return card;
+		}
+		
+		// 创建图片横向滚动HTML
+		function createImageScrollHtml(type, images, cardIndex, baseName) {
+			const typeIcons = {
+				'描述': '<i class="fas fa-info-circle"></i>',
+				'界面': '<i class="fas fa-mobile-alt"></i>',
+				'引言': '<i class="fas fa-book-open"></i>',
+				'目录': '<i class="fas fa-list-ul"></i>'
+			};
+			
+			const typeNames = {
+				'描述': '描述图片',
+				'界面': '界面截图',
+				'引言': '引言图片',
+				'目录': '目录图片'
+			};
+			
+			const icon = typeIcons[type] || '<i class="fas fa-image"></i>';
+			const typeName = typeNames[type] || type;
+			
+			// 构建图片HTML
+			let imagesHtml = '';
+			images.forEach((img, imgIndex) => {
+				imagesHtml += `
+					<img src="" 
+						 data-src="${img.download_url}"
+						 data-group-index="${cardIndex}"
+						 data-image-type="${img.type}"
+						 data-image-index="${imgIndex}"
+						 alt="${baseName} ${typeName} ${imgIndex + 1}"
+						 class="scroll-image lazy-image"
+						 loading="lazy">
+				`;
+			});
+			
+			return `
+				<div class="images-section">
+					<div class="section-title">
+						${icon} ${typeName} (${images.length}张)
+					</div>
+					<div class="scroll-container">
+						<button class="scroll-btn scroll-left" 
+								onclick="scrollImages('left', '${type}-${cardIndex}')">
+							<i class="fas fa-chevron-left"></i>
+						</button>
+						
+						<div class="scroll-wrapper" id="scroll-${type}-${cardIndex}">
+							<div class="scroll-content">
+								${imagesHtml}
+							</div>
+						</div>
+						
+						<button class="scroll-btn scroll-right"
+								onclick="scrollImages('right', '${type}-${cardIndex}')">
+							<i class="fas fa-chevron-right"></i>
+						</button>
+					</div>
+				</div>
+			`;
+		}
+		
+		// 初始化横向滚动
+		function initHorizontalScrolls() {
+			// 为每个滚动容器设置初始状态
+			document.querySelectorAll('.scroll-container').forEach(container => {
+				const wrapper = container.querySelector('.scroll-wrapper');
+				const leftBtn = container.querySelector('.scroll-left');
+				const rightBtn = container.querySelector('.scroll-right');
+				
+				// 初始检查按钮状态
+				updateScrollButtons(wrapper, leftBtn, rightBtn);
+				
+				// 监听滚动事件
+				wrapper.addEventListener('scroll', function() {
+					updateScrollButtons(wrapper, leftBtn, rightBtn);
+				});
+			});
+		}
+		
+		// 更新滚动按钮状态
+		function updateScrollButtons(wrapper, leftBtn, rightBtn) {
+			const scrollLeft = wrapper.scrollLeft;
+			const maxScrollLeft = wrapper.scrollWidth - wrapper.clientWidth;
+			
+			// 左按钮
+			if (scrollLeft <= 10) {
+				leftBtn.classList.add('hidden');
+			} else {
+				leftBtn.classList.remove('hidden');
+			}
+			
+			// 右按钮
+			if (scrollLeft >= maxScrollLeft - 10) {
+				rightBtn.classList.add('hidden');
+			} else {
+				rightBtn.classList.remove('hidden');
+			}
+		}
+		
+		// 滚动图片
+		function scrollImages(direction, scrollId) {
+			const wrapper = document.getElementById(`scroll-${scrollId}`);
+			if (!wrapper) return;
+			
+			const scrollAmount = 300; // 每次滚动300px
+			
+			if (direction === 'left') {
+				wrapper.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+			} else {
+				wrapper.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+			}
+		}
+		
+		// 初始化图片懒加载
+		function initLazyLoading() {
+			// 使用Intersection Observer实现懒加载
+			const lazyImages = document.querySelectorAll('.lazy-image');
+			
+			const imageObserver = new IntersectionObserver((entries, observer) => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) {
+						const img = entry.target;
+						img.src = img.dataset.src;
+						img.classList.remove('lazy-image');
+						
+						// 图片加载完成后移除背景色
+						img.onload = function() {
+							img.style.background = 'none';
+						};
+						
+						// 图片加载失败处理
+						img.onerror = function() {
+							img.style.background = '#ffebee';
+							img.style.display = 'flex';
+							img.style.alignItems = 'center';
+							img.style.justifyContent = 'center';
+							img.innerHTML = '<div style="color: #c62828; font-size: 0.8rem;">图片加载失败</div>';
+						};
+						
+						observer.unobserve(img);
+					}
+				});
+			});
+			
+			lazyImages.forEach(img => imageObserver.observe(img));
+		}
+		
+		// 初始化图片点击事件
+		function initImageClickEvents() {
+			document.querySelectorAll('.scroll-image').forEach(img => {
+				img.addEventListener('click', function() {
+					const groupIndex = parseInt(this.dataset.groupIndex);
+					const imageType = this.dataset.imageType;
+					const imageIndex = parseInt(this.dataset.imageIndex);
+					
+					// 打开图片浏览器
+					openImageBrowser(groupIndex, imageType, imageIndex);
+				});
+			});
+		}
+		
+		// 打开图片浏览器
+		function openImageBrowser(groupIndex, imageType, imageIndex) {
+			if (imageBrowser.isOpen) return;
+			
+			// 保存当前滚动位置
+			imageBrowser.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+			
+			// 锁定背景滚动
+			document.body.style.overflow = 'hidden';
+			document.body.style.position = 'fixed';
+			document.body.style.width = '100%';
+			document.body.style.top = `-${imageBrowser.scrollPosition}px`;
+			
+			// 设置图片浏览器数据
+			const group = filteredFilesData[groupIndex];
+			imageBrowser.currentGroupIndex = groupIndex;
+			imageBrowser.currentImageType = imageType;
+			imageBrowser.currentImageIndex = imageIndex;
+			imageBrowser.images = group.images[imageType];
+			imageBrowser.isOpen = true;
+			
+			// 更新模态框标题
+			const typeNames = {
+				'描述': '描述图片',
+				'界面': '界面截图',
+				'引言': '引言图片',
+				'目录': '目录图片'
+			};
+			
+			document.getElementById('modal-title-text').textContent = 
+				`${group.parsedName.baseName} - ${typeNames[imageType] || imageType}`;
+			
+			// 显示模态框
+			document.getElementById('image-browser-modal').style.display = 'flex';
+			
+			// 显示触摸提示（仅移动端）
+			if (isMobileDevice()) {
+				setTimeout(() => {
+					const touchHint = document.getElementById('touch-hint');
+					touchHint.classList.add('show');
+					setTimeout(() => touchHint.classList.remove('show'), 3000);
+				}, 500);
+			}
+			
+			// 加载当前图片
+			loadCurrentImage();
+			
+			// 更新导航按钮状态
+			updateImageNavButtons();
+		}
+		
+		// 加载当前图片
+		function loadCurrentImage() {
+			const currentImage = imageBrowser.images[imageBrowser.currentImageIndex];
+			
+			if (!currentImage) return;
+			
+			// 显示加载指示器
+			document.getElementById('image-loader').style.display = 'block';
+			
+			// 重置图片状态
+			const browserImage = document.getElementById('browser-image');
+			browserImage.classList.remove('loaded');
+			browserImage.style.opacity = '0';
+			
+			// 设置图片源
+			browserImage.src = currentImage.download_url;
+			browserImage.alt = currentImage.name;
+			
+			// 图片加载完成
+			browserImage.onload = function() {
+				document.getElementById('image-loader').style.display = 'none';
+				browserImage.classList.add('loaded');
+				browserImage.style.opacity = '1';
+				
+				// 更新图片信息
+				document.getElementById('image-info-text').textContent = 
+					`${currentImage.name} (${formatFileSize(currentImage.size)})`;
+				
+				// 更新计数器
+				document.getElementById('current-image-index').textContent = imageBrowser.currentImageIndex + 1;
+				document.getElementById('total-images-count').textContent = imageBrowser.images.length;
+				
+				// 更新下载按钮
+				document.getElementById('download-image-btn').dataset.imageUrl = currentImage.download_url;
+				document.getElementById('download-image-btn').dataset.imageName = currentImage.name;
+			};
+			
+			// 图片加载失败
+			browserImage.onerror = function() {
+				document.getElementById('image-loader').style.display = 'none';
+				browserImage.alt = '图片加载失败';
+				document.getElementById('image-info-text').textContent = '图片加载失败，请重试';
+			};
+		}
+		
+		// 显示上一张图片
+		function showPrevImage() {
+			if (imageBrowser.currentImageIndex > 0) {
+				imageBrowser.currentImageIndex--;
+				loadCurrentImage();
+				updateImageNavButtons();
+			}
+		}
+		
+		// 显示下一张图片
+		function showNextImage() {
+			if (imageBrowser.currentImageIndex < imageBrowser.images.length - 1) {
+				imageBrowser.currentImageIndex++;
+				loadCurrentImage();
+				updateImageNavButtons();
+			}
+		}
+		
+		// 更新图片导航按钮状态
+		function updateImageNavButtons() {
+			const prevBtn = document.getElementById('prev-image-btn');
+			const nextBtn = document.getElementById('next-image-btn');
+			
+			// 上一张按钮
+			if (imageBrowser.currentImageIndex > 0) {
+				prevBtn.classList.remove('hidden');
+			} else {
+				prevBtn.classList.add('hidden');
+			}
+			
+			// 下一张按钮
+			if (imageBrowser.currentImageIndex < imageBrowser.images.length - 1) {
+				nextBtn.classList.remove('hidden');
+			} else {
+				nextBtn.classList.add('hidden');
+			}
+		}
+		
+		// 关闭图片浏览器
+		function closeImageBrowser() {
+			if (!imageBrowser.isOpen) return;
+			
+			// 关闭模态框
+			document.getElementById('image-browser-modal').style.display = 'none';
+			
+			// 恢复背景滚动
+			document.body.style.overflow = '';
+			document.body.style.position = '';
+			document.body.style.width = '';
+			document.body.style.top = '';
+			
+			// 恢复滚动位置
+			window.scrollTo(0, imageBrowser.scrollPosition);
+			
+			// 重置状态
+			imageBrowser.isOpen = false;
+		}
+		
+		// 下载当前图片
+		function downloadCurrentImage() {
+			const btn = document.getElementById('download-image-btn');
+			const imageUrl = btn.dataset.imageUrl;
+			const imageName = btn.dataset.imageName;
+			
+			if (!imageUrl) return;
+			
+			const link = document.createElement('a');
+			link.href = imageUrl;
+			link.download = imageName;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			
+			// 记录下载
+			console.log(`图片下载: ${imageName}`);
+		}
+		
+		// 触摸事件处理
+		function handleTouchStart(e) {
+			if (!imageBrowser.isOpen) return;
+			
+			imageBrowser.touchStartX = e.touches[0].clientX;
+			imageBrowser.touchStartY = e.touches[0].clientY;
+		}
+		
+		function handleTouchMove(e) {
+			if (!imageBrowser.isOpen) return;
+			e.preventDefault(); // 防止页面滚动
+		}
+		
+		function handleTouchEnd(e) {
+			if (!imageBrowser.isOpen) return;
+			
+			const touchEndX = e.changedTouches[0].clientX;
+			const touchEndY = e.changedTouches[0].clientY;
+			
+			const diffX = imageBrowser.touchStartX - touchEndX;
+			const diffY = imageBrowser.touchStartY - touchEndY;
+			
+			// 水平滑动距离大于垂直滑动距离，且大于50px
+			if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+				if (diffX > 0) {
+					showNextImage(); // 向左滑动，下一张
+				} else {
+					showPrevImage(); // 向右滑动，上一张
+				}
+			}
+		}
+		
+		// 键盘事件处理
+		function handleKeyDown(e) {
+			if (!imageBrowser.isOpen) return;
+			
+			switch(e.key) {
+				case 'Escape':
+					closeImageBrowser();
+					break;
+				case 'ArrowLeft':
+					showPrevImage();
+					break;
+				case 'ArrowRight':
+					showNextImage();
+					break;
+				case ' ':
+				case 'Spacebar':
+					e.preventDefault(); // 防止空格键滚动页面
+					break;
+			}
+		}
+		
+		// 检测是否为移动设备
+		function isMobileDevice() {
+			return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+		}
+		
+		// 加载下载统计
+		function loadDownloadStats() {
+			try {
+				const stats = localStorage.getItem('downloadStats');
+				if (stats) {
+					downloadStats = JSON.parse(stats);
+				} else {
+					downloadStats = {};
+				}
+			} catch (e) {
+				console.error('加载下载统计失败:', e);
+				downloadStats = {};
+			}
+		}
+		
+		// 保存下载统计
+		function saveDownloadStats() {
+			try {
+				localStorage.setItem('downloadStats', JSON.stringify(downloadStats));
+			} catch (e) {
+				console.error('保存下载统计失败:', e);
+			}
+		}
+		
+		// 跟踪下载
+		function trackDownload(filename) {
+			// 增加下载计数
+			downloadStats[filename] = (downloadStats[filename] || 0) + 1;
+			
+			// 保存到localStorage
+			saveDownloadStats();
+			
+			// 更新当前卡片的下载次数显示
+			const downloadCountElement = document.querySelector(`.file-card[data-index] .download-count`);
+			if (downloadCountElement) {
+				downloadCountElement.textContent = `${downloadStats[filename]}次`;
+			}
+			
+			// 更新总下载次数显示
+			updateStats();
+			
+			// 记录下载日志
+			console.log(`文件下载: ${filename}, 总下载次数: ${downloadStats[filename]}`);
+		}
+		
+		// 更新统计信息
+		function updateStats() {
+			// 文件数量
+			document.getElementById('total-files').textContent = `${filteredFilesData.length}个文件`;
+			
+			// 总下载次数
+			const totalDownloads = Object.values(downloadStats).reduce((sum, count) => sum + count, 0);
+			document.getElementById('total-downloads').textContent = `${totalDownloads}次下载`;
+			
+			// 最后更新时间
+			if (filteredFilesData.length > 0) {
+				// 找到最新的更新时间
+				let latestTime = new Date(0);
+				filteredFilesData.forEach(group => {
+					const fileTime = new Date(group.mainFile.updated_at || group.mainFile.created_at);
+					if (fileTime > latestTime) {
+						latestTime = fileTime;
+					}
+				});
+				
+				document.getElementById('last-update').textContent = `更新于: ${formatTime(latestTime.toISOString(), true)}`;
+			} else {
+				document.getElementById('last-update').textContent = `暂无文件`;
+			}
+		}
+		
+		// 显示错误信息
+		function showError(message) {
+			document.getElementById('error-text').textContent = message;
+			document.getElementById('error-container').style.display = 'block';
+			document.getElementById('loading').style.display = 'none';
+			document.getElementById('files-container').style.display = 'none';
+		}
+		
+		// 格式化文件大小
 		function formatFileSize(bytes) {
 			if (bytes === 0 || bytes === undefined) return '未知大小';
+			
 			const units = ['B', 'KB', 'MB', 'GB'];
 			let size = bytes;
 			let unitIndex = 0;
@@ -477,8 +1824,8 @@
 			return size.toFixed(2) + ' ' + units[unitIndex];
 		}
 		
-		// 修复时间格式化函数
-		function formatTime(dateString) {
+		// 格式化时间
+		function formatTime(dateString, short = false) {
 			if (!dateString) return '未知时间';
 			
 			try {
@@ -486,391 +1833,24 @@
 				if (isNaN(date.getTime())) {
 					return '未知时间';
 				}
-				return date.toLocaleDateString('zh-CN') + ' ' + date.toLocaleTimeString('zh-CN', { 
-					hour: '2-digit', 
-					minute: '2-digit' 
-				});
+				
+				if (short) {
+					// 简短格式：月-日 时:分
+					return date.toLocaleDateString('zh-CN', { 
+						month: '2-digit', 
+						day: '2-digit' 
+					}) + ' ' + date.toLocaleTimeString('zh-CN', { 
+						hour: '2-digit', 
+						minute: '2-digit' 
+					});
+				} else {
+					// 完整格式：年-月-日 时:分:秒
+					return date.toLocaleDateString('zh-CN') + ' ' + date.toLocaleTimeString('zh-CN');
+				}
 			} catch (e) {
 				return '未知时间';
 			}
 		}
-		
-		// 从文件名提取应用名称
-		function extractAppName(filename) {
-			// 去掉.apk扩展名
-			let name = filename.replace('.apk', '');
-			
-			// 尝试去掉版本号（如果有）
-			name = name.replace(/[vV]?\d+(\.\d+)*$/, '').replace(/[_\-\s]+$/, '');
-			
-			return name || filename.replace('.apk', '');
-		}
-		
-		// 获取文件名前缀（用于匹配图片）
-		function getFilePrefix(filename) {
-			// 对于中文文件名，直接返回去掉.apk的部分
-			return filename.replace('.apk', '');
-		}
-		
-		// 显示图片模态框
-		function showImageModal(imageUrl) {
-			const modal = document.getElementById('image-modal');
-			const modalImage = document.getElementById('modal-image');
-			
-			modalImage.src = imageUrl;
-			modal.style.display = 'flex';
-			
-			modal.onclick = function(event) {
-				if (event.target === modal) {
-					closeImageModal();
-				}
-			};
-		}
-		
-		// 关闭图片模态框
-		function closeImageModal() {
-			document.getElementById('image-modal').style.display = 'none';
-		}
-		
-		// 搜索应用
-		function searchApps() {
-			const searchInput = document.getElementById('search-input').value.toLowerCase();
-			
-			if (!searchInput.trim()) {
-				filteredApps = [...allApps];
-				displayApps();
-				return;
-			}
-			
-			filteredApps = allApps.filter(app => {
-				const appName = app.name.toLowerCase();
-				const fileName = app.filename.toLowerCase();
-				
-				return appName.includes(searchInput) || fileName.includes(searchInput);
-			});
-			
-			displayApps();
-		}
-		
-		// 显示应用列表
-		function displayApps() {
-			const container = document.getElementById('apps-container');
-			const emptyState = document.getElementById('empty-state');
-			const loading = document.getElementById('loading');
-			
-			loading.style.display = 'none';
-			
-			if (filteredApps.length === 0) {
-				container.style.display = 'none';
-				emptyState.style.display = 'block';
-				return;
-			}
-			
-			emptyState.style.display = 'none';
-			container.style.display = 'grid';
-			
-			container.innerHTML = '';
-			
-			document.getElementById('total-apps').textContent = `应用数量: ${filteredApps.length}`;
-			document.getElementById('file-count').textContent = filteredApps.length;
-			
-			const totalSize = filteredApps.reduce((sum, app) => {
-				return sum + (app.size || 0);
-			}, 0);
-			
-			document.getElementById('total-size').textContent = `总大小: ${formatFileSize(totalSize)}`;
-			
-			// 按文件名排序，中文优先
-			filteredApps.sort((a, b) => {
-				// 中文文件名排在前面
-				const isChineseA = /[\u4e00-\u9fff]/.test(a.filename);
-				const isChineseB = /[\u4e00-\u9fff]/.test(b.filename);
-				
-				if (isChineseA && !isChineseB) return -1;
-				if (!isChineseA && isChineseB) return 1;
-				
-				// 都中文或都英文，按字母顺序
-				return a.filename.localeCompare(b.filename, 'zh-CN');
-			});
-			
-			filteredApps.forEach(app => {
-				const appCard = document.createElement('div');
-				appCard.className = 'app-card';
-				
-				let infoImageHtml = '';
-				let descImageHtml = '';
-				let screenshotsHtml = '';
-				
-				// 基本信息图片
-				if (app.infoImage) {
-					infoImageHtml = `
-						<div class="image-section">
-							<div class="section-title">
-								<i>📋</i> 基本信息
-							</div>
-							<img src="${app.infoImage.download_url}" 
-								 alt="${app.name}基本信息" 
-								 class="info-image"
-								 onclick="showImageModal('${app.infoImage.download_url}')">
-						</div>
-					`;
-				}
-				
-				// 描述图片
-				if (app.descImage) {
-					descImageHtml = `
-						<div class="image-section">
-							<div class="section-title">
-								<i>📝</i> 应用描述
-							</div>
-							<img src="${app.descImage.download_url}" 
-								 alt="${app.name}描述" 
-								 class="desc-image"
-								 onclick="showImageModal('${app.descImage.download_url}')">
-						</div>
-					`;
-				}
-				
-				// 界面截图
-				if (app.screenshots && app.screenshots.length > 0) {
-					const screenshotsGrid = app.screenshots.map((screenshot, index) => `
-						<img src="${screenshot.download_url}" 
-							 alt="${app.name}截图${index + 1}" 
-							 class="screenshot"
-							 onclick="showImageModal('${screenshot.download_url}')">
-					`).join('');
-					
-					screenshotsHtml = `
-						<div class="image-section">
-							<div class="section-title">
-								<i>🖼️</i> 界面截图 (${app.screenshots.length}张)
-							</div>
-							<div class="screenshots-grid">
-								${screenshotsGrid}
-							</div>
-						</div>
-					`;
-				}
-				
-				// 文件信息
-				const fileInfoHtml = `
-					<div class="file-info">
-						<div class="file-info-row">
-							<span class="file-info-label">文件名:</span>
-							<span class="file-info-value">${app.filename}</span>
-						</div>
-						<div class="file-info-row">
-							<span class="file-info-label">文件大小:</span>
-							<span class="file-info-value">${formatFileSize(app.size)}</span>
-						</div>
-						<div class="file-info-row">
-							<span class="file-info-label">上传时间:</span>
-							<span class="file-info-value">${formatTime(app.updated)}</span>
-						</div>
-						<div class="file-info-row">
-							<span class="file-info-label">GitHub链接:</span>
-							<a href="${app.html_url}" target="_blank" class="github-link">
-								🔗 查看文件
-							</a>
-						</div>
-					</div>
-				`;
-				
-				appCard.innerHTML = `
-					<div class="app-header">
-						<div class="app-name">${app.name}</div>
-						<div class="app-filename">${app.filename}</div>
-						<div class="app-size">${formatFileSize(app.size)}</div>
-					</div>
-					
-					<div class="app-content">
-						${fileInfoHtml}
-						
-						${infoImageHtml}
-						${descImageHtml}
-						${screenshotsHtml}
-						
-						<a href="${app.download_url}" 
-						   class="download-btn" 
-						   onclick="trackDownload('${app.filename}')"
-						   download="${app.filename}">
-							<i>⬇️</i> 下载 ${app.name}
-						</a>
-					</div>
-				`;
-				
-				container.appendChild(appCard);
-			});
-		}
-		
-		// 显示错误信息
-		function showError(message) {
-			const errorContainer = document.getElementById('error-container');
-			errorContainer.style.display = 'block';
-			errorContainer.innerHTML = `
-				<div class="error-message">
-					<i>⚠️</i> <strong>错误:</strong> ${message}
-				</div>
-			`;
-			
-			document.getElementById('loading').style.display = 'none';
-		}
-		
-		// 下载跟踪
-		function trackDownload(filename) {
-			console.log(`开始下载: ${filename}`);
-			
-			// 可以在这里添加下载统计
-			try {
-				const downloads = JSON.parse(localStorage.getItem('download_stats') || '{}');
-				downloads[filename] = (downloads[filename] || 0) + 1;
-				localStorage.setItem('download_stats', JSON.stringify(downloads));
-			} catch (e) {
-				console.log('下载统计保存失败:', e);
-			}
-		}
-		
-		// 主函数：从GitHub仓库获取文件
-		async function loadAppsFromGitHub() {
-			try {
-				document.getElementById('current-time').textContent = new Date().toLocaleString('zh-CN');
-				
-				const username = 'ningchaojie';
-				const repo = 'ningchaojie.github.io';
-				
-				// 使用代理或直接访问GitHub API
-				const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/`;
-				
-				console.log('正在请求GitHub API:', apiUrl);
-				
-				const response = await fetch(apiUrl);
-				
-				if (!response.ok) {
-					throw new Error(`GitHub API返回错误: ${response.status} ${response.statusText}`);
-				}
-				
-				const files = await response.json();
-				
-				if (!Array.isArray(files)) {
-					throw new Error('GitHub API返回的数据格式不正确');
-				}
-				
-				console.log(`获取到${files.length}个文件`);
-				
-				const apkFiles = files.filter(file => 
-					file.type === 'file' && 
-					file.name.toLowerCase().endsWith('.apk')
-				);
-				
-				console.log(`找到${apkFiles.length}个APK文件`);
-				
-				if (apkFiles.length === 0) {
-					showError('未在仓库中找到APK文件。请上传.apk文件到仓库根目录。');
-					document.getElementById('empty-state').style.display = 'block';
-					document.getElementById('loading').style.display = 'none';
-					return;
-				}
-				
-				const apps = [];
-				let latestUpdate = null;
-				
-				for (const apkFile of apkFiles) {
-					const appName = extractAppName(apkFile.name);
-					const prefix = getFilePrefix(apkFile.name);
-					
-					console.log(`处理APK: ${apkFile.name}, 前缀: ${prefix}`);
-					
-					// 查找基本信息图片
-					const infoImage = files.find(file => 
-						file.type === 'file' && 
-						file.name === `${prefix}_基本信息.jpg`
-					);
-					
-					// 查找描述图片
-					const descImage = files.find(file => 
-						file.type === 'file' && 
-						file.name === `${prefix}_描述.jpg`
-					);
-					
-					// 查找所有界面截图
-					const screenshots = files.filter(file => {
-						if (file.type !== 'file' || !file.name.toLowerCase().endsWith('.jpg')) {
-							return false;
-						}
-						
-						const pattern = new RegExp(`^${prefix}_界面_\\d+\\.jpg$`, 'i');
-						return pattern.test(file.name);
-					}).sort((a, b) => {
-						const numA = parseInt(a.name.match(/_界面_(\d+)/i)?.[1] || 0);
-						const numB = parseInt(b.name.match(/_界面_(\d+)/i)?.[1] || 0);
-						return numA - numB;
-					});
-					
-					// 更新时间处理
-					let updatedTime = apkFile.updated_at || apkFile.created_at;
-					if (updatedTime) {
-						const updateDate = new Date(updatedTime);
-						if (!latestUpdate || updateDate > latestUpdate) {
-							latestUpdate = updateDate;
-						}
-					}
-					
-					apps.push({
-						name: appName,
-						filename: apkFile.name,
-						size: apkFile.size,
-						download_url: apkFile.download_url,
-						html_url: apkFile.html_url,
-						updated: updatedTime,
-						infoImage: infoImage,
-						descImage: descImage,
-						screenshots: screenshots
-					});
-					
-					console.log(`  - 找到 ${screenshots.length} 张截图`);
-				}
-				
-				allApps = apps;
-				filteredApps = [...apps];
-				
-				// 更新最后更新时间
-				if (latestUpdate) {
-					document.getElementById('last-update').textContent = `最后更新: ${formatTime(latestUpdate.toISOString())}`;
-				} else {
-					document.getElementById('last-update').textContent = `最后更新: ${new Date().toLocaleDateString('zh-CN')}`;
-				}
-				
-				displayApps();
-				
-			} catch (error) {
-				console.error('加载应用时出错:', error);
-				showError(`无法加载应用列表: ${error.message}`);
-			}
-		}
-		
-		// 页面加载完成后执行
-		window.addEventListener('DOMContentLoaded', () => {
-			document.getElementById('current-time').textContent = new Date().toLocaleString('zh-CN');
-			
-			loadAppsFromGitHub();
-			
-			document.getElementById('search-input').addEventListener('keyup', (event) => {
-				if (event.key === 'Enter') {
-					searchApps();
-				}
-			});
-			
-			document.addEventListener('keydown', (event) => {
-				if (event.key === 'Escape') {
-					closeImageModal();
-				}
-			});
-			
-			// 添加自动刷新功能（每小时刷新一次）
-			setInterval(() => {
-				loadAppsFromGitHub();
-			}, 3600000); // 1小时
-		});
 	</script>
 </body>
 </html>
