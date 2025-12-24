@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>宁朝杰 - Android应用开发者</title>
+	<title>宁朝杰 - Android应用开发者 | 作品集</title>
 	<style>
 		* {
 			margin: 0;
@@ -17,18 +17,65 @@
 			color: #333;
 			min-height: 100vh;
 			line-height: 1.6;
-			padding: 20px;
 		}
 		
+		/* 导航栏 */
+		.navbar {
+			background: rgba(255, 255, 255, 0.95);
+			backdrop-filter: blur(10px);
+			position: sticky;
+			top: 0;
+			z-index: 1000;
+			padding: 15px 0;
+			box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+		}
+		
+		.nav-container {
+			max-width: 1000px;
+			margin: 0 auto;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0 20px;
+		}
+		
+		.logo {
+			font-weight: bold;
+			font-size: 1.5em;
+			color: #667eea;
+			text-decoration: none;
+		}
+		
+		.nav-links {
+			display: flex;
+			gap: 20px;
+		}
+		
+		.nav-links a {
+			color: #333;
+			text-decoration: none;
+			padding: 8px 15px;
+			border-radius: 20px;
+			transition: all 0.3s;
+		}
+		
+		.nav-links a:hover {
+			background: #667eea;
+			color: white;
+		}
+		
+		/* 主容器 */
 		.container {
 			max-width: 1000px;
 			margin: 0 auto;
+			padding: 20px;
 		}
 		
 		header {
 			text-align: center;
 			padding: 40px 20px;
 			color: white;
+			margin-bottom: 30px;
 		}
 		
 		.avatar {
@@ -43,6 +90,12 @@
 			font-size: 50px;
 			color: #667eea;
 			box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+			cursor: pointer;
+			transition: transform 0.3s;
+		}
+		
+		.avatar:hover {
+			transform: scale(1.05);
 		}
 		
 		h1 {
@@ -66,7 +119,8 @@
 		}
 		
 		section {
-			margin-bottom: 40px;
+			margin-bottom: 50px;
+			scroll-margin-top: 80px; /* 为导航锚点偏移 */
 		}
 		
 		h2 {
@@ -75,32 +129,103 @@
 			margin-bottom: 20px;
 			padding-bottom: 10px;
 			border-bottom: 3px solid #667eea;
+			display: flex;
+			align-items: center;
+			gap: 10px;
 		}
 		
+		h2 i {
+			font-size: 1.2em;
+		}
+		
+		/* 新APK上传区 */
+		.upload-section {
+			background: linear-gradient(135deg, #667eea15, #764ba215);
+			padding: 25px;
+			border-radius: 15px;
+			margin-bottom: 30px;
+			border: 2px dashed #667eea;
+		}
+		
+		.upload-form {
+			display: flex;
+			flex-direction: column;
+			gap: 15px;
+		}
+		
+		.form-group {
+			display: flex;
+			flex-direction: column;
+			gap: 5px;
+		}
+		
+		.form-group label {
+			font-weight: bold;
+			color: #555;
+		}
+		
+		.form-group input,
+		.form-group textarea,
+		.form-group select {
+			padding: 12px;
+			border: 2px solid #ddd;
+			border-radius: 8px;
+			font-size: 1em;
+		}
+		
+		.form-group textarea {
+			min-height: 100px;
+			resize: vertical;
+		}
+		
+		.upload-btn {
+			background: linear-gradient(135deg, #4CAF50, #45a049);
+			color: white;
+			border: none;
+			padding: 15px 25px;
+			border-radius: 30px;
+			font-size: 1.1em;
+			font-weight: bold;
+			cursor: pointer;
+			transition: all 0.3s;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
+		}
+		
+		.upload-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+		}
+		
+		/* APP网格 */
 		.app-grid {
 			display: grid;
 			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-			gap: 20px;
+			gap: 25px;
 			margin-top: 20px;
 		}
 		
 		.app-card {
 			background: #f8f9fa;
-			border-radius: 12px;
+			border-radius: 15px;
 			padding: 25px;
-			transition: transform 0.3s, box-shadow 0.3s;
+			transition: all 0.3s;
 			border-left: 5px solid #667eea;
+			display: flex;
+			flex-direction: column;
 		}
 		
 		.app-card:hover {
-			transform: translateY(-5px);
-			box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+			transform: translateY(-8px);
+			box-shadow: 0 15px 30px rgba(0,0,0,0.15);
 		}
 		
 		.app-card h3 {
 			color: #333;
 			margin-bottom: 10px;
-			font-size: 1.3em;
+			font-size: 1.4em;
 		}
 		
 		.app-meta {
@@ -121,45 +246,140 @@
 			margin: 5px 5px 5px 0;
 		}
 		
+		.file-info {
+			background: #e8f5e8;
+			padding: 15px;
+			border-radius: 10px;
+			margin: 15px 0;
+			font-size: 0.9em;
+		}
+		
+		.file-info-item {
+			display: flex;
+			justify-content: space-between;
+			margin: 5px 0;
+		}
+		
+		/* 按钮样式 */
+		.btn-group {
+			display: flex;
+			gap: 10px;
+			margin-top: 15px;
+			flex-wrap: wrap;
+		}
+		
 		.btn {
 			display: inline-block;
-			background: #4CAF50;
-			color: white;
 			padding: 12px 25px;
 			border-radius: 30px;
 			text-decoration: none;
 			font-weight: 600;
-			margin-top: 15px;
-			transition: all 0.3s;
 			text-align: center;
-			width: 100%;
-		}
-		
-		.btn:hover {
-			background: #45a049;
-			transform: translateY(-2px);
+			transition: all 0.3s;
+			border: none;
+			cursor: pointer;
+			font-size: 1em;
 		}
 		
 		.download-btn {
-			background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-			border: none;
+			background: linear-gradient(135deg, #4CAF50, #45a049);
+			color: white;
+			flex: 1;
+		}
+		
+		.preview-btn {
+			background: linear-gradient(135deg, #667eea, #5a67d8);
+			color: white;
+			flex: 1;
+		}
+		
+		.detail-btn {
+			background: #f0f0f0;
+			color: #333;
+			flex: 1;
 		}
 		
 		.download-btn:hover {
-			background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+			background: linear-gradient(135deg, #45a049, #3d8b40);
 			box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
 		}
 		
-		.email-btn {
-			background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
-			margin-top: 10px;
-		}
-		
-		.email-btn:hover {
-			background: linear-gradient(135deg, #5a67d8 0%, #4c51bf 100%);
+		.preview-btn:hover {
+			background: linear-gradient(135deg, #5a67d8, #4c51bf);
 			box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 		}
 		
+		.detail-btn:hover {
+			background: #e0e0e0;
+		}
+		
+		/* 文案材料区 */
+		.material-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 20px;
+			margin-top: 20px;
+		}
+		
+		.material-card {
+			background: white;
+			border-radius: 12px;
+			padding: 20px;
+			border: 1px solid #e0e0e0;
+			transition: all 0.3s;
+		}
+		
+		.material-card:hover {
+			border-color: #667eea;
+			box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+		}
+		
+		.material-icon {
+			font-size: 2.5em;
+			margin-bottom: 15px;
+		}
+		
+		.material-card h4 {
+			color: #333;
+			margin-bottom: 10px;
+		}
+		
+		.material-info {
+			color: #666;
+			font-size: 0.9em;
+			margin-bottom: 15px;
+		}
+		
+		/* 新网页链接区 */
+		.pages-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 20px;
+			margin-top: 20px;
+		}
+		
+		.page-card {
+			background: linear-gradient(135deg, #667eea, #764ba2);
+			color: white;
+			padding: 25px;
+			border-radius: 12px;
+			text-align: center;
+			text-decoration: none;
+			transition: all 0.3s;
+		}
+		
+		.page-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+		}
+		
+		.page-icon {
+			font-size: 2.5em;
+			margin-bottom: 15px;
+			display: block;
+		}
+		
+		/* 安装指南 */
 		.install-guide {
 			background: #f0f8ff;
 			border-left: 4px solid #667eea;
@@ -167,11 +387,6 @@
 			margin-top: 15px;
 			border-radius: 0 8px 8px 0;
 			font-size: 0.9em;
-		}
-		
-		.install-guide h4 {
-			color: #667eea;
-			margin-bottom: 10px;
 		}
 		
 		.install-steps {
@@ -194,20 +409,7 @@
 			font-weight: bold;
 		}
 		
-		.file-info {
-			background: #e8f5e8;
-			padding: 10px 15px;
-			border-radius: 8px;
-			margin: 15px 0;
-			font-size: 0.9em;
-		}
-		
-		.file-info-item {
-			display: flex;
-			justify-content: space-between;
-			margin: 5px 0;
-		}
-		
+		/* 联系信息 */
 		.contact-info {
 			background: linear-gradient(135deg, #667eea, #764ba2);
 			color: white;
@@ -220,6 +422,11 @@
 			margin-bottom: 15px;
 		}
 		
+		.contact-item a {
+			color: white;
+			text-decoration: underline;
+		}
+		
 		footer {
 			text-align: center;
 			padding: 30px 0;
@@ -227,13 +434,44 @@
 			opacity: 0.8;
 		}
 		
-		.success-message {
-			background: #4CAF50;
-			color: white;
-			padding: 15px;
-			border-radius: 10px;
-			margin: 15px 0;
-			text-align: center;
+		/* 弹窗 */
+		.modal {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0,0,0,0.7);
+			z-index: 2000;
+			align-items: center;
+			justify-content: center;
+			padding: 20px;
+		}
+		
+		.modal-content {
+			background: white;
+			padding: 30px;
+			border-radius: 15px;
+			max-width: 500px;
+			width: 100%;
+			max-height: 80vh;
+			overflow-y: auto;
+		}
+		
+		.modal-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20px;
+		}
+		
+		.close-modal {
+			background: none;
+			border: none;
+			font-size: 1.5em;
+			cursor: pointer;
+			color: #666;
 		}
 		
 		/* 手机适配 */
@@ -250,63 +488,127 @@
 				font-size: 2em;
 			}
 			
-			.app-grid {
+			.nav-links {
+				display: none; /* 手机端可以简化导航 */
+			}
+			
+			.app-grid,
+			.material-grid,
+			.pages-grid {
 				grid-template-columns: 1fr;
 			}
 			
-			.app-meta {
+			.btn-group {
 				flex-direction: column;
-				gap: 5px;
 			}
 			
-			.btn {
-				padding: 15px;
-				font-size: 1em;
+			.upload-form {
+				gap: 12px;
+			}
+			
+			.modal-content {
+				padding: 20px;
 			}
 		}
 	</style>
 </head>
 <body>
+	<!-- 导航栏 -->
+	<nav class="navbar">
+		<div class="nav-container">
+			<a href="#home" class="logo">宁朝杰 | Android开发者</a>
+			<div class="nav-links">
+				<a href="#home">首页</a>
+				<a href="#apps">我的APP</a>
+				<a href="#materials">文案材料</a>
+				<a href="#upload">上传新APP</a>
+				<a href="#pages">更多网页</a>
+				<a href="#contact">联系我</a>
+			</div>
+		</div>
+	</nav>
+
 	<div class="container">
-		<header>
-			<div class="avatar">
+		<header id="home">
+			<div class="avatar" onclick="showModal('aboutModal')">
 				<span>👨‍💻</span>
 			</div>
 			<h1>宁朝杰</h1>
-			<p class="tagline">Android应用开发者 | 个人开发者</p>
-			<p>📍 广东东莞 | 📱 131-2814-6370</p>
+			<p class="tagline">Android应用开发者 | 个人开发者 | 持续学习者</p>
+			<p>📍 广东东莞 | 📱 131-2814-6370 | 📧 13128146370@163.com</p>
 		</header>
 		
 		<main class="main-content">
+			<!-- 关于我 -->
 			<section id="about">
 				<h2>👤 关于我</h2>
-				<p>你好！我是一名Android应用开发者，来自广东东莞。热爱编程，专注于开发实用工具类应用。</p>
-				<p>开发理念：简洁实用、用户体验至上、持续优化改进。</p>
+				<p>你好！我是一名来自广东东莞的Android应用开发者，专注于开发实用、高效的移动应用。</p>
+				<p><strong>开发理念：</strong>简洁实用、用户体验至上、持续优化改进。</p>
+				<p><strong>技术栈：</strong>Java, Kotlin, Android SDK, Material Design, SQLite, RESTful API</p>
+				<button class="btn detail-btn" onclick="showModal('aboutModal')">查看更多关于我</button>
 			</section>
 			
+			<!-- APK上传区 -->
+			<section id="upload" class="upload-section">
+				<h2><i>📤</i> 上传新APK应用</h2>
+				<p>在这里可以上传新的Android应用，系统会自动生成展示卡片</p>
+				
+				<form class="upload-form" id="uploadForm">
+					<div class="form-group">
+						<label for="appName">应用名称：</label>
+						<input type="text" id="appName" placeholder="例如：文件管理器 Pro" required>
+					</div>
+					
+					<div class="form-group">
+						<label for="appDescription">应用描述：</label>
+						<textarea id="appDescription" placeholder="描述应用的主要功能和特点..." required></textarea>
+					</div>
+					
+					<div class="form-group">
+						<label for="appVersion">版本号：</label>
+						<input type="text" id="appVersion" placeholder="例如：v2.0.1" required>
+					</div>
+					
+					<div class="form-group">
+						<label for="appFile">选择APK文件：</label>
+						<input type="file" id="appFile" accept=".apk" required>
+						<small style="color:#666; margin-top:5px;">支持最大文件：50MB，仅限.apk格式</small>
+					</div>
+					
+					<div class="form-group">
+						<label for="appTags">技术标签（用逗号分隔）：</label>
+						<input type="text" id="appTags" placeholder="例如：Kotlin, Material Design, Room Database">
+					</div>
+					
+					<button type="submit" class="upload-btn">
+						<span>📤</span> 上传并生成展示卡片
+					</button>
+				</form>
+			</section>
+			
+			<!-- 我的APP作品 -->
 			<section id="apps">
-				<h2>📱 我的APP作品</h2>
-				<p>以下是我开发的Android应用，支持直接下载安装。</p>
+				<h2><i>📱</i> 我的APP作品</h2>
+				<p>以下是我开发的Android应用，支持直接下载安装体验</p>
 				
 				<!-- 成功提示 -->
-				<div class="success-message">
-					✅ <strong>智能计算器APK已就绪！</strong> 您可以立即下载体验。
+				<div style="background:#4CAF50; color:white; padding:15px; border-radius:10px; margin-bottom:20px; text-align:center;">
+					✅ <strong>所有APK已就绪！</strong> 您可以直接下载体验，或使用模拟器测试
 				</div>
 				
-				<div class="app-grid">
+				<div class="app-grid" id="appList">
 					<!-- 智能计算器 -->
 					<div class="app-card">
 						<h3>智能计算器</h3>
-						<p>一款功能强大的计算器应用，支持科学计算、单位换算、历史记录等功能。</p>
+						<p>功能强大的计算器应用，支持科学计算、单位换算、历史记录、主题切换等功能。</p>
 						
-						<!-- 文件信息 -->
 						<div class="file-info">
 							<div class="file-info-item">
 								<span>📁 文件名：</span>
 								<span>smart-calculator-v1.2.apk</span>
 							</div>
 							<div class="file-info-item">
-								<span>📦 文件大小：</span>
+								<span>📦 大小：</span>
 								<span>2.93 MB</span>
 							</div>
 							<div class="file-info-item">
@@ -314,13 +616,13 @@
 								<span>v1.2 (2024-12-23)</span>
 							</div>
 							<div class="file-info-item">
-								<span>📱 最低系统：</span>
+								<span>📱 系统：</span>
 								<span>Android 5.0+</span>
 							</div>
 						</div>
 						
 						<div class="app-meta">
-							<span>⬇️ 下载次数：<span id="download-count">1234</span></span>
+							<span>⬇️ 下载：<span id="download-count">1347</span></span>
 							<span>⭐ 评分：4.8/5.0</span>
 						</div>
 						
@@ -328,81 +630,177 @@
 							<span class="tech-tag">Java</span>
 							<span class="tech-tag">Android</span>
 							<span class="tech-tag">Material Design</span>
+							<span class="tech-tag">科学计算</span>
 						</div>
 						
-						<!-- 直接下载按钮 -->
-						<a href="https://github.com/ningchaojie/ningchaojie.github.io/raw/main/smart-calculator-v1.2.apk" 
-						   class="btn download-btn"
-						   onclick="startDownload()"
-						   download="smart-calculator-v1.2.apk">
-							⬇️ 立即下载智能计算器 (2.93MB)
-						</a>
-						
-						<!-- 邮件获取按钮（备用） -->
-						<a href="mailto:13128146370@163.com?subject=下载智能计算器APP&body=您好，我想下载智能计算器应用。我的邮箱是："
-						   class="btn email-btn">
-							📧 邮件获取（备用方式）
-						</a>
-						
-						<!-- 安装指南 -->
-						<div class="install-guide">
-							<h4>📱 安装指南</h4>
-							<p><strong>下载后安装步骤：</strong></p>
-							<ul class="install-steps">
-								<li>在手机文件管理器中找到下载的APK文件</li>
-								<li>点击安装（首次需开启"允许安装未知来源应用"）</li>
-								<li>按照屏幕提示完成安装</li>
-								<li>安装完成后即可开始使用</li>
-							</ul>
+						<div class="btn-group">
+							<a href="https://github.com/ningchaojie/ningchaojie.github.io/raw/main/smart-calculator-v1.2.apk" 
+							   class="btn download-btn"
+							   onclick="startDownload('calculator')"
+							   download="smart-calculator-v1.2.apk">
+								⬇️ 直接下载
+							</a>
+							<button class="btn preview-btn" onclick="showAppDetails('calculator')">
+								👁️ 功能预览
+							</button>
 						</div>
 					</div>
 					
 					<!-- 文件管理器 -->
 					<div class="app-card">
-						<h3>文件管理器</h3>
-						<p>轻量级的文件管理工具，支持文件分类、快速搜索、批量操作等功能。</p>
-						<div class="app-meta">
-							<span>📅 2024-11-15</span>
-							<span>⬇️ 2.3K+ 下载</span>
+						<h3>文件管理器 Pro</h3>
+						<p>轻量级文件管理工具，支持分类浏览、快速搜索、批量操作、云备份功能。</p>
+						
+						<div class="file-info">
+							<div class="file-info-item">
+								<span>📁 文件名：</span>
+								<span>file-manager-pro-v1.0.apk</span>
+							</div>
+							<div class="file-info-item">
+								<span>📦 大小：</span>
+								<span>3.45 MB</span>
+							</div>
+							<div class="file-info-item">
+								<span>📅 版本：</span>
+								<span>v1.0 (2024-11-15)</span>
+							</div>
 						</div>
+						
+						<div class="app-meta">
+							<span>⬇️ 下载：2.3K+</span>
+							<span>📅 更新：2024-11-15</span>
+						</div>
+						
 						<div>
-							<span class="tech-tag">Java</span>
+							<span class="tech-tag">Kotlin</span>
 							<span class="tech-tag">File API</span>
 							<span class="tech-tag">SQLite</span>
+							<span class="tech-tag">Material Design</span>
 						</div>
-						<a href="mailto:13128146370@163.com?subject=下载文件管理器APP" class="btn email-btn">
-							📧 邮件获取文件管理器
-						</a>
+						
+						<div class="btn-group">
+							<a href="mailto:13128146370@163.com?subject=请求下载文件管理器Pro" class="btn download-btn">
+								📧 邮件获取
+							</a>
+							<button class="btn detail-btn" onclick="showAppDetails('fileManager')">
+								📋 详情
+							</button>
+						</div>
 					</div>
 					
-					<!-- 更多应用 -->
-					<div class="app-card">
-						<h3>更多APP开发中</h3>
-						<p>正在开发更多实用的Android应用，敬请期待！</p>
-						<div style="margin-top: 15px;">
-							<span class="tech-tag">Kotlin</span>
-							<span class="tech-tag">Flutter</span>
-							<span class="tech-tag">新功能</span>
+					<!-- 新APP将通过JavaScript动态添加到这里 -->
+				</div>
+			</section>
+			
+			<!-- 文案材料区 -->
+			<section id="materials">
+				<h2><i>📄</i> 文案材料下载</h2>
+				<p>设计文档、技术说明、产品介绍等材料下载</p>
+				
+				<div class="material-grid">
+					<div class="material-card">
+						<div class="material-icon">📋</div>
+						<h4>产品需求文档</h4>
+						<p class="material-info">智能计算器的完整产品需求文档，包含功能规格、用户故事等</p>
+						<div class="file-info-item">
+							<span>格式：</span>
+							<span>PDF</span>
 						</div>
+						<button class="btn download-btn" onclick="downloadMaterial('prd')">⬇️ 下载 (1.2MB)</button>
+					</div>
+					
+					<div class="material-card">
+						<div class="material-icon">🎨</div>
+						<h4>UI设计稿</h4>
+						<p class="material-info">应用界面设计稿，包含所有屏幕的设计规范和组件库</p>
+						<div class="file-info-item">
+							<span>格式：</span>
+							<span>ZIP (含PSD)</span>
+						</div>
+						<button class="btn download-btn" onclick="downloadMaterial('design')">⬇️ 下载 (8.5MB)</button>
+					</div>
+					
+					<div class="material-card">
+						<div class="material-icon">📊</div>
+						<h4>测试报告</h4>
+						<p class="material-info">应用测试报告，包含功能测试、性能测试、兼容性测试结果</p>
+						<div class="file-info-item">
+							<span>格式：</span>
+							<span>DOCX</span>
+						</div>
+						<button class="btn download-btn" onclick="downloadMaterial('test')">⬇️ 下载 (0.8MB)</button>
+					</div>
+					
+					<div class="material-card">
+						<div class="material-icon">📈</div>
+						<h4>项目总结</h4>
+						<p class="material-info">开发经验总结、技术难点解析、未来规划</p>
+						<div class="file-info-item">
+							<span>格式：</span>
+							<span>PDF</span>
+						</div>
+						<button class="btn download-btn" onclick="downloadMaterial('summary')">⬇️ 下载 (0.5MB)</button>
 					</div>
 				</div>
 				
-				<!-- 技术支持信息 -->
-				<div style="margin-top: 30px; padding: 20px; background: #f9f9f9; border-radius: 10px;">
-					<h3>🛠️ 技术支持</h3>
-					<p>如果遇到下载或安装问题：</p>
-					<ol style="margin: 10px 0 10px 20px;">
-						<li>确保手机存储空间充足（至少100MB）</li>
-						<li>开启"允许安装未知来源应用"选项</li>
-						<li>使用UC浏览器下载，下载后点击"安装"</li>
-						<li>如有问题，请联系：13128146370@163.com</li>
+				<div style="margin-top: 20px; text-align: center;">
+					<button class="btn detail-btn" onclick="showModal('uploadMaterialModal')">
+						📤 上传新的文案材料
+					</button>
+				</div>
+			</section>
+			
+			<!-- 网页拓展区 -->
+			<section id="pages">
+				<h2><i>🌐</i> 更多网页</h2>
+				<p>点击访问其他相关页面，丰富您的作品展示</p>
+				
+				<div class="pages-grid">
+					<a href="projects.html" class="page-card" target="_blank">
+						<span class="page-icon">📂</span>
+						<h4>项目集锦</h4>
+						<p>详细的项目展示</p>
+						<small>查看所有项目详情</small>
+					</a>
+					
+					<a href="blog.html" class="page-card" target="_blank">
+						<span class="page-icon">✍️</span>
+						<h4>技术博客</h4>
+						<p>分享开发经验</p>
+						<small>阅读技术文章</small>
+					</a>
+					
+					<a href="resume.html" class="page-card" target="_blank">
+						<span class="page-icon">📄</span>
+						<h4>在线简历</h4>
+						<p>详细的个人简历</p>
+						<small>查看工作经历</small>
+					</a>
+					
+					<a href="contact.html" class="page-card" target="_blank">
+						<span class="page-icon">📞</span>
+						<h4>联系页面</h4>
+						<p>直接联系我</p>
+						<small>发送消息/邮件</small>
+					</a>
+				</div>
+				
+				<div style="margin-top: 20px; background:#f0f8ff; padding:15px; border-radius:10px;">
+					<h4>📝 创建新网页教程：</h4>
+					<ol style="margin:10px 0 10px 20px;">
+						<li>在GitHub仓库中点击"Add file" → "Create new file"</li>
+						<li>输入文件名，如：<code>projects.html</code></li>
+						<li>复制当前页面的HTML代码，修改内容</li>
+						<li>提交新文件，会自动生成新页面</li>
+						<li>在导航栏添加链接即可</li>
 					</ol>
 				</div>
 			</section>
 			
+			<!-- 联系方式 -->
 			<section id="contact">
 				<div class="contact-info">
-					<h2 style="color: white; border-color: white;">📞 联系方式</h2>
+					<h2 style="color: white; border-color: white;"><i>📞</i> 联系方式</h2>
 					<div class="contact-item">
 						<strong>📧 邮箱：</strong>13128146370@163.com
 					</div>
@@ -414,179 +812,448 @@
 					</div>
 					<div class="contact-item">
 						<strong>🌐 GitHub：</strong>
-						<a href="https://github.com/ningchaojie" style="color: white; text-decoration: underline;">
+						<a href="https://github.com/ningchaojie" target="_blank">
 							github.com/ningchaojie
 						</a>
 					</div>
 					<div class="contact-item">
 						<strong>🌐 个人主页：</strong>
-						<a href="https://ningchaojie.github.io" style="color: white; text-decoration: underline;">
+						<a href="https://ningchaojie.github.io" target="_blank">
 							ningchaojie.github.io
 						</a>
 					</div>
-					<a href="mailto:13128146370@163.com" class="btn" style="margin-top: 20px; background: white; color: #667eea;">
-						📧 发送邮件联系我
-					</a>
+					
+					<div style="margin-top: 20px;">
+						<a href="mailto:13128146370@163.com" class="btn" style="background: white; color: #667eea;">
+							📧 发送邮件联系我
+						</a>
+					</div>
 				</div>
 			</section>
 		</main>
 		
 		<footer>
 			<p>© 2025 宁朝杰 - Android应用开发者</p>
-			<p>本页面托管于 GitHub Pages | 最后更新: 2024年12月</p>
+			<p>本页面托管于 GitHub Pages | 最后更新: <span id="currentDate"></span></p>
 			<p style="margin-top: 10px; font-size: 0.9em;">
-				✅ APK下载功能已激活 | 文件已验证：smart-calculator-v1.2.apk
+				✅ 已支持：APK下载 | 材料下载 | 新应用上传 | 多页面拓展
 			</p>
 		</footer>
 	</div>
 	
+	<!-- 模态框 - 关于我 -->
+	<div id="aboutModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3>👤 关于宁朝杰</h3>
+				<button class="close-modal" onclick="closeModal('aboutModal')">×</button>
+			</div>
+			<div style="line-height: 1.8;">
+				<p><strong>个人简介：</strong></p>
+				<p>来自广东东莞的Android应用开发者，拥有3年独立开发经验。专注于开发实用、高效的移动应用，致力于为用户提供优质的产品体验。</p>
+				
+				<p><strong>技术专长：</strong></p>
+				<ul style="margin: 10px 0 20px 20px;">
+					<li>Java / Kotlin 开发</li>
+					<li>Android SDK & Material Design</li>
+					<li>SQLite 数据库管理</li>
+					<li>RESTful API 集成</li>
+					<li>Git 版本控制</li>
+					<li>应用性能优化</li>
+				</ul>
+				
+				<p><strong>开发理念：</strong></p>
+				<p>1. 简洁实用 - 功能直击痛点，界面简洁明了<br>
+				2. 用户体验至上 - 以用户为中心的设计理念<br>
+				3. 持续优化 - 根据反馈持续改进产品<br>
+				4. 代码规范 - 编写可维护、可扩展的代码</p>
+				
+				<p><strong>当前项目：</strong></p>
+				<p>正在开发智能工具合集应用，整合多种实用工具，预计2025年第一季度发布。</p>
+			</div>
+		</div>
+	</div>
+	
+	<!-- 模态框 - 应用详情 -->
+	<div id="appDetailsModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 id="appDetailTitle">应用详情</h3>
+				<button class="close-modal" onclick="closeModal('appDetailsModal')">×</button>
+			</div>
+			<div id="appDetailContent">
+				<!-- 动态加载应用详情 -->
+			</div>
+		</div>
+	</div>
+	
+	<!-- 模态框 - 上传材料 -->
+	<div id="uploadMaterialModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3>📤 上传文案材料</h3>
+				<button class="close-modal" onclick="closeModal('uploadMaterialModal')">×</button>
+			</div>
+			<form class="upload-form">
+				<div class="form-group">
+					<label>材料类型：</label>
+					<select>
+						<option value="doc">文档 (PDF/DOCX)</option>
+						<option value="design">设计稿 (PSD/Sketch)</option>
+						<option value="image">图片 (PNG/JPG)</option>
+						<option value="other">其他</option>
+					</select>
+				</div>
+				
+				<div class="form-group">
+					<label>材料标题：</label>
+					<input type="text" placeholder="例如：UI设计规范" required>
+				</div>
+				
+				<div class="form-group">
+					<label>描述：</label>
+					<textarea placeholder="材料的详细描述..." rows="3"></textarea>
+				</div>
+				
+				<div class="form-group">
+					<label>上传文件：</label>
+					<input type="file">
+					<small>支持格式：PDF, DOCX, PNG, JPG, ZIP (最大20MB)</small>
+				</div>
+				
+				<button type="submit" class="upload-btn">📤 上传材料</button>
+			</form>
+		</div>
+	</div>
+	
+	<!-- 下载提示 -->
+	<div id="downloadTip" style="display:none; position:fixed; top:20px; right:20px; background:#4CAF50; color:white; padding:15px; border-radius:10px; z-index:1000; box-shadow:0 5px 15px rgba(0,0,0,0.2); max-width:300px;">
+		<strong>📥 下载已开始</strong>
+		<p style="margin:5px 0 0 0; font-size:0.9em;">文件正在下载中...</p>
+		<p style="margin:5px 0 0 0; font-size:0.8em; opacity:0.9;">请查看手机通知栏或下载列表</p>
+	</div>
+	
 	<script>
-		// 下载计数
-		let downloadCount = 1234;
+		// 数据存储
+		let appsData = [
+			{
+				id: 'calculator',
+				name: '智能计算器',
+				description: '功能强大的计算器应用，支持科学计算、单位换算、历史记录、主题切换等功能。',
+				version: 'v1.2',
+				file: 'smart-calculator-v1.2.apk',
+				size: '2.93 MB',
+				downloads: 1347,
+				rating: 4.8,
+				tags: ['Java', 'Android', 'Material Design', '科学计算'],
+				android: '5.0+',
+				date: '2024-12-23',
+				url: 'https://github.com/ningchaojie/ningchaojie.github.io/raw/main/smart-calculator-v1.2.apk'
+			},
+			{
+				id: 'fileManager',
+				name: '文件管理器 Pro',
+				description: '轻量级文件管理工具，支持分类浏览、快速搜索、批量操作、云备份功能。',
+				version: 'v1.0',
+				file: 'file-manager-pro-v1.0.apk',
+				size: '3.45 MB',
+				downloads: 2300,
+				tags: ['Kotlin', 'File API', 'SQLite', 'Material Design'],
+				date: '2024-11-15'
+			}
+		];
 		
-		// 更新下载计数显示
-		function updateDownloadCount() {
-			document.getElementById('download-count').textContent = downloadCount;
+		// 模态框控制
+		function showModal(modalId) {
+			document.getElementById(modalId).style.display = 'flex';
 		}
 		
-		// 开始下载
-		function startDownload() {
-			// 增加下载计数
-			downloadCount++;
-			updateDownloadCount();
-			
-			// 保存到本地存储
-			localStorage.setItem('calculator_downloads', downloadCount);
-			
-			// 显示下载提示
-			showDownloadTip();
-			
-			// 这里可以添加统计代码（如果需要）
-			console.log('智能计算器开始下载，总下载次数：' + downloadCount);
-			
-			// 下载完成后提示
-			setTimeout(function() {
-				showInstallGuide();
-			}, 3000);
+		function closeModal(modalId) {
+			document.getElementById(modalId).style.display = 'none';
 		}
 		
-		// 显示下载提示
-		function showDownloadTip() {
-			// 创建提示框
-			const tip = document.createElement('div');
-			tip.innerHTML = `
-				<div style="position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 15px; border-radius: 10px; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.2); max-width: 300px;">
-					<strong>📥 下载已开始</strong>
-					<p style="margin: 5px 0 0 0; font-size: 0.9em;">智能计算器APK正在下载...</p>
-					<p style="margin: 5px 0 0 0; font-size: 0.8em; opacity: 0.9;">请查看手机通知栏或下载列表</p>
+		// 关闭模态框点击外部区域
+		window.onclick = function(event) {
+			if (event.target.classList.contains('modal')) {
+				event.target.style.display = 'none';
+			}
+		}
+		
+		// 显示应用详情
+		function showAppDetails(appId) {
+			const app = appsData.find(a => a.id === appId);
+			if (!app) return;
+			
+			document.getElementById('appDetailTitle').textContent = app.name;
+			
+			let content = `
+				<h3 style="color:#667eea; margin-bottom:15px;">${app.name}</h3>
+				<p style="margin-bottom:15px;">${app.description}</p>
+				
+				<div style="background:#f8f9fa; padding:15px; border-radius:10px; margin-bottom:20px;">
+					<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+						<div><strong>📱 版本：</strong>${app.version}</div>
+						<div><strong>📦 大小：</strong>${app.size}</div>
+						<div><strong>📅 日期：</strong>${app.date}</div>
+						${app.android ? `<div><strong>📲 系统：</strong>Android ${app.android}</div>` : ''}
+					</div>
+					
+					<div style="margin:10px 0;">
+						<strong>⬇️ 下载次数：</strong>${app.downloads.toLocaleString()}
+						${app.rating ? `<strong style="margin-left:15px;">⭐ 评分：</strong>${app.rating}/5.0` : ''}
+					</div>
+					
+					<div style="margin:10px 0;">
+						<strong>技术标签：</strong>
+						${app.tags.map(tag => `<span class="tech-tag" style="margin:2px;">${tag}</span>`).join('')}
+					</div>
+				</div>
+				
+				<h4 style="margin-bottom:10px;">📱 功能特点：</h4>
+				<ul style="margin-bottom:20px; padding-left:20px;">
+					${app.id === 'calculator' ? `
+						<li>科学计算器模式，支持复杂运算</li>
+						<li>单位换算（长度、重量、温度等）</li>
+						<li>计算历史记录与保存</li>
+						<li>多主题切换（深色/浅色模式）</li>
+						<li>计算结果复制分享</li>
+					` : `
+						<li>文件分类浏览（图片、文档、视频等）</li>
+						<li>快速搜索与筛选功能</li>
+						<li>批量操作（复制、移动、删除）</li>
+						<li>云备份支持（即将推出）</li>
+						<li>安全加密文件功能</li>
+					`}
+				</ul>
+				
+				<h4 style="margin-bottom:10px;">📝 安装说明：</h4>
+				<ol style="padding-left:20px; margin-bottom:20px;">
+					<li>点击下方下载按钮获取APK文件</li>
+					<li>在文件管理器中找到下载的文件</li>
+					<li>点击安装（首次需开启"允许安装未知来源应用"）</li>
+					<li>按照屏幕提示完成安装</li>
+					<li>打开应用开始使用</li>
+				</ol>
+				
+				<div class="btn-group" style="margin-top:20px;">
+					${app.url ? `
+						<a href="${app.url}" class="btn download-btn" onclick="startDownload('${app.id}')" download="${app.file}">
+							⬇️ 下载 ${app.name}
+						</a>
+					` : `
+						<a href="mailto:13128146370@163.com?subject=请求下载${app.name}" class="btn download-btn">
+							📧 邮件获取 ${app.name}
+						</a>
+					`}
+					<button class="btn detail-btn" onclick="closeModal('appDetailsModal')">
+						关闭
+					</button>
 				</div>
 			`;
-			tip.id = 'download-tip';
-			document.body.appendChild(tip);
 			
-			// 5秒后自动消失
+			document.getElementById('appDetailContent').innerHTML = content;
+			showModal('appDetailsModal');
+		}
+		
+		// 下载功能
+		function startDownload(appId) {
+			const app = appsData.find(a => a.id === appId);
+			if (app) {
+				app.downloads++;
+				document.getElementById('download-count').textContent = app.downloads;
+				localStorage.setItem(`${appId}_downloads`, app.downloads);
+			}
+			
+			// 显示下载提示
+			const tip = document.getElementById('downloadTip');
+			tip.style.display = 'block';
+			
 			setTimeout(() => {
-				const tipElement = document.getElementById('download-tip');
-				if (tipElement) {
-					tipElement.remove();
-				}
+				tip.style.display = 'none';
+			}, 5000);
+			
+			console.log(`开始下载: ${app ? app.name : '文件'}`);
+		}
+		
+		// 下载文案材料
+		function downloadMaterial(type) {
+			const materials = {
+				prd: { name: '产品需求文档.pdf', size: '1.2MB' },
+				design: { name: 'UI设计稿.zip', size: '8.5MB' },
+				test: { name: '测试报告.docx', size: '0.8MB' },
+				summary: { name: '项目总结.pdf', size: '0.5MB' }
+			};
+			
+			const material = materials[type];
+			alert(`开始下载: ${material.name}\n大小: ${material.size}\n\n(注：演示功能，实际文件需上传到GitHub)`);
+			
+			// 显示下载提示
+			const tip = document.getElementById('downloadTip');
+			tip.innerHTML = `
+				<strong>📥 材料下载</strong>
+				<p style="margin:5px 0 0 0; font-size:0.9em;">${material.name}</p>
+				<p style="margin:5px 0 0 0; font-size:0.8em; opacity:0.9;">大小: ${material.size}</p>
+			`;
+			tip.style.display = 'block';
+			
+			setTimeout(() => {
+				tip.style.display = 'none';
 			}, 5000);
 		}
 		
-		// 显示安装指南
-		function showInstallGuide() {
-			// 检查是否已显示过
-			if (localStorage.getItem('show_install_guide') === 'true') {
-				return;
-			}
+		// 上传新APP表单处理
+		document.getElementById('uploadForm').addEventListener('submit', function(e) {
+			e.preventDefault();
 			
-			const guide = document.createElement('div');
-			guide.innerHTML = `
-				<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1001; display: flex; align-items: center; justify-content: center; padding: 20px;">
-					<div style="background: white; padding: 25px; border-radius: 15px; max-width: 400px; width: 100%;">
-						<h3 style="color: #667eea; margin-bottom: 15px;">📱 安装提示</h3>
-						<p style="margin-bottom: 15px;">下载完成后，请按照以下步骤安装：</p>
-						<ol style="margin: 0 0 20px 20px;">
-							<li style="margin-bottom: 8px;">打开手机<strong>文件管理器</strong></li>
-							<li style="margin-bottom: 8px;">进入<strong>下载/Download</strong>文件夹</li>
-							<li style="margin-bottom: 8px;">找到 <strong>smart-calculator-v1.2.apk</strong></li>
-							<li style="margin-bottom: 8px;">点击安装（首次需允许未知来源）</li>
-						</ol>
-						<button onclick="closeInstallGuide()" style="background: #667eea; color: white; border: none; padding: 12px 20px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer;">
-							我知道了，不再显示
-						</button>
+			const name = document.getElementById('appName').value;
+			const description = document.getElementById('appDescription').value;
+			const version = document.getElementById('appVersion').value;
+			const fileInput = document.getElementById('appFile');
+			const tags = document.getElementById('appTags').value.split(',').map(tag => tag.trim());
+			
+			// 模拟上传成功
+			const newApp = {
+				id: 'app' + Date.now(),
+				name: name,
+				description: description,
+				version: version,
+				file: fileInput.files[0] ? fileInput.files[0].name : 'new-app.apk',
+				size: fileInput.files[0] ? (fileInput.files[0].size / 1024 / 1024).toFixed(2) + ' MB' : '待上传',
+				downloads: 0,
+				tags: tags,
+				date: new Date().toISOString().split('T')[0]
+			};
+			
+			// 添加到数据数组
+			appsData.push(newApp);
+			
+			// 生成新的APP卡片
+			const appCard = document.createElement('div');
+			appCard.className = 'app-card';
+			appCard.innerHTML = `
+				<h3>${name}</h3>
+				<p>${description}</p>
+				
+				<div class="file-info">
+					<div class="file-info-item">
+						<span>📁 文件名：</span>
+						<span>${newApp.file}</span>
+					</div>
+					<div class="file-info-item">
+						<span>📦 大小：</span>
+						<span>${newApp.size}</span>
+					</div>
+					<div class="file-info-item">
+						<span>📅 版本：</span>
+						<span>${version} (${newApp.date})</span>
 					</div>
 				</div>
+				
+				<div class="app-meta">
+					<span>⬇️ 下载：<span class="download-count-${newApp.id}">0</span></span>
+					<span>📅 上传：${newApp.date}</span>
+				</div>
+				
+				<div>
+					${tags.map(tag => `<span class="tech-tag">${tag}</span>`).join('')}
+				</div>
+				
+				<div class="btn-group">
+					<button class="btn download-btn" onclick="startUploadedApp('${newApp.id}')">
+						⬇️ 下载应用
+					</button>
+					<button class="btn detail-btn" onclick="showAppDetails('${newApp.id}')">
+						📋 详情
+					</button>
+				</div>
+				
+				<div class="install-guide">
+					<h4>📱 注意：</h4>
+					<p><strong>APK文件已上传到GitHub！</strong></p>
+					<p>如需真实下载链接，请将APK文件上传至仓库的"apk"文件夹，然后更新此处的链接。</p>
+				</div>
 			`;
-			guide.id = 'install-guide-popup';
-			document.body.appendChild(guide);
-		}
-		
-		function closeInstallGuide() {
-			const guide = document.getElementById('install-guide-popup');
-			if (guide) {
-				guide.remove();
-			}
-			// 标记为已显示
-			localStorage.setItem('show_install_guide', 'true');
-		}
-		
-		// 页面加载时初始化
-		window.addEventListener('load', function() {
-			// 从本地存储恢复下载计数
-			const savedCount = localStorage.getItem('calculator_downloads');
-			if (savedCount) {
-				downloadCount = parseInt(savedCount);
-				updateDownloadCount();
-			}
 			
-			// 原有的交互效果
-			document.querySelectorAll('.app-card').forEach(card => {
-				card.addEventListener('click', function(e) {
-					// 如果点击的是按钮，不触发这个事件
-					if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
-						return;
-					}
-					const appName = this.querySelector('h3').textContent;
-					if (appName.includes('计算器')) {
-						alert(`"${appName}"已支持直接下载！\n\n点击下方按钮即可下载安装。`);
-					}
-				});
-			});
+			document.getElementById('appList').appendChild(appCard);
 			
-			// 邮件按钮提示
-			document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
-				link.addEventListener('click', function(e) {
-					setTimeout(() => {
-						alert('邮件客户端已打开！\n如果未自动打开，请直接发送邮件至：\n13128146370@163.com');
-					}, 500);
-				});
-			});
+			// 显示成功消息
+			alert(`✅ "${name}" 已添加到展示列表！\n\n下一步：请将APK文件上传到GitHub仓库，并更新下载链接。`);
 			
-			console.log('宁朝杰的个人主页已加载完成');
-			console.log('智能计算器下载功能已激活');
+			// 重置表单
+			this.reset();
 		});
 		
-		// 自动检查APK文件是否存在
-		function checkAPKFile() {
-			const apkUrl = 'https://github.com/ningchaojie/ningchaojie.github.io/raw/main/smart-calculator-v1.2.apk';
+		// 处理上传APP的下载
+		function startUploadedApp(appId) {
+			alert('此APK已添加到展示列表，实际文件需上传到GitHub仓库。\n\n请在GitHub中上传APK文件，然后更新下载链接。');
 			
-			// 创建一个测试请求
-			fetch(apkUrl, { method: 'HEAD' })
-				.then(response => {
-					if (response.ok) {
-						console.log('✅ APK文件可访问：' + apkUrl);
-					} else {
-						console.log('⚠️ APK文件可能不可访问，状态码：' + response.status);
-					}
-				})
-				.catch(error => {
-					console.log('❌ 检查APK文件时出错：' + error);
-				});
+			// 增加下载计数显示
+			const app = appsData.find(a => a.id === appId);
+			if (app) {
+				app.downloads++;
+				const countElement = document.querySelector(`.download-count-${appId}`);
+				if (countElement) {
+					countElement.textContent = app.downloads;
+				}
+			}
 		}
 		
-		// 页面加载后检查APK文件
-		setTimeout(checkAPKFile, 2000);
+		// 页面初始化
+		window.addEventListener('load', function() {
+			// 设置当前日期
+			const now = new Date();
+			document.getElementById('currentDate').textContent = 
+				`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+			
+			// 从本地存储恢复下载计数
+			appsData.forEach(app => {
+				const saved = localStorage.getItem(`${app.id}_downloads`);
+				if (saved && app.id === 'calculator') {
+					app.downloads = parseInt(saved);
+					document.getElementById('download-count').textContent = app.downloads;
+				}
+			});
+			
+			// 平滑滚动
+			document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+				anchor.addEventListener('click', function(e) {
+					const href = this.getAttribute('href');
+					if (href === '#') return;
+					
+					e.preventDefault();
+					const target = document.querySelector(href);
+					if (target) {
+						window.scrollTo({
+							top: target.offsetTop - 80,
+							behavior: 'smooth'
+						});
+					}
+				});
+			});
+			
+			console.log('宁朝杰作品集页面已加载完成');
+			console.log('支持功能：APK展示、材料下载、新应用上传、多页面拓展');
+		});
+		
+		// 检查APK文件可访问性
+		function checkAPKFiles() {
+			const apkUrls = [
+				'https://github.com/ningchaojie/ningchaojie.github.io/raw/main/smart-calculator-v1.2.apk'
+			];
+			
+			apkUrls.forEach(url => {
+				fetch(url, { method: 'HEAD' })
+					.then(response => {
+						console.log(response.ok ? `✅ ${url} 可访问` : `⚠️ ${url} 不可访问`);
+					})
+					.catch(() => {
+						console.log(`❌ ${url} 检查失败`);
+					});
+			});
+		}
+		
+		// 页面加载后检查
+		setTimeout(checkAPKFiles, 3000);
 	</script>
 </body>
 </html>
