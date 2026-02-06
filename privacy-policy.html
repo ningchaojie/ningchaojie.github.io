@@ -5,70 +5,166 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>隐私政策 - LaTeX公式编辑器</title>
 	<style>
-		body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 20px auto; padding: 20px; }
-		h1 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-		h2 { color: #34495e; margin-top: 25px; }
-		.update { color: #7f8c8d; font-size: 0.9em; margin-bottom: 30px; }
-		.highlight { background: #f8f9fa; padding: 15px; border-left: 4px solid #3498db; margin: 20px 0; }
-		.contact { background: #e8f4fc; padding: 15px; border-radius: 5px; margin-top: 30px; }
+		body { 
+			font-family: sans-serif; 
+			line-height: 1.6; 
+			max-width: 800px; 
+			margin: 20px auto; 
+			padding: 20px; 
+			color: #333; 
+		}
+		h1 { 
+			color: #2c3e50; 
+			border-bottom: 2px solid #eee; 
+			padding-bottom: 10px; 
+		}
+		h2 { 
+			color: #34495e; 
+			margin-top: 25px; 
+		}
+		.header-box { 
+			background: #e8f4fc; 
+			padding: 20px; 
+			border-radius: 8px; 
+			margin: 20px 0; 
+		}
+		.update-info { 
+			color: #7f8c8d; 
+			font-size: 0.9em; 
+			margin-bottom: 30px; 
+		}
+		.contact { 
+			background: #f8f9fa; 
+			padding: 15px; 
+			border-radius: 5px; 
+			margin-top: 30px; 
+		}
+		.highlight {
+			background: #fff3cd;
+			border-left: 4px solid #ffc107;
+			padding: 15px;
+			border-radius: 5px;
+			margin: 20px 0;
+		}
+		a { 
+			color: #3498db; 
+			text-decoration: none;
+		}
+		a:hover {
+			text-decoration: underline;
+		}
 	</style>
 </head>
 <body>
-
 	<h1>LaTeX公式编辑器 隐私政策</h1>
-	<p class="update"><strong>生效日期：</strong>2026年2月3日<br><strong>最后更新：</strong>2026年2月3日</p>
-
-	<div class="highlight">
-	     <p><strong>应用名称：</strong>LaTeX公式编辑器</p>
- 		 <p><strong>开发者（运营方）：</strong>宁朝杰</p>
- 		 <p><strong>联系方式：</strong>13128146370@163.com</p>
-<!-- 以下是原有的隐私政策内容... -->
-		<p><strong>核心声明：</strong>LaTeX公式编辑器是一款<b>完全免费</b>的本地工具应用。所有功能均在您设备本地完成，<b>我们不会收集、存储或上传您的任何个人信息或公式数据</b>。</p>
+	<p class="update-info">
+		<strong>生效日期：</strong>2026年2月3日<br>
+		<strong>最后更新：</strong>2026年2月7日<br>
+		<strong>版本：</strong>1.2
+	</p>
+	
+	<div class="header-box">
+		<p><strong>应用名称：</strong>LaTeX公式编辑器</p>
+		<p><strong>开发者（运营方）：</strong>宁朝杰</p>
+		<p><strong>联系方式：</strong>13128146370@163.com</p>
+		<p><strong>核心声明：</strong>本应用为<b>完全免费、纯本地运行</b>的工具。所有功能均在您设备本地完成，<b>我们不会收集、存储或上传您的任何个人信息或公式数据</b>。</p>
 	</div>
-
+	
+	<div class="highlight">
+		<p><strong>⚠️ 重要说明：</strong>本应用在以下三种情况下会访问网络，且仅限于此：</p>
+		<ol>
+			<li>首次启动时加载应用图标（从GitHub服务器）</li>
+			<li>在"关于"页面查看本《隐私政策》（从GitHub Pages加载）</li>
+			<li>在"关于"页面查看《个人备案》信息（从GitHub Pages加载）</li>
+		</ol>
+		<p>这些网络访问<b>不涉及任何用户数据上传</b>，仅用于获取静态资源文件。应用的核心公式编辑和预览功能完全离线运行。</p>
+	</div>
+	
 	<h2>1. 我们如何对待您的数据</h2>
-	<p>本应用的设计遵循“隐私优先”原则：</p>
+	<p>本应用的设计严格遵循"隐私优先"原则：</p>
 	<ul>
 		<li><b>无数据收集</b>：应用不包含任何用于收集用户个人信息（如姓名、邮箱、设备标识符）的代码。</li>
-		<li><b>纯粹的本地处理</b>：您输入的所有数学公式、编辑操作仅在您设备的内存中进行处理和预览，<b>永远不会离开您的设备</b>，也不会被发送到任何远程服务器。</li>
-		<li><b>无账户系统</b>：应用无需注册登录，避免了与此相关的数据风险。</li>
+		<li><b>纯粹的本地处理</b>：您输入的所有数学公式、编辑操作仅在您设备的内存中进行处理和预览，<b>永远不会离开您的设备</b>。</li>
+		<li><b>无账户系统</b>：应用无需注册登录，不涉及任何账户数据。</li>
 	</ul>
-
-	<h2>2. 本地存储说明</h2>
-	<p>为了提供基本的应用体验，我们仅在您设备的本地存储（如浏览器的LocalStorage）中保存以下<b>非个人信息</b>：</p>
+	
+	<h2>2. 联网行为详细说明</h2>
+	<p>本应用的网络访问极为有限，具体如下：</p>
+	
+	<h3>2.1 网络访问目的</h3>
 	<ul>
-		<li><b>界面偏好</b>：如您选择的字体大小、主题颜色等设置，以便您下次打开时应用保持一致。</li>
-		<li><b>临时数据</b>：当前正在编辑的公式内容（仅限当前会话，用于防止意外关闭导致内容丢失）。</li>
+		<li><b>加载应用图标</b>：仅在首次启动时从GitHub服务器加载一次图标文件</li>
+		<li><b>显示隐私政策</b>：当您在"关于"页面点击"隐私政策"链接时，从GitHub Pages加载此HTML文件</li>
+		<li><b>显示个人备案</b>：当您在"关于"页面点击"个人备案"链接时，从GitHub Pages加载备案信息</li>
 	</ul>
-	<p>您可以在设备的应用设置中随时清除这些数据，且清除操作不会影响应用的核心功能。</p>
-
-	<h2>3. 关于第三方服务</h2>
+	
+	<h3>2.2 网络访问特点</h3>
+	<ul>
+		<li><b>只读访问</b>：仅从远程服务器读取文件，不向任何服务器发送数据</li>
+		<li><b>无追踪</b>：网络请求不包含任何用户标识信息或追踪参数</li>
+		<li><b>可缓存</b>：加载的资源会被设备缓存，后续使用无需重复下载</li>
+		<li><b>非必需</b>：即使网络访问失败，应用核心功能仍可正常使用</li>
+	</ul>
+	
+	<h3>2.3 网络请求地址</h3>
+	<ul>
+		<li>图标：<code>https://ningchaojie.github.io/LaTeX公式编辑器.png</code></li>
+		<li>隐私政策：<code>https://ningchaojie.github.io/privacy-policy.html</code></li>
+		<li>个人备案：<code>https://ningchaojie.github.io/record.html</code></li>
+	</ul>
+	
+	<h2>3. 本地存储说明</h2>
+	<p>为提供基础体验，我们仅在您设备的本地存储中保存以下<b>非个人信息</b>：</p>
+	<ul>
+		<li><b>界面偏好</b>：如您选择的字体大小等设置。</li>
+		<li><b>临时数据</b>：当前编辑的公式内容（仅限本次使用，用于防止意外关闭）。</li>
+	</ul>
+	<p>您可以在设备的应用设置中随时清除这些数据。</p>
+	
+	<h2>4. 关于第三方服务</h2>
 	<p>当前版本的LaTeX公式编辑器：</p>
 	<ul>
-		<li><b>不包含任何广告</b>：应用内没有任何第三方广告SDK或广告内容。</li>
-		<li><b>不集成分析工具</b>：我们没有集成任何用户行为分析工具（如Google Analytics）。</li>
-		<li><b>无社交分享插件</b>：应用内的“导出”功能仅在设备本地生成图片，是否分享、如何分享完全由您通过设备系统的分享功能决定，我们不会介入此过程。</li>
+		<li><b>不包含任何广告与分析工具</b>：应用内没有广告SDK或用户行为分析工具。</li>
+		<li><b>无社交分享插件</b>：应用内的"导出"功能仅在本地生成图片，是否分享完全由您决定。</li>
+		<li><b>使用的开源库</b>：应用在本地使用了 <b>KaTeX</b>（用于公式渲染）和 <b>html2canvas</b>（用于导出图片）这两个纯前端库。它们不涉及数据传输。</li>
 	</ul>
-
-	<h2>4. 您的权利</h2>
+	
+	<h2>5. 您的权利</h2>
 	<p>由于我们不收集数据，您天然享有以下权利：</p>
 	<ul>
-		<li><b>访问权</b>：您的所有数据都存储在您自己的设备上，您拥有完全的控制权和访问权。</li>
-		<li><b>删除权</b>：您可以随时通过卸载应用或清除应用数据来永久删除所有相关信息。</li>
-		<li><b>控制权</b>：您可以随时在设备设置中关闭本应用的网络访问权限（尽管应用基本无需联网），这不会影响核心的公式编辑功能。</li>
+		<li><b>访问权与控制权</b>：您的所有数据都存储在您自己的设备上。</li>
+		<li><b>删除权</b>：您可以随时通过卸载应用来永久删除所有相关信息。</li>
+		<li><b>网络控制权</b>：您可以在系统设置中禁用本应用的网络访问，这只会影响图标和政策文件的加载，不影响核心功能。</li>
 	</ul>
-
-	<h2>5. 本政策的变更</h2>
-	<p>如果未来我们决定为应用添加新功能（如基于用户自愿的匿名错误反馈），我们可能会更新此政策。政策更新后，我们会在应用内或项目页面发布通知。您继续使用应用即表示接受更新后的政策。</p>
-
+	
+	<h2>6. 关于华为应用市场</h2>
+	<p>本应用通过华为应用市场（AppGallery）分发。您从该市场下载、安装本应用的行为，同时受<a href="https://consumer.huawei.com/minisite/cloudservice/agreement.htm?country=CN" target="_blank">《华为应用市场用户协议》</a>和<a href="https://consumer.huawei.com/minisite/cloudservice/privacy-policy.htm?country=CN" target="_blank">《华为消费者业务隐私声明》</a>的约束。华为作为分发平台，其自身的数据处理行为不适用本政策。</p>
+	
+	<h2>7. 未成年人保护</h2>
+	<p>本应用作为数学工具，不主动面向未成年人提供服务。监护人应注意：</p>
+	<ul>
+		<li>应用允许自由输入文本，请指导未成年人不要输入任何个人信息</li>
+		<li>应用内不含任何不适合未成年人的内容</li>
+		<li>应用不包含社交功能或互动功能</li>
+	</ul>
+	
+	<h2>8. 本政策的变更</h2>
+	<p>如果未来我们更新此政策，会在以下位置发布：</p>
+	<ul>
+		<li>GitHub Pages上的本隐私政策页面</li>
+		<li>华为应用市场的版本更新说明</li>
+	</ul>
+	<p>您继续使用应用即表示接受更新后的政策。</p>
+	
 	<div class="contact">
-		<h2>6. 联系我们</h2>
-		<p>如果您对这款免费工具有任何疑问、建议，或关于本隐私政策有任何疑虑，欢迎通过以下方式与我们联系：</p>
-		<p><strong>开发者邮箱：</strong>13128146370@163.com </p>
-		<p><strong>项目主页：</strong> <a href="https://github.com/ningchaojie/ningchaojie.github.io" target="_blank">https://github.com/ningchaojie/ningchaojie.github.io</a></p>
-		<p><strong>应用开发中心：</strong> <a href="https://ningchaojie.github.io" target="_blank">https://ningchaojie.github.io</a></p>	
-		<p>我们承诺会认真对待每一位用户的反馈。</p>
+		<h2>9. 联系我们</h2>
+		<p>如果您对本隐私政策有任何疑问或建议，欢迎通过以下方式联系：</p>
+		<p><strong>开发者邮箱：</strong><a href="mailto:13128146370@163.com">13128146370@163.com</a></p>
+		<p><strong>项目主页：</strong> <a href="https://ningchaojie.github.io" target="_blank">https://ningchaojie.github.io</a></p>
+		<p><strong>本隐私政策链接：</strong> <a href="https://ningchaojie.github.io/privacy-policy.html" target="_blank">https://ningchaojie.github.io/privacy-policy.html</a></p>
+		<p><strong>个人备案信息：</strong> <a href="https://ningchaojie.github.io/record.html" target="_blank">https://ningchaojie.github.io/record.html</a></p>
+		<p>我们会认真对待每一位用户的反馈。</p>
+		<p>© 2026 宁朝杰 版权所有</p>
 	</div>
-
 </body>
 </html>
