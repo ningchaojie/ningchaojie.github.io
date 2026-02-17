@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+	<title>LaTeX 公式编辑器 · 新版本介绍</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+			background: linear-gradient(145deg, #f5f7fa 0%, #e9ecf0 100%);
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 16px;
+		}
+
+		.container {
+			max-width: 720px;
+			width: 100%;
+			background: rgba(255,255,255,0.85);
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+			border-radius: 32px;
+			box-shadow: 0 20px 40px rgba(0,20,50,0.15), 0 4px 12px rgba(0,0,0,0.05);
+			padding: 24px 20px 32px;
+			margin: 12px 0 24px;
+			border: 1px solid rgba(255,255,255,0.5);
+		}
+
+		h1 {
+			font-size: 2.2rem;
+			font-weight: 700;
+			background: linear-gradient(135deg, #1e2b4f, #2a3f6e);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			margin-bottom: 8px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		h1 span {
+			font-size: 2rem;
+			background: none;
+			-webkit-text-fill-color: #4a6fa5;
+		}
+
+		.subtitle {
+			font-size: 1.1rem;
+			color: #4a5568;
+			margin-bottom: 28px;
+			border-left: 4px solid #4a90e2;
+			padding-left: 16px;
+			background: rgba(74,144,226,0.05);
+			border-radius: 0 8px 8px 0;
+			line-height: 1.5;
+		}
+
+		.version-badge {
+			display: inline-block;
+			background: #4a90e2;
+			color: white;
+			font-weight: 600;
+			font-size: 0.9rem;
+			padding: 6px 16px;
+			border-radius: 40px;
+			letter-spacing: 0.3px;
+			margin-bottom: 24px;
+			box-shadow: 0 4px 8px rgba(74,144,226,0.3);
+		}
+
+		.feature-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+			gap: 16px;
+			margin: 30px 0 20px;
+		}
+
+		.feature-card {
+			background: white;
+			border-radius: 24px;
+			padding: 20px 12px;
+			text-align: center;
+			box-shadow: 0 6px 14px rgba(0,0,0,0.02);
+			transition: transform 0.2s ease, box-shadow 0.2s ease;
+			border: 1px solid rgba(0,0,0,0.03);
+		}
+
+		.feature-card:hover {
+			transform: translateY(-4px);
+			box-shadow: 0 16px 24px rgba(0,0,0,0.06);
+		}
+
+		.feature-icon {
+			font-size: 2.4rem;
+			margin-bottom: 12px;
+		}
+
+		.feature-title {
+			font-weight: 600;
+			color: #1e2b4f;
+			margin-bottom: 8px;
+			font-size: 1.1rem;
+		}
+
+		.feature-desc {
+			font-size: 0.85rem;
+			color: #5f6b7a;
+			line-height: 1.4;
+		}
+
+		.update-section {
+			background: #f0f4fe;
+			border-radius: 24px;
+			padding: 20px 18px;
+			margin: 28px 0 20px;
+			border-left: 5px solid #4a90e2;
+		}
+
+		.update-title {
+			font-size: 1.3rem;
+			font-weight: 700;
+			color: #1a2b44;
+			margin-bottom: 12px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.update-list {
+			list-style: none;
+		}
+
+		.update-list li {
+			padding: 10px 0;
+			border-bottom: 1px solid rgba(74,144,226,0.2);
+			display: flex;
+			gap: 12px;
+			align-items: flex-start;
+			color: #2d3f5e;
+		}
+
+		.update-list li:last-child {
+			border-bottom: none;
+		}
+
+		.update-list .tag {
+			background: #4a90e2;
+			color: white;
+			font-size: 0.7rem;
+			font-weight: 600;
+			padding: 4px 8px;
+			border-radius: 40px;
+			white-space: nowrap;
+		}
+
+		.screenshot-area {
+			margin: 28px 0;
+			border-radius: 24px;
+			overflow-x: auto;
+			white-space: nowrap;
+			padding: 6px 0;
+			-webkit-overflow-scrolling: touch;
+			scrollbar-width: thin;
+		}
+
+		.screenshot-track {
+			display: flex;
+			gap: 16px;
+		}
+
+		.screenshot-item {
+			flex: 0 0 auto;
+			width: 220px;
+			background: #d9e2ef;
+			border-radius: 20px;
+			overflow: hidden;
+			box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+			border: 2px solid white;
+		}
+
+		.screenshot-placeholder {
+			background: linear-gradient(145deg, #b8c8dd, #9aafcb);
+			height: 140px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			font-size: 2rem;
+			text-shadow: 0 2px 6px rgba(0,0,0,0.2);
+		}
+
+		.screenshot-caption {
+			padding: 10px;
+			background: white;
+			font-size: 0.8rem;
+			text-align: center;
+			color: #1f2b3a;
+			font-weight: 500;
+		}
+
+		.download-area {
+			background: white;
+			border-radius: 28px;
+			padding: 24px;
+			margin: 24px 0 12px;
+			text-align: center;
+			box-shadow: 0 8px 20px rgba(0,30,60,0.08);
+		}
+
+		.qrcode-placeholder {
+			width: 130px;
+			height: 130px;
+			background: #eceff5;
+			margin: 12px auto 18px;
+			border-radius: 20px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #7b8ba0;
+			font-size: 0.9rem;
+			border: 2px dashed #b3c2d1;
+		}
+
+		.btn {
+			background: #4a90e2;
+			color: white;
+			border: none;
+			padding: 16px 32px;
+			border-radius: 48px;
+			font-size: 1.2rem;
+			font-weight: 600;
+			width: 100%;
+			max-width: 280px;
+			margin: 12px auto 0;
+			display: inline-block;
+			text-decoration: none;
+			box-shadow: 0 10px 18px rgba(74,144,226,0.4);
+			transition: all 0.15s ease;
+		}
+
+		.btn:active {
+			transform: scale(0.96);
+			box-shadow: 0 5px 10px rgba(74,144,226,0.4);
+		}
+
+		.btn-secondary {
+			background: #eef2f7;
+			color: #2d3f5e;
+			box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+			margin-top: 10px;
+			font-size: 1rem;
+			padding: 12px 24px;
+		}
+
+		.footer-note {
+			text-align: center;
+			color: #6f7d95;
+			font-size: 0.8rem;
+			margin-top: 30px;
+			border-top: 1px solid rgba(0,0,0,0.05);
+			padding-top: 18px;
+		}
+
+		.footer-note a {
+			color: #4a90e2;
+			text-decoration: none;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>
+			<span>∑</span> LaTeX 公式编辑器
+		</h1>
+		<div class="subtitle">
+			专业 · 轻量 · 全平台
+		</div>
+		<div class="version-badge">
+			🚀 全新版本 v2.5.0
+		</div>
+
+		<!-- 核心功能卡片 -->
+		<div class="feature-grid">
+			<div class="feature-card">
+				<div class="feature-icon">⚡</div>
+				<div class="feature-title">实时渲染</div>
+				<div class="feature-desc">输入即预览，支持 KaTeX 全语法</div>
+			</div>
+			<div class="feature-card">
+				<div class="feature-icon">🖱️</div>
+				<div class="feature-title">符号面板</div>
+				<div class="feature-desc">200+ 常用符号，分门别类一键插入</div>
+			</div>
+			<div class="feature-card">
+				<div class="feature-icon">📸</div>
+				<div class="feature-title">导出图片/PDF</div>
+				<div class="feature-desc">高清截图、打印 PDF，支持页面设置</div>
+			</div>
+			<div class="feature-card">
+				<div class="feature-icon">📁</div>
+				<div class="feature-title">文件管理</div>
+				<div class="feature-desc">本地保存、打开、删除，多文件切换</div>
+			</div>
+		</div>
+
+		<!-- 更新亮点 -->
+		<div class="update-section">
+			<div class="update-title">
+				<span>✨</span> 此版本新特性
+			</div>
+			<ul class="update-list">
+				<li>
+					<span class="tag">新增</span>
+					手写识别入口：一键跳转 SimpleTex，图片转 LaTeX
+				</li>
+				<li>
+					<span class="tag">优化</span>
+					智能换行功能，自动对齐多行公式
+				</li>
+				<li>
+					<span class="tag">增强</span>
+					全屏模式缩放、字体大小独立记忆
+				</li>
+				<li>
+					<span class="tag">新增</span>
+					文件管理器（IndexedDB 存储），支持重命名、覆盖保存
+				</li>
+				<li>
+					<span class="tag">修复</span>
+					大括号环境断裂问题，cases 等环境完美显示
+				</li>
+				<li>
+					<span class="tag">体验</span>
+					工具栏分类收起/展开，键盘弹出自动适配布局
+				</li>
+			</ul>
+		</div>
+
+		<!-- 截图展示区（占位，可替换为真实截图） -->
+		<div class="screenshot-area">
+			<div class="screenshot-track">
+				<div class="screenshot-item">
+					<div class="screenshot-placeholder">📱 主界面</div>
+					<div class="screenshot-caption">编辑 & 预览</div>
+				</div>
+				<div class="screenshot-item">
+					<div class="screenshot-placeholder">🔣 符号面板</div>
+					<div class="screenshot-caption">分类符号</div>
+				</div>
+				<div class="screenshot-item">
+					<div class="screenshot-placeholder">📂 文件管理</div>
+					<div class="screenshot-caption">保存/打开</div>
+				</div>
+				<div class="screenshot-item">
+					<div class="screenshot-placeholder">🖨️ 打印PDF</div>
+					<div class="screenshot-caption">页面设置</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 下载或使用区（已完善APK下载链接） -->
+		<div class="download-area">
+			<div style="font-size: 1.4rem; font-weight: 600; color: #1e2b4f;">获取最新版本</div>
+			<div style="color: #55657b; margin: 8px 0 6px;">Android 应用 · 完全免费</div>
+			
+			<!-- 二维码占位（可替换为真实下载二维码） -->
+			<div class="qrcode-placeholder">
+				<span>📲 扫码下载</span>
+			</div>
+
+			<!-- 真实的 APK 下载链接，添加 download 属性强制下载 -->
+			<a href="https://ningchaojie.github.io/Latex%E5%85%AC%E5%BC%8F%E7%BC%96%E8%BE%91%E5%99%A84.apk" 
+			   class="btn" 
+			   download="Latex公式编辑器4.apk">
+			   📥 直接下载 APK
+			</a>
+			
+			<!-- 备用下载按钮（例如 PDF 版本，可自行替换链接） -->
+			<a href="https://ningchaojie.github.io/Latex公式编辑器使用手册.pdf" 
+			   class="btn btn-secondary" 
+			   download="LaTeX公式编辑器使用手册.pdf" 
+			   style="display: none;">📄 下载使用手册 (PDF)</a>
+			
+			<a href="https://ningchaojie.github.io" class="btn btn-secondary" target="_blank">🌐 访问开发者网站</a>
+			
+			<div style="margin-top: 18px; font-size: 0.9rem; background: #f4f9ff; padding: 12px; border-radius: 20px;">
+				⚡ 网页版同样可用：<br>
+				<a href="https://ningchaojie.github.io/latex公式编辑器.html" style="color:#4a90e2; word-break:break-all;" target="_blank">ningchaojie.github.io/latex公式编辑器.html</a>
+			</div>
+		</div>
+
+		<!-- 留言互动提示（后续会集成到 App 内） -->
+		<div style="background: #e9f0fb; border-radius: 20px; padding: 16px; margin: 20px 0 10px; border: 1px solid #cddef7;">
+			<div style="display: flex; gap: 12px; align-items: center;">
+				<span style="font-size: 2rem;">💬</span>
+				<div>
+					<div style="font-weight: 600; color: #1a2b44;">留言反馈即将上线</div>
+					<div style="font-size: 0.85rem; color: #42648d;">App 内评论互动功能开发中，敬请期待</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="footer-note">
+			<p>© 2025  ningchaojie.github.io  ·  LaTeX 公式编辑器<br>
+			<a href="https://ningchaojie.github.io">返回主站</a>   |   <a href="#" onclick="alert('感谢使用！')">意见反馈</a></p>
+		</div>
+	</div>
+</body>
+</html>
