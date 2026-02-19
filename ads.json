@@ -22,5 +22,21 @@
     "image": "https://images.unsplash.com/photo-1509228468518-180dd4864904?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
     "link": "https://e.tb.cn/h.7OBJNA3SnYFXa2z",
     "aspectRatio": 1.7777777777777777
+  },
+  {
+    "id": 4,
+    "title": "三星 Note8 手机",
+    "description": "国行双卡note9全网通4G曲屏手机",
+    "image": "https://ningchaojie.github.io/20260220_020302.jpg",
+    "link": "https://e.tb.cn/h.7yk7Yxivt4gPMeh?tk=2kPkUoOgzK6",
+    "aspectRatio": 0.75
+  },
+  {
+    "id": 5,
+    "title": "自酿葡萄酒原料",
+    "description": "男女士原汁5斤半甜自酿葡萄酒",
+    "image": "https://ningchaojie.github.io/20260220_020217.png",
+    "link": "https://e.tb.cn/h.7yyIiUP?tk=H4dZUoO8TL8",
+    "aspectRatio": 1.0
   }
 ]
