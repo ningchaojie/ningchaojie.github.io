@@ -1,26 +1,26 @@
 [
-			{
-				id: 1,
-				title: "下载站",
-				description: "应用资料免费下载",
-				image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
-				link: "https://ningchaojie.github.io",
-				aspectRatio: 16/9 // 16:9 宽高比
-			},
-			{
-				id: 2,
-				title: "天猫触屏电容笔",
-				description: "iPad/平板通用，免运费",
-				image: "https://raw.githubusercontent.com/ningchaojie/ningchaojie.github.io/main/%E8%A7%A6%E6%91%B8%E7%AC%94.png",
-				link: "https://e.tb.cn/h.7quPuKtqo7oBgPT",
-				aspectRatio: 3/4 // 3:4 竖屏比例
-			},
-			{
-				id: 3,
-				title: "触摸笔",
-				description: "iPad/平板通用，免运费",
-				image: "https://images.unsplash.com/photo-1509228468518-180dd4864904?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
-				link: "https://e.tb.cn/h.7OBJNA3SnYFXa2z",
-				aspectRatio: 16/9
-			}
-		]
+  {
+    "id": 1,
+    "title": "下载站",
+    "description": "应用资料免费下载",
+    "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
+    "link": "https://ningchaojie.github.io",
+    "aspectRatio": 1.7777777777777777
+  },
+  {
+    "id": 2,
+    "title": "天猫触屏电容笔",
+    "description": "iPad/平板通用，免运费",
+    "image": "https://raw.githubusercontent.com/ningchaojie/ningchaojie.github.io/main/%E8%A7%A6%E6%91%B8%E7%AC%94.png",
+    "link": "https://e.tb.cn/h.7quPuKtqo7oBgPT",
+    "aspectRatio": 0.75
+  },
+  {
+    "id": 3,
+    "title": "触摸笔",
+    "description": "iPad/平板通用，免运费",
+    "image": "https://images.unsplash.com/photo-1509228468518-180dd4864904?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
+    "link": "https://e.tb.cn/h.7OBJNA3SnYFXa2z",
+    "aspectRatio": 1.7777777777777777
+  }
+]
