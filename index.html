@@ -1082,69 +1082,78 @@
 		}
 		
 		// 处理文件数据
-		function processFiles(files) {
-			// 清空数据
-			allFilesData = [];
-			
-			// 按文件名分组
-			const fileGroups = {};
-			
-			// 首先按基础名称分组
-			files.forEach(file => {
-				if (file.type !== 'file') return;
-				
-				const parsed = parseFileName(file.name);
-				const baseName = parsed.baseName;
-				
-				if (!fileGroups[baseName]) {
-					fileGroups[baseName] = {
-						mainFile: null,
-						images: {
-							'描述': [],
-							'界面': [],
-							'引言': [],
-							'目录': []
-						},
-						parsedName: parsed
-					};
-				}
-				
-				if (parsed.type === 'main') {
-					fileGroups[baseName].mainFile = file;
-				} else if (['描述', '界面', '引言', '目录'].includes(parsed.type)) {
-					// 添加到对应类型的数组中，并记录序号
-					fileGroups[baseName].images[parsed.type].push({
-						...file,
-						index: parsed.index,
-						type: parsed.type
-					});
-				}
-			});
-			
-			// 对每种类型的图片按序号排序（允许跳序）
-			Object.values(fileGroups).forEach(group => {
-				Object.keys(group.images).forEach(type => {
-					group.images[type].sort((a, b) => a.index - b.index);
-				});
-			});
-			
-			// 转换为数组并过滤掉没有主文件的组
-			allFilesData = Object.values(fileGroups).filter(group => group.mainFile);
-			
-			// 如果没有文件，显示空状态
-			if (allFilesData.length === 0) {
-				document.getElementById('loading').style.display = 'none';
-				document.getElementById('empty-state').style.display = 'block';
-				updateStats();
-				return;
+// 处理文件数据
+function processFiles(files) {
+	// 清空数据
+	allFilesData = [];
+	
+	// 按文件名分组
+	const fileGroups = {};
+	
+	// 首先按基础名称分组
+	files.forEach(file => {
+		if (file.type !== 'file') return;
+		
+		const parsed = parseFileName(file.name);
+		const baseName = parsed.baseName;
+		
+		// 新增：如果是主文件且扩展名为 html/htm，则忽略该文件
+		if (parsed.type === 'main') {
+			const ext = parsed.ext.toLowerCase();
+			if (ext === 'html' || ext === 'htm') {
+				return; // 跳过 HTML 文件
 			}
-			
-			// 应用当前筛选
-			applyFilter();
-			
-			// 隐藏加载动画
-			document.getElementById('loading').style.display = 'none';
 		}
+		
+		if (!fileGroups[baseName]) {
+			fileGroups[baseName] = {
+				mainFile: null,
+				images: {
+					'描述': [],
+					'界面': [],
+					'引言': [],
+					'目录': []
+				},
+				parsedName: parsed
+			};
+		}
+		
+		if (parsed.type === 'main') {
+			fileGroups[baseName].mainFile = file;
+		} else if (['描述', '界面', '引言', '目录'].includes(parsed.type)) {
+			// 添加到对应类型的数组中，并记录序号
+			fileGroups[baseName].images[parsed.type].push({
+				...file,
+				index: parsed.index,
+				type: parsed.type
+			});
+		}
+	});
+	
+	// 对每种类型的图片按序号排序（允许跳序）
+	Object.values(fileGroups).forEach(group => {
+		Object.keys(group.images).forEach(type => {
+			group.images[type].sort((a, b) => a.index - b.index);
+		});
+	});
+	
+	// 转换为数组并过滤掉没有主文件的组
+	allFilesData = Object.values(fileGroups).filter(group => group.mainFile);
+	
+	// 如果没有文件，显示空状态
+	if (allFilesData.length === 0) {
+		document.getElementById('loading').style.display = 'none';
+		document.getElementById('empty-state').style.display = 'block';
+		updateStats();
+		return;
+	}
+	
+	// 应用当前筛选
+	applyFilter();
+	
+	// 隐藏加载动画
+	document.getElementById('loading').style.display = 'none';
+}
 		
 		// 解析文件名
 		function parseFileName(filename) {
