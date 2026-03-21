@@ -1,0 +1,742 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>文档编辑器 · 专业版 v1.0</title>
+<!-- Font Awesome 图标库 (免费) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+} 
+
+body {
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+background: #f4f7fc;
+color: #1e293b;
+padding-bottom: 40px;
+} 
+
+/* 头部区域（类似应用商店风格） */
+.app-header {
+background: linear-gradient(145deg, #1e3c72, #2a5298);
+color: white;
+padding: 20px 18px 25px;
+border-bottom-left-radius: 30px;
+border-bottom-right-radius: 30px;
+box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+} 
+
+.app-header-top {
+display: flex;
+align-items: center;
+gap: 16px;
+margin-bottom: 16px;
+} 
+
+.app-icon {
+width: 70px;
+height: 70px;
+background: rgba(255,255,255,0.15);
+border-radius: 18px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 38px;
+color: #ffd966;
+border: 1px solid rgba(255,255,255,0.3);
+backdrop-filter: blur(4px);
+overflow: hidden;
+}
+.app-icon img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+display: block;
+} 
+
+.app-title-box h1 {
+font-size: 1.9rem;
+font-weight: 700;
+letter-spacing: 0.5px;
+line-height: 1.2;
+} 
+
+.app-title-box .dev {
+font-size: 0.95rem;
+opacity: 0.8;
+margin-top: 5px;
+} 
+
+.stats {
+display: flex;
+gap: 20px;
+margin-top: 12px;
+background: rgba(255,255,255,0.1);
+padding: 12px 18px;
+border-radius: 40px;
+backdrop-filter: blur(4px);
+font-size: 0.95rem;
+flex-wrap: wrap;
+} 
+
+.stats i {
+margin-right: 6px;
+color: #ffd966;
+} 
+
+/* 卡片通用 */
+.card {
+background: white;
+border-radius: 24px;
+margin: 20px 16px;
+padding: 20px 16px;
+box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+} 
+
+.card-title {
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 1.3rem;
+font-weight: 600;
+margin-bottom: 16px;
+color: #0b2b4a;
+} 
+
+.card-title i {
+color: #3b82f6;
+font-size: 1.5rem;
+} 
+
+/* 横向滚动容器 */
+.scroll-horizontal {
+display: flex;
+gap: 14px;
+overflow-x: auto;
+scroll-snap-type: x mandatory;
+-webkit-overflow-scrolling: touch;
+padding-bottom: 8px;
+margin: 0 -4px;
+} 
+
+.scroll-horizontal::-webkit-scrollbar {
+height: 4px;
+background: #e2e8f0;
+border-radius: 4px;
+}
+.scroll-horizontal::-webkit-scrollbar-thumb {
+background: #94a3b8;
+border-radius: 4px;
+} 
+
+/* 视频卡片 */
+.video-card {
+flex: 0 0 260px;
+scroll-snap-align: start;
+background: #0f2a44;
+border-radius: 22px;
+overflow: hidden;
+box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+border: 1px solid #3a5470;
+} 
+
+.video-wrapper {
+width: 100%;
+height: 160px;
+background: #000;
+position: relative;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+} 
+
+.video-wrapper video {
+width: 100%;
+height: 100%;
+object-fit: contain;
+pointer-events: none;
+background: #000;
+} 
+
+.play-overlay {
+position: absolute;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0,0,0,0.2);
+display: flex;
+align-items: center;
+justify-content: center;
+opacity: 0.8;
+transition: 0.2s;
+pointer-events: none;
+}
+.play-overlay i {
+font-size: 50px;
+color: white;
+text-shadow: 0 2px 10px black;
+} 
+
+.video-card p {
+padding: 12px 12px 14px;
+font-weight: 500;
+color: #eef4ff;
+background: #0f2a44;
+font-size: 0.95rem;
+} 
+
+/* 图片卡片 */
+.image-card {
+flex: 0 0 200px;
+scroll-snap-align: start;
+border-radius: 24px;
+overflow: hidden;
+background: #f8fafc;
+box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+border: 1px solid #dee5ed;
+cursor: pointer;
+} 
+
+.image-card img {
+width: 100%;
+height: 150px;
+object-fit: contain;
+display: block;
+background: #e2e8f0;
+} 
+
+.image-card .label {
+padding: 10px 12px;
+font-weight: 500;
+color: #1e293b;
+background: white;
+border-top: 1px solid #ecf1f7;
+font-size: 0.9rem;
+} 
+
+/* 详细描述区域 */
+.desc-section {
+background: white;
+border-radius: 28px;
+margin: 20px 16px;
+padding: 24px 20px;
+} 
+
+.desc-section h3 {
+font-size: 1.5rem;
+margin-bottom: 16px;
+color: #163a5f;
+border-left: 6px solid #3b82f6;
+padding-left: 16px;
+} 
+
+.desc-text {
+color: #334155;
+line-height: 1.7;
+font-size: 1rem;
+margin-bottom: 20px;
+white-space: pre-line;
+} 
+
+.feature-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+gap: 14px;
+margin: 24px 0 16px;
+} 
+
+.feature-item {
+background: #f0f6ff;
+padding: 14px 10px;
+border-radius: 20px;
+text-align: center;
+font-weight: 500;
+color: #1e3a8a;
+border: 1px solid #b9d3f8;
+font-size: 0.95rem;
+}
+.feature-item i {
+display: block;
+font-size: 1.6rem;
+margin-bottom: 6px;
+color: #2563eb;
+} 
+
+.meta-grid {
+display: flex;
+flex-wrap: wrap;
+gap: 16px 22px;
+background: #f1f6fd;
+border-radius: 28px;
+padding: 18px 20px;
+margin: 20px 0 10px;
+}
+.meta-item {
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 1rem;
+color: #1e3a5f;
+}
+.meta-item i {
+width: 26px;
+color: #2563eb;
+font-size: 1.2rem;
+} 
+
+/* 用户评价部分 */
+.reviews {
+margin: 24px 0 10px;
+}
+.review-item {
+background: #f9fbfe;
+border-radius: 20px;
+padding: 14px 16px;
+margin-bottom: 12px;
+border: 1px solid #e2eaf2;
+}
+.review-item .name {
+font-weight: 600;
+color: #1e293b;
+margin-bottom: 4px;
+}
+.review-item .stars {
+color: #fbbf24;
+margin-bottom: 6px;
+font-size: 0.9rem;
+}
+.review-item .content {
+color: #475569;
+} 
+
+/* 底部按钮 */
+.action-button-container {
+margin: 30px 16px 10px;
+}
+.download-btn {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 12px;
+width: 100%;
+background: linear-gradient(145deg, #2563eb, #1d4ed8);
+border: none;
+border-radius: 60px;
+padding: 18px 24px;
+color: white;
+font-size: 1.6rem;
+font-weight: 600;
+box-shadow: 0 12px 24px -8px #2563eb80;
+transition: all 0.2s ease;
+cursor: pointer;
+border: 1px solid #ffffff60;
+text-decoration: none;
+}
+.download-btn:active {
+transform: scale(0.97);
+box-shadow: 0 6px 12px -4px #1e3a8a;
+}
+.download-btn i {
+font-size: 2rem;
+} 
+
+/* 图片放大模态框 */
+.modal {
+display: none;
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0, 0, 0, 0.95);
+z-index: 1000;
+justify-content: center;
+align-items: center;
+backdrop-filter: blur(6px);
+}
+.modal.active {
+display: flex;
+}
+.modal img {
+max-width: 95%;
+max-height: 85%;
+border-radius: 18px;
+box-shadow: 0 10px 40px black;
+object-fit: contain;
+}
+.modal-close {
+position: absolute;
+top: 30px;
+right: 30px;
+background: rgba(255,255,255,0.2);
+border: none;
+color: white;
+font-size: 40px;
+cursor: pointer;
+width: 50px;
+height: 50px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+backdrop-filter: blur(4px);
+} 
+
+/* 提示条 */
+.demo-note {
+background: #fff8e5;
+border-radius: 18px;
+padding: 12px 18px;
+margin: 8px 16px 0;
+font-size: 0.9rem;
+color: #856404;
+border: 1px dashed #fbbf24;
+}
+</style>
+</head>
+<body> 
+
+<!-- 头部信息 (仿应用商店) -->
+<div class="app-header">
+<div class="app-header-top">
+<div class="app-icon">
+<img src="https://ningchaojie.github.io/文档编辑器APP图标.jpg " alt="LaTeX图标">
+</div>
+<div class="app-title-box">
+<h1>文档编辑器</h1>
+<div class="dev">Ncj科技 · 专业版 v1.0</div>
+</div>
+</div>
+<div class="stats">
+<span><i class="fas fa-download"></i> 1.2w 下载</span>
+<span><i class="fas fa-database"></i> 3.01 MB</span>
+<span><i class="fas fa-shield-alt"></i>专业版 无广告/无病毒</span>
+<span><i class="fas fa-rotate-right"></i> v1.0</span>
+</div>
+</div> 
+
+<!-- 横向滑动视频区 (6个演示，新增3个) -->
+<div class="card">
+<div class="card-title">
+<i class="fas fa-play-circle"></i> 演示视频 · 横向滑动
+<span style="margin-left: auto; font-size: 0.8rem; color: #6b7280;"><i class="far fa-hand-pointer"></i> 点击全屏</span>
+</div>
+<div class="scroll-horizontal" id="video-scroll">
+<!-- 视频1: 实时预览与插入 -->
+<div class="video-card" onclick="playVideoFullscreen(this)">
+<div class="video-wrapper">
+<video preload="metadata" poster="https://via.placeholder.com/400x225/1e3a5f/ffffff?text=图片操作" muted playsinline>
+<source src="https://ningchaojie.github.io/图片操作.mp4">
+</video>
+<div class="play-overlay"><i class="fas fa-play-circle"></i></div>
+</div>
+<p>🖼️ 图片操作</p>
+</div>
+
+<!-- 视频1.1: 手写操作 -->
+<div class="video-card" onclick="playVideoFullscreen(this)">
+<div class="video-wrapper">
+<video preload="metadata" poster="https://via.placeholder.com/400x225/1e3a5f/ffffff?text=手写操作" muted playsinline>
+<source src="https://ningchaojie.github.io/手写操作.mp4">
+</video>
+<div class="play-overlay"><i class="fas fa-play-circle"></i></div>
+</div>
+<p>✍️ 手写操作</p>
+</div>
+
+<!-- 视频2: 排版及PDF操作-->
+<div class="video-card" onclick="playVideoFullscreen(this)">
+<div class="video-wrapper">
+<video preload="metadata" poster="https://via.placeholder.com/400x225/2d3748/ffffff?text=排版及PDF操作" muted playsinline>
+<source src="https://ningchaojie.github.io/排版及PDF操作.mp4" type="video/mp4">
+</video>
+<div class="play-overlay"><i class="fas fa-play-circle"></i></div>
+</div>
+<p>📄 排版及PDF操作</p>
+</div>
+
+<!-- 视频3: 表格制作 -->
+<div class="video-card" onclick="playVideoFullscreen(this)">
+<div class="video-wrapper">
+<video preload="metadata" poster="https://via.placeholder.com/400x225/4a235a/ffffff?text=表格制作" muted playsinline>
+<source src="https://ningchaojie.github.io/表格.mp4" type="video/mp4">
+</video>
+<div class="play-overlay"><i class="fas fa-play-circle"></i></div>
+</div>
+<p>📊 表格制作 · 矩阵快速生成</p>
+</div>
+
+<!-- 视频4: 公式编辑-->
+<div class="video-card" onclick="playVideoFullscreen(this)">
+<div class="video-wrapper">
+<video preload="metadata" poster="https://via.placeholder.com/400x225/4a235a/ffffff?text=公式编辑" muted playsinline>
+<source src="https://ningchaojie.github.io/公式编辑.mp4" type="video/mp4">
+</video>
+<div class="play-overlay"><i class="fas fa-play-circle"></i></div>
+</div>
+<p>🧮 公式编辑</p>
+</div> 
+
+<!-- 新增视频5: 保存打开分享 -->
+<div class="video-card" onclick="playVideoFullscreen(this)">
+<div class="video-wrapper">
+<video preload="metadata" poster="https://via.placeholder.com/400x225/0b3b5c/ffffff?text=保存打开分享→quad" muted playsinline>
+<source src="https://ningchaojie.github.io/保存打开分享.mp4" type="video/mp4">
+</video>
+<div class="play-overlay"><i class="fas fa-play-circle"></i></div>
+</div>
+<p>💾 保存打开分享</p>
+</div> 
+
+<!-- 新增视频6: 菜单栏 -->
+<div class="video-card" onclick="playVideoFullscreen(this)">
+<div class="video-wrapper">
+<video preload="metadata" poster="https://via.placeholder.com/400x225/0b3b5c/ffffff?text=菜单栏" muted playsinline>
+<source src="https://ningchaojie.github.io/菜单栏.mp4" type="video/mp4">
+</video>
+<div class="play-overlay"><i class="fas fa-play-circle"></i></div>
+</div>
+<p>☰ 菜单栏</p>
+</div> 
+
+<!-- 新增视频7: 字体样式等编辑 -->
+<div class="video-card" onclick="playVideoFullscreen(this)">
+<div class="video-wrapper">
+<video preload="metadata" poster="https://via.placeholder.com/400x225/0b3b5c/ffffff?text=字体样式等编辑" muted playsinline>
+<source src="https://ningchaojie.github.io/字体样式等编辑.mp4" type="video/mp4">
+</video>
+<div class="play-overlay"><i class="fas fa-play-circle"></i></div>
+</div>
+<p>🔤 字体样式等编辑</p>
+</div>
+</div>
+<div class="demo-note">
+<i class="fas fa-info-circle"></i> 演示视频(MP4格式)，展示功能。
+</div>
+</div> 
+
+<!-- 横向滑动截图区 (7张界面，新增2张) -->
+<div class="card">
+<div class="card-title">
+<i class="fas fa-images"></i> 界面截图 · 左右滑动
+<span style="margin-left: auto; font-size: 0.8rem; color: #6b7280;"><i class="far fa-hand-pointer"></i> 点击放大</span>
+</div>
+<div class="scroll-horizontal" id="screenshot-scroll">
+<!-- 截图1: 麦克斯韦文档编辑 -->
+<div class="image-card" onclick="openImageModal(this)">
+<img src="https://ningchaojie.github.io/麦克斯韦文档编辑.jpg" alt="麦克斯韦文档编辑">
+<div class="label">⚛️ 麦克斯韦文档编辑</div>
+</div>
+<!-- 截图2: 主编辑界面 -->
+<div class="image-card" onclick="openImageModal(this)">
+	<img src="https://ningchaojie.github.io/主编辑界面.jpg" alt="主编辑界面">
+<div class="label">📝 主编辑界面</div>
+</div>
+<!-- 截图3: 手写面板 -->
+<div class="image-card" onclick="openImageModal(this)">
+<img src="https://ningchaojie.github.io/手写面板.jpg" alt="手写面板">
+<div class="label">✍️ 手写面板</div>
+</div>
+<!-- 截图4: 笔记管理 -->
+<div class="image-card" onclick="openImageModal(this)">
+<img src="https://ningchaojie.github.io/笔记管理.jpg" alt="笔记管理">
+<div class="label">📁 笔记管理</div>
+</div>
+<!-- 截图5: 时间奖励+广告 -->
+<div class="image-card" onclick="openImageModal(this)">
+<img src="https://ningchaojie.github.io/%E7%9C%8B%E5%B9%BF%E5%91%8A%E8%8E%B7%E5%8F%96%E6%97%B6%E9%97%B4.jpg" alt="时间奖励">
+<div class="label">⏱️ 时间奖励 · 看广告得5分钟</div>
+</div>
+<!-- 新增截图6: 页面大小设定 -->
+<div class="image-card" onclick="openImageModal(this)">
+<img src="https://ningchaojie.github.io/页面大小设定.jpg" alt="页面大小设定">
+<div class="label">📐 页面大小设定</div>
+</div>
+<!-- 新增截图7: 微信支付 -->
+<div class="image-card" onclick="openImageModal(this)">
+<img src="https://ningchaojie.github.io/微信支付.jpg" alt="微信支付">
+<div class="label">💬 微信支付</div>
+</div>
+
+<!-- 新增截图8: PDF打印 -->
+<div class="image-card" onclick="openImageModal(this)">
+<img src="https://ningchaojie.github.io/PDF打印.jpg" alt="PDF打印">
+<div class="label">🖨️ PDF打印</div>
+</div>
+
+
+<!-- 新增截图9: 公式编辑浮窗 -->
+<div class="image-card" onclick="openImageModal(this)">
+<img src="https://ningchaojie.github.io/公式编辑浮窗.jpg" alt="公式编辑浮窗">
+<div class="label">🧮 公式编辑浮窗</div>
+</div>
+
+</div>
+<div class="demo-note">
+<i class="fas fa-info-circle"></i> 截图均为真实截图，新增浮动工具、菜单栏展示。
+</div>
+</div> 
+
+<!-- 详细描述区域 (包含软件介绍、功能亮点、用户评价) -->
+<!-- 详细描述区域 (包含软件介绍、功能亮点、用户评价) -->
+<div class="desc-section">
+	<h3><i class="fas fa-align-left" style="margin-right: 10px;"></i> 软件介绍</h3>
+	<div class="desc-text">
+		<strong>LaTeX 文章编辑器 · 最终版</strong> 是一款集公式编辑、手写输入、笔记管理、时间奖励机制于一体的全能型 LaTeX 工具。基于 Quill 富文本编辑器与 KaTeX 渲染引擎，实现所见即所得的公式编写体验。
+		<br><br>
+		• <strong>实时渲染</strong>：输入 LaTeX 代码即时预览，语法错误高亮提示。<br>
+		• <strong>手写画板</strong>：内置手写 canvas，支持手指/触控笔书写，插入为图片。<br>
+		• <strong>广告奖励系统</strong>：免费用户每日 2 分钟基础时间，观看 10 秒广告可得 5 分钟，每日最多累积 2 小时奖励时间。<br>
+		• <strong>专业版解锁</strong>：永久无限制、去广告，可通过微信支付获取每日密码激活。<br>
+		• <strong>留言评论</strong>：集成 JSONBin.io 云留言板，用户可实时分享反馈。<br>
+		• <strong>图片处理</strong>：支持插入本地图片，并自由调整尺寸、锁定宽高比。<br>
+		• <strong>笔记管理</strong>：基于 IndexedDB 的本地笔记保存/打开/删除，支持长按分享。<br>
+		• <strong>打印 PDF</strong>：一键生成符合纸张尺寸的 PDF（需 Android 原生支持）。<br>
+		• <strong>调试面板</strong>：内置控制台日志，方便开发者排查问题。
+	</div>
+
+	<!-- 功能亮点网格 -->
+	<div style="margin: 16px 0 8px;">
+		<span style="font-weight: 600; font-size: 1.1rem;"><i class="fas fa-star" style="color: #fbbf24;"></i> 核心亮点</span>
+	</div>
+	<div class="feature-grid">
+		<div class="feature-item"><i class="fas fa-bolt"></i> 实时预览</div>
+		<div class="feature-item"><i class="fas fa-pen-fancy"></i> 手写画板</div>
+		<div class="feature-item"><i class="fas fa-clock"></i> 时间奖励</div>
+		<div class="feature-item"><i class="fas fa-crown"></i> 专业版</div>
+		<div class="feature-item"><i class="fas fa-comment-dots"></i> 云留言板</div>
+		<div class="feature-item"><i class="fas fa-file-pdf"></i> PDF打印</div>
+		<div class="feature-item"><i class="fas fa-image"></i> 图片插入</div>
+		<div class="feature-item"><i class="fas fa-folder-open"></i> 笔记管理</div>
+		<div class="feature-item"><i class="fas fa-bug"></i> 调试面板</div>
+		<div class="feature-item"><i class="fas fa-undo-alt"></i> 广告奖励</div>
+	</div>
+
+	<!-- 详细数据卡片 -->
+	<div class="meta-grid">
+		<div class="meta-item"><i class="fas fa-user-shield"></i> 开发者：Ncj科技</div>
+		<div class="meta-item"><i class="fas fa-rotate-right"></i> 更新：2026-03-20</div>
+		<div class="meta-item"><i class="fas fa-tag"></i> 类别：教育/办公</div>
+		<div class="meta-item"><i class="fas fa-ban"></i> 专业版无广告</div>
+		<div class="meta-item"><i class="fas fa-check-circle"></i> 内置反馈</div>
+	</div>
+	
+	
+	
+<!-- 用户评价 (新增一条关于新功能的评价) -->
+	<!-- 用户评价 (模拟) -->
+	<div style="margin: 28px 0 10px;">
+		<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+			<i class="fas fa-star" style="color: #fbbf24;"></i>
+			<span style="font-weight: 600; font-size: 1.2rem;">用户评价 (6)</span>
+		</div>
+		<div class="reviews">
+			<div class="review-item">
+				<div class="name">数学博士Alan</div>
+				<div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+				<div class="content">手写画板太实用了，上课记公式直接画，比打字快多了！</div>
+			</div>
+			<div class="review-item">
+				<div class="name">考研党小李</div>
+				<div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+				<div class="content">免费版有广告奖励，每天看几个广告就能用很久，良心！</div>
+			</div>
+			<div class="review-item">
+				<div class="name">软件发烧友</div>
+				<div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+				<div class="content">专业版激活很方便，微信支付后密码立即生效，无广告体验极佳。</div>
+			</div>
+			<div class="review-item">
+				<div class="name">物理系研究生</div>
+				<div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+				<div class="content">公式编辑流畅，支持图片插入，写论文必备。</div>
+			</div>
+			<div class="review-item">
+				<div class="name">高中生小张</div>
+				<div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+				<div class="content">留言板可以和其他用户交流解题思路，超赞！</div>
+			</div>
+			<div class="review-item">
+				<div class="name">开发者朋友</div>
+				<div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+				<div class="content">调试面板对二次开发很有帮助，代码清晰。</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- 底部按钮：下载APK v1.0 -->
+<div class="action-button-container">
+<a href="https://ningchaojie.github.io/文档编辑器.apk" class="download-btn" id="downloadBtn" download>
+<i class="fas fa-download"></i> 下载 APK v1.0
+<i class="fas fa-chevron-right" style="font-size: 1.4rem;"></i>
+</a>
+<p style="text-align: center; margin-top: 14px; color: #64748b; font-size: 0.9rem;">
+直接下载 APK 文件 (约3.01MB)
+</p>
+</div> 
+
+<!-- 图片放大模态框 -->
+<div id="imageModal" class="modal" onclick="closeModal(event)">
+<span class="modal-close" onclick="closeModal(event)">&times;</span>
+<img id="modalImage" src="" alt="放大预览">
+</div> 
+
+<script>
+// 视频全屏播放
+function playVideoFullscreen(card) {
+const video = card.querySelector('video');
+if (!video) return;
+if (video.requestFullscreen) {
+video.requestFullscreen();
+} else if (video.webkitEnterFullscreen) { // iOS Safari
+video.webkitEnterFullscreen();
+} else if (video.webkitRequestFullscreen) {
+video.webkitRequestFullscreen();
+}
+video.play().catch(e => console.log('自动播放被阻止', e));
+} 
+
+// 图片放大
+const modal = document.getElementById('imageModal');
+const modalImg = document.getElementById('modalImage'); 
+
+function openImageModal(card) {
+const img = card.querySelector('img');
+if (!img) return;
+modalImg.src = img.src;
+modal.classList.add('active');
+document.body.style.overflow = 'hidden';
+} 
+
+function closeModal(e) {
+if (e.target === modal || e.target.classList.contains('modal-close')) {
+modal.classList.remove('active');
+document.body.style.overflow = '';
+}
+} 
+
+// ESC键关闭模态框
+document.addEventListener('keydown', function(e) {
+if (e.key === 'Escape' && modal.classList.contains('active')) {
+modal.classList.remove('active');
+document.body.style.overflow = '';
+}
+}); 
+
+// 防止视频点击传播到父级
+document.querySelectorAll('.video-wrapper video').forEach(v => {
+v.addEventListener('click', (e) => e.stopPropagation());
+});
+</script> 
+
+<!-- 占位说明 (可删除) -->
+<div style="margin: 10px 16px 20px; padding: 14px; background: #e6f0ff; border-radius: 18px; color: #1e3a8a; font-size: 0.9rem; border: 1px solid #b9d3f8;">
+	<i class="fas fa-lightbulb" style="margin-right: 8px;"></i> 
+	本页面为 LaTeX 文章编辑器 · 最终版 的独立介绍页。所有演示视频、截图均为真实素材，展示了广告系统、时间限制、手写画板、专业版等特色功能。
+</div>
+
+</body>
+</html>
