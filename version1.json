@@ -1,5 +1,5 @@
 {
-  "version": "2.0",
-  "releaseNotes": "手写功能增强：1.点击手写图片可以再手写,2.添加颜色、粗细、撤销、重做、橡皮擦功能",
-  "url": "https://ningchaojie.github.io/文档编辑器v2.0.apk"
+  "version": "2.1",
+  "releaseNotes": "手写功能增强：1.点击手写图片可以再手写,2.添加颜色、粗细、撤销、重做、橡皮擦功能,3.套索、复制粘贴、移动、缩放等",
+  "url": "https://ningchaojie.github.io/文档编辑器v2.1.apk"
 }
