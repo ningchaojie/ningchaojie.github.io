@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>掌上数学实验室 - 符号计算版</title>
+	<!-- 数值计算库 Math.js -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.2.1/math.min.js"></script>
+	<!-- 绘图库 Plotly -->
+	<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+	<!-- 符号计算库 Nerdamer 及其插件 -->
+	<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.2/nerdamer.core.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.2/Algebra.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.2/Calculus.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.2/Solve.js"></script>
+	<style>
+		:root { --bg: #0d1117; --card: #161b22; --text: #c9d1d9; --accent: #58a6ff; --green: #3fb950; --err: #f85149; --border: #30363d; }
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		body { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; }
+		
+		header { padding: 10px 15px; background: var(--card); border-bottom: 1px solid var(--border); font-size: 16px; font-weight: bold; color: var(--accent); display: flex; justify-content: space-between; align-items: center; }
+		.help-btn { font-size: 12px; background: var(--border); color: var(--text); border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+
+		.console-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+		
+		#output { flex: 1; overflow-y: auto; padding: 15px; font-size: 14px; line-height: 1.6; }
+		#output::-webkit-scrollbar { width: 4px; }
+		#output::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+		.log-in { color: var(--accent); white-space: pre-wrap; word-break: break-all; margin-bottom: 4px; }
+		.log-out { color: var(--green); white-space: pre-wrap; word-break: break-all; margin-bottom: 15px; border-left: 2px solid var(--border); padding-left: 10px; }
+		.log-err { color: var(--err); white-space: pre-wrap; margin-bottom: 15px; }
+		.log-sys { color: #8b949e; font-style: italic; margin-bottom: 15px; }
+
+		#chart-box { height: 300px; width: 100%; border-top: 1px solid var(--border); display: none; background: var(--bg); }
+
+		.input-area { background: var(--card); border-top: 1px solid var(--border); padding: 15px; display: flex; gap: 10px; align-items: flex-end; }
+		textarea { flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 15px; padding: 10px; border-radius: 6px; resize: none; height: 45px; min-height: 100px; max-height: 200px; outline: none; }
+		textarea:focus { border-color: var(--accent); }
+		button.run { background: var(--accent); color: #000; border: none; padding: 0 20px; height: 45px; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; }
+
+		.modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
+		.modal-content { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; max-width: 650px; width: 100%; max-height: 80vh; overflow-y: auto; }
+		.modal-content h3 { color: var(--accent); margin: 15px 0 5px 0; font-size: 16px; }
+		.modal-content p { font-size: 13px; margin-bottom: 8px; color: var(--text); }
+		.modal-content code { background: var(--bg); padding: 2px 5px; border-radius: 3px; color: var(--green); }
+		.close-modal { float: right; background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer; }
+	</style>
+</head>
+<body>
+
+<header>
+	数学终端 v7.0 (符号计算引擎)
+	<button class="help-btn" onclick="document.getElementById('helpModal').style.display='flex'">语法帮助</button>
+</header>
+
+<div class="console-container">
+	<div id="output">
+		<div class="log-sys">欢迎使用数学终端。符号运算由 Nerdamer 驱动，支持不定积分、方程求解、微分/代数化简及2D/3D绘图。新增 dsolve 符号求解常微分方程 (Pyodide+SymPy)。</div>
+	</div>
+	<div id="chart-box"></div>
+</div>
+
+<div class="input-area">
+	<textarea id="cmd" placeholder="输入指令，如 int(x^2, x)  或  solve(x^2-4=0, x)" rows="1" oninput="this.style.height='45px';this.style.height=this.scrollHeight+'px'"></textarea>
+	<button class="run" onclick="execute()">RUN</button>
+</div>
+
+<div id="helpModal" class="modal" onclick="if(event.target===this)this.style.display='none'">
+	<div class="modal-content">
+		<button class="close-modal" onclick="document.getElementById('helpModal').style.display='none'">✕</button>
+		<h3>1. 基础计算与函数</h3>
+		<p><code>2^10 + sin(pi/4)</code> (支持复数、矩阵，如 <code>det([[1,2],[3,4]])</code>)</p>
+		
+		<h3>2. 符号运算</h3>
+		<p><code>simplify(表达式)</code> - 化简表达式</p>
+		<p><code>expand(表达式)</code> - 展开多项式</p>
+		<p><code>factor(表达式)</code> - 因式分解</p>
+		
+		<h3>3. 符号求导</h3>
+		<p><code>diff(表达式, 变量)</code> 例: <code>diff(x^3 * sin(x), x)</code></p>
+		
+		<h3>4. 不定积分</h3>
+		<p><code>int(表达式, 变量)</code> 例: <code>int(x^2, x)</code> → x^3/3</p>
+		
+		<h3>5. 定积分 (数值/符号)</h3>
+		<p><code>int(表达式, 变量, 下限, 上限)</code> 优先尝试符号精确值，失败则数值积分。</p>
+		<p>例: <code>int(exp(-x^2), x, 0, 1)</code> 或 <code>int(x^2, x, 0, 2)</code></p>
+		
+		<h3>6. 方程求解</h3>
+		<p><code>solve(方程, 变量)</code> - 符号求解（方程可含等号，如 <code>x^2-4=0</code> 或 <code>x^2-4</code> 自动补0）</p>
+		<p>例: <code>solve(x^2 - 4, x)</code> → [-2,2]</p>
+		<p><code>nsolve(方程, 变量, 初始值)</code> - 数值求解（牛顿法）</p>
+		<p>例: <code>nsolve(x^3 - x - 2, x, 2)</code></p>
+		
+		<h3>7. 多元方程组</h3>
+		<p><code>solve([方程1, 方程2], [变量1, 变量2])</code></p>
+		<p>例: <code>solve([x+y=3, x-y=1], [x,y])</code> → {x:2, y:1}</p>
+		
+		<h3>8. 常微分方程 (数值)</h3>
+		<p><code>ode(y', y0, t_end)</code> (默认步长0.1，t从0到t_end) 例: <code>ode(-2*t*y, 1, 3)</code></p>
+		
+		<h3>9. 函数绘图</h3>
+		<p><code>plot(表达式, 变量, 下限, 上限)</code> 例: <code>plot(sin(x)/x, x, -10, 10)</code></p>
+		<p><code>plot3d(表达式, [x下,x上], [y下,y上])</code> 例: <code>plot3d(sin(sqrt(x^2+y^2)), [-5,5], [-5,5])</code></p>
+		
+		<h3>10. 常微分方程符号求解 (SymPy引擎)</h3>
+		<p><code>dsolve(微分方程, 因变量, 自变量)</code> - 符号求解ODE，支持一阶、二阶及常系数线性等。</p>
+		<p>例: <code>dsolve(m*diff(x,t,2)=F, x, t)</code> → x(t) = F*t^2/(2*m) + C1*t + C2</p>
+		<p>例: <code>dsolve(diff(y,x)=2*y, y, x)</code> → y(x) = C1*exp(2*x)</p>
+		<p><span style="color:#f85149">注意：首次使用 dsolve 会加载约6-8MB的Pyodide引擎，请稍等。</span></p>
+	</div>
+</div>
+
+<script>
+	// ---------- DOM 元素 ----------
+	const cmdInput = document.getElementById('cmd');
+	const outputDiv = document.getElementById('output');
+	const chartBox = document.getElementById('chart-box');
+	
+	// 符号表：存储已声明的符号变量和函数
+	const symTable = {
+		variables: new Set(),   // 普通符号变量，如 m, F
+		functions: new Map()    // 函数映射：因变量 -> 自变量，如 x -> t
+	};
+	
+	function clearSymTable() {
+		symTable.variables.clear();
+		symTable.functions.clear();
+		log("符号表已清空", "sys");
+	}
+	
+	function handleSyms(args) {
+		for (let arg of args) {
+			arg = arg.trim();
+			// 匹配函数声明: x(t) 或 y(t)
+			const funcMatch = arg.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\(([a-zA-Z_][a-zA-Z0-9_]*)\)$/);
+			if (funcMatch) {
+				const depVar = funcMatch[1];
+				const indepVar = funcMatch[2];
+				symTable.functions.set(depVar, indepVar);
+				log(`声明函数: ${depVar}(${indepVar})`, "sys");
+			} 
+			// 匹配普通符号变量: m, F, k 等
+			else if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(arg)) {
+				symTable.variables.add(arg);
+				log(`声明变量: ${arg}`, "sys");
+			} 
+			else {
+				throw new Error(`无效的 syms 参数: ${arg}，请使用格式 "x" 或 "x(t)"`);
+			}
+		}
+	}	
+	
+
+	cmdInput.addEventListener('keydown', function(e) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			execute();
+		}
+	});
+
+	function log(text, type = 'out') {
+		const div = document.createElement('div');
+		div.className = `log-${type}`;
+		div.innerText = text;
+		outputDiv.appendChild(div);
+		outputDiv.scrollTop = outputDiv.scrollHeight;
+	}
+
+	// ---------- 健壮的参数解析器 (支持嵌套括号和方括号) ----------
+	function parseArguments(argsStr) {
+		argsStr = argsStr.trim();
+		if (argsStr === '') return [];
+		const args = [];
+		let current = '';
+		let parenDepth = 0;
+		let bracketDepth = 0;
+		
+		for (let i = 0; i < argsStr.length; i++) {
+			const ch = argsStr[i];
+			if (ch === '(') parenDepth++;
+			else if (ch === ')') parenDepth--;
+			else if (ch === '[') bracketDepth++;
+			else if (ch === ']') bracketDepth--;
+			
+			if (ch === ',' && parenDepth === 0 && bracketDepth === 0) {
+				args.push(current.trim());
+				current = '';
+			} else {
+				current += ch;
+			}
+		}
+		if (current.trim()) args.push(current.trim());
+		return args;
+	}
+
+	// ---------- 辅助函数：方程预处理 (若无等号则补上 =0) ----------
+	function normalizeEquation(expr) {
+		expr = expr.trim();
+		if (!expr.includes('=')) {
+			return expr + '=0';
+		}
+		return expr;
+	}
+
+	// 格式化 nerdamer 解 (对象/数组)
+	function formatNerdamerResult(result) {
+		if (result === undefined || result === null) return '无解';
+		if (typeof result === 'object') {
+			if (Array.isArray(result)) {
+				if (result.length === 0) return '无解';
+				return result.map(v => v.toString()).join(', ');
+			}
+			const entries = Object.entries(result);
+			if (entries.length) {
+				return entries.map(([k, v]) => `${k} = ${v.toString()}`).join(', ');
+			}
+		}
+		return result.toString();
+	}
+
+	// 数值定积分 (辛普森, 后备方案)
+	function simpsonIntegrate(exprStr, varName, a, b, n = 1000) {
+		const compiled = math.compile(exprStr);
+		const h = (b - a) / n;
+		let sum = compiled.evaluate({[varName]: a}) + compiled.evaluate({[varName]: b});
+		for (let i = 1; i < n; i++) {
+			let x = a + i * h;
+			let val = compiled.evaluate({[varName]: x});
+			sum += (i % 2 === 0 ? 2 : 4) * val;
+		}
+		return (h / 3) * sum;
+	}
+
+	// 牛顿法数值求解
+	function newtonSolve(exprStr, varName, x0, tol = 1e-10, maxIter = 100) {
+		const f = math.compile(exprStr);
+		const fPrime = math.compile(math.derivative(exprStr, varName).toString());
+		let x = x0;
+		for (let i = 0; i < maxIter; i++) {
+			let fx = f.evaluate({[varName]: x});
+			let fpx = fPrime.evaluate({[varName]: x});
+			if (Math.abs(fpx) < 1e-15) throw new Error("导数为0，牛顿法失效。请更换初始值。");
+			let xNew = x - fx / fpx;
+			if (Math.abs(xNew - x) < tol) return xNew;
+			x = xNew;
+		}
+		throw new Error("超过最大迭代次数，可能不收敛。");
+	}
+
+	// ---------- ODE 数值求解 (RK4) ----------
+	function handleODE(input) {
+		const args = parseArguments(input.substring(4, input.length - 1));
+		if (args.length < 3) throw new Error("ode 语法: ode(y', y0, t_end)");
+		const exprStr = args[0];
+		const y0 = parseFloat(args[1]);
+		const tEnd = parseFloat(args[2]);
+		const dt = args[3] ? parseFloat(args[3]) : 0.1;
+		const f = math.compile(exprStr);
+		let t = 0, y = y0;
+		let tArr = [t], yArr = [y];
+		while (t < tEnd) {
+			let currentDt = (t + dt > tEnd) ? (tEnd - t) : dt;
+			let k1 = currentDt * f.evaluate({t: t, y: y});
+			let k2 = currentDt * f.evaluate({t: t + currentDt/2, y: y + k1/2});
+			let k3 = currentDt * f.evaluate({t: t + currentDt/2, y: y + k2/2});
+			let k4 = currentDt * f.evaluate({t: t + currentDt, y: y + k3});
+			y = y + (k1 + 2*k2 + 2*k3 + k4) / 6;
+			t += currentDt;
+			tArr.push(t);
+			yArr.push(y);
+		}
+		Plotly.newPlot(chartBox, [{
+			x: tArr, y: yArr, type: 'scatter', mode: 'lines',
+			line: { color: '#3fb950', width: 3 }
+		}], {
+			paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+			margin: { l: 40, r: 20, t: 30, b: 40 },
+			font: { color: '#8b949e', family: 'monospace' },
+			xaxis: { title: 't', gridcolor: '#21262d' },
+			yaxis: { title: 'y(t)', gridcolor: '#21262d' }
+		}, {responsive: true, displayModeBar: false});
+		chartBox.style.display = 'block';
+		log(`[系统] ODE 求解完成，已绘制 y(t) 曲线。末端值 y(${tEnd}) = ${y}`, 'sys');
+		return undefined;
+	}
+
+	// ---------- 2D 绘图 (math.js) ----------
+	function handlePlot2D(input) {
+		const args = parseArguments(input.substring(5, input.length - 1));
+		if (args.length < 4) throw new Error("plot 语法: plot(表达式, 变量, 下限, 上限)");
+		const expr = args[0], varName = args[1], min = parseFloat(args[2]), max = parseFloat(args[3]);
+		const compiled = math.compile(expr);
+		let xArr = [], yArr = [];
+		const step = (max - min) / 800;
+		for (let x = min; x <= max + step/2; x += step) {
+			try {
+				let y = compiled.evaluate({[varName]: x});
+				if (typeof y === 'number' && isFinite(y)) { xArr.push(x); yArr.push(y); }
+			} catch(e) {}
+		}
+		Plotly.newPlot(chartBox, [{x: xArr, y: yArr, type: 'scatter', mode: 'lines', line: {color: '#58a6ff', width: 3}}], 
+		{paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)', margin:{l:40,r:20,t:30,b:40}, font:{color:'#8b949e',family:'monospace'}, xaxis:{gridcolor:'#21262d'}, yaxis:{gridcolor:'#21262d'}}, 
+		{responsive:true, displayModeBar:false});
+		chartBox.style.display = 'block';
+		return undefined;
+	}
+
+	// ---------- 3D 绘图 (math.js) 修复参数解析 ----------
+	function handlePlot3D(input) {
+		const args = parseArguments(input.substring(7, input.length - 1));
+		if (args.length < 3) throw new Error("plot3d 语法: plot3d(表达式, [x下,x上], [y下,y上])");
+		const expr = args[0];
+		
+		function parseRange(rangeStr) {
+			rangeStr = rangeStr.trim();
+			if (rangeStr.startsWith('[') && rangeStr.endsWith(']')) {
+				let inner = rangeStr.slice(1, -1);
+				const parts = inner.split(',').map(p => parseFloat(p.trim()));
+				if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+					return parts;
+				}
+			}
+			throw new Error(`范围参数格式错误，应为 [下限,上限] 但得到: ${rangeStr}`);
+		}
+		
+		const xRange = parseRange(args[1]);
+		const yRange = parseRange(args[2]);
+		
+		const compiled = math.compile(expr);
+		let xArr = [], yArr = [], zArr = [];
+		const stepX = (xRange[1] - xRange[0]) / 50;
+		const stepY = (yRange[1] - yRange[0]) / 50;
+		for (let x = xRange[0]; x <= xRange[1] + stepX/2; x += stepX) {
+			let rowX = [], rowY = [], rowZ = [];
+			for (let y = yRange[0]; y <= yRange[1] + stepY/2; y += stepY) {
+				try {
+					let z = compiled.evaluate({x, y});
+					if (typeof z === 'number' && isFinite(z)) rowZ.push(z);
+					else rowZ.push(null);
+				} catch(e) {
+					rowZ.push(null);
+				}
+				rowX.push(x);
+				rowY.push(y);
+			}
+			xArr.push(rowX);
+			yArr.push(rowY);
+			zArr.push(rowZ);
+		}
+		
+		Plotly.newPlot(chartBox, [{z: zArr, x: xArr, y: yArr, type: 'surface', colorscale: 'Cividis', opacity: 0.9}], 
+		{paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)', margin:{l:0,r:0,t:0,b:0}, scene: {bgcolor:'rgba(0,0,0,0)', xaxis:{gridcolor:'#21262d'}, yaxis:{gridcolor:'#21262d'}, zaxis:{gridcolor:'#21262d'}, camera:{eye:{x:1.5, y:1.5, z:1.2}}}}, 
+		{responsive:true, displayModeBar:false});
+		chartBox.style.display = 'block';
+		return undefined;
+	}
+
+	// ==================== 新增：Pyodide + SymPy 支持 dsolve ====================
+	let pyodideReadyPromise = null;
+	let pyodide = null;
+
+	function showLoading(msg) {
+		log(`[系统] ${msg}`, 'sys');
+	}
+
+	function loadPyodideAndPackages() {
+		if (pyodideReadyPromise) return pyodideReadyPromise;
+		
+		showLoading("正在加载符号计算引擎（Pyodide + SymPy），首次加载约需几秒，请稍后...");
+		pyodideReadyPromise = new Promise(async (resolve, reject) => {
+			try {
+				// 动态加载 Pyodide 脚本
+				const script = document.createElement('script');
+				script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js';
+				script.onload = async () => {
+					try {
+						pyodide = await loadPyodide({
+							indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.1/full/'
+							//env: { PYODIDE_USE_SAB: false }   // 关键行：禁用 SharedArrayBuffer	
+						});
+						await pyodide.loadPackage('sympy');
+						showLoading("符号计算引擎加载完成，现在可以使用 dsolve 命令。");
+						resolve(pyodide);
+					} catch (err) {
+						reject(err);
+					}
+				};
+				script.onerror = () => reject(new Error("Pyodide 脚本加载失败，请检查网络。"));
+				document.head.appendChild(script);
+			} catch (err) {
+				reject(err);
+			}
+		});
+		return pyodideReadyPromise;
+	}
+
+	// 将 nerdamer 风格的微分表达式转换为 SymPy 可识别的字符串
+	function convertOdeToSympy(odeStr, depVar, indepVar) {
+		// 1. 处理等号，转换为 expr = 0 的形式
+		let eq = odeStr.trim();
+		eq = eq.replace(/==/g, '=');   // 支持 ==
+		if (!eq.includes('=')) {
+			eq = eq + '=0';
+		}
+		let sides = eq.split('=');
+		let left = sides[0];
+		let right = sides[1];
+		let expr = `${left} - (${right})`;
+		
+		// 2. 替换 diff 函数： diff(y, t)    -> Derivative(y, t)
+		//             diff(y, t, 2) -> Derivative(y, t, t)
+		const diffPattern = new RegExp(`diff\\(\\s*${depVar}\\s*,\\s*${indepVar}(?:\\s*,\\s*(\\d+))?\\s*\\)`, 'g');
+		expr = expr.replace(diffPattern, (match, order) => {
+			if (order === undefined || order === '1') {
+				return `Derivative(${depVar}, ${indepVar})`;
+			} else {
+				let args = Array(parseInt(order)).fill(indepVar).join(', ');
+				return `Derivative(${depVar}, ${args})`;
+			}
+		});
+		
+		// 注意：不再需要将独立因变量替换为函数形式，因为 Python 代码中已定义 depVar = depVar_func(indepVar)
+		// 此时 depVar 本身已经代表 depVar(indepVar)，直接使用即可。
+		
+		return expr;
+	}
+
+	// dsolve 处理函数
+// dsolve 处理函数
+async function handleDsolve(input) {
+	const args = parseArguments(input.substring(7, input.length - 1));
+	if (args.length !== 3) {
+		throw new Error("dsolve 语法: dsolve(微分方程, 因变量, 自变量)\n例如: dsolve(m*diff(x,t,2)=F, x, t)");
+	}
+	const [odeStr, depVar, indepVar] = args;
+
+	// 验证因变量是否已通过 syms 声明为函数
+	const declaredIndep = symTable.functions.get(depVar);
+	if (!declaredIndep) {
+		throw new Error(`因变量 ${depVar} 未声明为函数，请先执行: syms ${depVar}(${indepVar}) 或 syms(${depVar}(${indepVar}))`);
+	}
+	if (declaredIndep !== indepVar) {
+		throw new Error(`函数 ${depVar} 的自变量声明为 ${declaredIndep}，但与求解使用的 ${indepVar} 不一致`);
+	}
+
+	// 从符号表中提取额外参数（排除因变量和自变量）
+	const extraVars = [...symTable.variables].filter(v => v !== depVar && v !== indepVar);
+	let extraVarsStr = '';
+	if (extraVars.length === 1) {
+		extraVarsStr = `${extraVars[0]} = symbols('${extraVars[0]}')`;
+	} else if (extraVars.length > 1) {
+		extraVarsStr = `${extraVars.join(', ')} = symbols('${extraVars.join(' ')}')`;
+	}
+
+	// 转换 ODE 表达式（已支持 ==）
+	let sympyExpr;
+	try {
+		sympyExpr = convertOdeToSympy(odeStr, depVar, indepVar);
+	} catch (e) {
+		throw new Error(`ODE 表达式转换失败: ${e.message}`);
+	}
+
+	// 确保 Pyodide 已加载
+	await loadPyodideAndPackages();
+
+	// 构建安全的 Python 代码
+const pythonCode = `
+from sympy import (
+	symbols, Function, Eq, Derivative, dsolve,
+	sin, cos, tan, cot, sec, csc,
+	asin, acos, atan, acot, asec, acsc,
+	sinh, cosh, tanh, coth, sech, csch,
+	asinh, acosh, atanh, acoth, asech, acsch,
+	exp, log, ln, sqrt, root,
+	pi, E, I, oo, nan,
+	gamma, erf, erfc, erfi, erfinv,
+	factorial, binomial,
+	Abs, im, re, conjugate,
+	floor, ceiling, frac,
+	Matrix, zeros, ones, eye,
+	integrate, limit, series,
+	solve, roots, Poly,
+	expand, factor, simplify, cancel, apart,
+	trigsimp, powsimp, combsimp, radsimp,
+	diff, Derivative, Integral, Limit,
+	O
+)
+${indepVar} = symbols('${indepVar}')
+${extraVarsStr}
+${depVar}_func = Function('${depVar}')
+${depVar} = ${depVar}_func(${indepVar})
+ode_expr = ${sympyExpr}
+ode_eq = Eq(ode_expr, 0)
+try:
+	sol = dsolve(ode_eq, ${depVar})
+	if sol is None:
+		result = "无解析解"
+	else:
+		result = str(sol.rhs)
+except Exception as e:
+	result = f"SymPy求解失败: {str(e)}"
+result
+`;
+
+	try {
+		const result = await pyodide.runPythonAsync(pythonCode);
+		if (result.startsWith("SymPy求解失败")) {
+			throw new Error(result);
+		}
+		// 将幂符号 ** 替换为 ^ 更符合习惯
+		let prettyResult = result.replace(/\*\*/g, '^');
+		return `${depVar}(${indepVar}) = ${prettyResult}`;
+	} catch (err) {
+		throw new Error(`ODE 求解失败: ${err.message}`);
+	}
+}
+
+	// ---------- 主求值入口：符号指令走 nerdamer，数值/绘图走 math.js，dsolve 走 Pyodide ----------
+	function parseAndEval(input) {
+		// 绘图指令优先拦截
+		if (input.startsWith('plot3d(')) {
+			return handlePlot3D(input);
+		}
+		if (input.startsWith('plot(')) {
+			return handlePlot2D(input);
+		}
+		if (input.startsWith('ode(')) {
+			return handleODE(input);
+		}
+		
+		// 匹配函数调用格式
+		const funcMatch = input.match(/^(\w+)\((.*)\)$/);
+		if (funcMatch) {
+			const funcName = funcMatch[1];
+			const argsStr = funcMatch[2];
+			const args = parseArguments(argsStr);
+			
+			// ----- 符号计算分支 (nerdamer) -----
+			switch(funcName) {
+				case 'diff': {
+					if (args.length < 2) throw new Error("diff 语法: diff(表达式, 变量)");
+					const expr = args[0];
+					const varName = args[1];
+					try {
+						const result = nerdamer.diff(expr, varName);
+						return result.toString();
+					} catch(e) {
+						throw new Error(`求导失败: ${e.message}`);
+					}
+				}
+				case 'int': {
+					if (args.length === 2) {
+						const expr = args[0];
+						const varName = args[1];
+						try {
+							const result = nerdamer.integrate(expr, varName);
+							return result.toString();
+						} catch(e) {
+							throw new Error(`不定积分失败: ${e.message}`);
+						}
+					} else if (args.length === 4) {
+						const expr = args[0];
+						const varName = args[1];
+						const a = args[2];
+						const b = args[3];
+						try {
+							const defInt = nerdamer(`defint(${expr}, ${varName}, ${a}, ${b})`);
+							const val = defInt.evaluate();
+							if (val && !isNaN(parseFloat(val))) {
+								return parseFloat(val).toString();
+							} else {
+								const aNum = parseFloat(a), bNum = parseFloat(b);
+								if (isNaN(aNum) || isNaN(bNum)) throw new Error("积分限不是数字");
+								const numeric = simpsonIntegrate(expr, varName, aNum, bNum, 1000);
+								log(`[系统] 符号定积分未能求出精确值，使用数值积分结果: ${numeric}`, 'sys');
+								return numeric.toString();
+							}
+						} catch(e) {
+							const aNum = parseFloat(a), bNum = parseFloat(b);
+							if (isNaN(aNum) || isNaN(bNum)) throw new Error("积分限无效");
+							const numeric = simpsonIntegrate(expr, varName, aNum, bNum, 1000);
+							log(`[系统] 符号定积分失败 (${e.message})，使用数值积分结果: ${numeric}`, 'sys');
+							return numeric.toString();
+						}
+					} else {
+						throw new Error("int 语法: int(表达式, 变量) 或 int(表达式, 变量, 下限, 上限)");
+					}
+				}
+				case 'solve': {
+					// 优先处理多元方程组（因为参数同样长度为2，但以方括号开头）
+					if (args.length === 2 && args[0].startsWith('[') && args[1].startsWith('[')) {
+						let eqsStr = args[0];
+						let varsStr = args[1];
+						let eqs = [];
+						let vars = [];
+						try {
+							const eqMatch = eqsStr.match(/\[(.*)\]/);
+							if (eqMatch) {
+								let inner = eqMatch[1];
+								eqs = parseArguments(inner);
+							}
+							const varMatch = varsStr.match(/\[(.*)\]/);
+							if (varMatch) {
+								let inner = varMatch[1];
+								vars = parseArguments(inner);
+							}
+							if (eqs.length === 0 || vars.length === 0) throw new Error("无法解析方程组");
+							eqs = eqs.map(eq => normalizeEquation(eq));
+							const solutions = nerdamer.solveEquations(eqs, vars);
+							return formatNerdamerResult(solutions);
+						} catch(e) {
+							throw new Error(`方程组求解失败: ${e.message}`);
+						}
+					} 
+					// 再处理单变量方程
+					else if (args.length === 2) {
+						let eq = args[0];
+						const varName = args[1];
+						eq = normalizeEquation(eq);
+						try {
+							const solutions = nerdamer.solveEquations(eq, varName);
+							if (!solutions) return "无解";
+							if (Array.isArray(solutions)) {
+								return solutions.map(s => s.toString()).join(', ');
+							} else if (typeof solutions === 'object') {
+								return formatNerdamerResult(solutions);
+							}
+							return solutions.toString();
+						} catch(e) {
+							throw new Error(`方程求解失败: ${e.message}`);
+						}
+					} else {
+						throw new Error("solve 语法: solve(方程, 变量) 或 solve([方程1,方程2], [变量1,变量2])");
+					}
+				}
+				case 'nsolve': {
+					if (args.length === 3) {
+						const eq = normalizeEquation(args[0]);
+						const varName = args[1];
+						const guess = parseFloat(args[2]);
+						if (isNaN(guess)) throw new Error("初始值必须是数字");
+						let expr = eq;
+						if (expr.includes('=')) {
+							let sides = expr.split('=');
+							expr = `${sides[0]}-(${sides[1]})`;
+						}
+						return newtonSolve(expr, varName, guess);
+					}
+					throw new Error("nsolve 语法: nsolve(方程, 变量, 初始值)");
+				}
+				case 'simplify': {
+					if (args.length !== 1) throw new Error("simplify 语法: simplify(表达式)");
+					try {
+						return nerdamer(args[0]).toString();
+					} catch(e) {
+						throw new Error(`化简失败: ${e.message}`);
+					}
+				}
+				case 'expand': {
+					if (args.length !== 1) throw new Error("expand 语法: expand(表达式)");
+					try {
+						return nerdamer.expand(args[0]).toString();
+					} catch(e) {
+						throw new Error(`展开失败: ${e.message}`);
+					}
+				}
+				case 'factor': {
+					if (args.length !== 1) throw new Error("factor 语法: factor(表达式)");
+					try {
+						return nerdamer.factor(args[0]).toString();
+					} catch(e) {
+						throw new Error(`因式分解失败: ${e.message}`);
+					}
+				}
+				default:
+					return math.evaluate(input);
+			}
+		}
+		
+		// 非函数调用，默认数值计算 (math.js)
+		try {
+			return math.evaluate(input);
+		} catch(e) {
+			try {
+				const res = nerdamer(input);
+				if (res) return res.toString();
+				throw new Error("无法计算");
+			} catch(e2) {
+				throw new Error(`计算失败: ${e.message}`);
+			}
+		}
+	}
+
+	// ---------- 执行入口 (异步支持 dsolve) ----------
+	async function execute() {
+		let input = cmdInput.value.trim();
+		if (!input) return;
+		log(`>> ${input}`, 'in');
+		cmdInput.value = '';
+		cmdInput.style.height = '45px';
+		
+		// 处理 syms 命令
+		const trimmed = input.trim();
+		// 支持 syms(...) 和 syms x(t) m F 两种格式
+		if (trimmed.startsWith('syms(')) {
+			// 括号格式: syms(x(t), m, F)
+			const args = parseArguments(trimmed.substring(5, trimmed.length - 1));
+			handleSyms(args);
+			log("符号声明完成", "sys");
+			return;
+		} else if (trimmed.startsWith('syms ')) {
+			// 无括号空格分隔格式: syms x(t) m F
+			const rest = trimmed.slice(5).trim();
+			const args = rest.split(/\s+/);
+			handleSyms(args);
+			log("符号声明完成", "sys");
+			return;
+		}
+		
+		
+		
+		try {
+			// 检查是否为 dsolve 命令（需要异步处理）
+			if (input.trim().startsWith('dsolve(')) {
+				let result = await handleDsolve(input);
+				if (result !== undefined && result !== null) 
+				{
+					log(result);
+				}
+				return;
+			}
+			
+			// 其他命令同步执行
+			let result = parseAndEval(input);
+			if (result !== undefined && result !== null) 
+			{
+				let outputStr = result;
+				if (typeof result === 'number' && Math.abs(result) < 1e-12) outputStr = "0";
+				else if (typeof result === 'number' && !isFinite(result)) outputStr = "无穷大或未定义";
+				else outputStr = math.format(result, {precision: 14});
+				log(outputStr);
+			}
+		} catch (err) {
+			log(`错误: ${err.message}`, 'err');
+		}
+	}
+</script>
+</body>
+</html>
