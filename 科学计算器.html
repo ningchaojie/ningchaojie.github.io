@@ -444,7 +444,7 @@ header {
 	background: white;
 	border-radius: 8px;
 	box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-	z-index: 1000;
+	z-index: 10000;
 	border: 2px solid #FF9800;
 }
 .tls-overlay-content {
@@ -690,6 +690,7 @@ header {
 	<!-- 右侧：可左右滑动的按钮组（语法帮助 + 升级 + 未来扩展） -->
 	<div class="header-actions" id="header-actions">
 		<button class="help-btn" onclick="document.getElementById('helpModal').style.display='flex'">语法帮助</button>
+		<button id="graph-modal-btn" class="upgrade-btn1" style="background:#3b82f6;">📈 图像</button>
 		<button id="upgrade-btn1" class="upgrade-btn1">⭐ 升级</button>
 		<button id="upgrade-btn2" class="upgrade-btn1">⭐ 升级</button>
 		<button id="upgrade-btn3" class="upgrade-btn1">⭐ 升级</button>
@@ -2847,5 +2848,329 @@ result
 	
 	
 </script>
+
+<!-- ==================== 全屏绘图模态框 ==================== -->
+<div id="fullscreen-graph-modal" class="graph-modal" style="display: none;">
+	<div class="graph-modal-content">
+		<div class="graph-modal-header">
+			<span>📐 函数图像绘制</span>
+			<button class="graph-close-btn" id="graph-close-modal">&times;</button>
+		</div>
+		<div class="graph-controls">
+			<div class="graph-examples">
+				<button class="graph-example-btn" data-expr="y = x^2 - 4">2D 抛物线</button>
+				<button class="graph-example-btn" data-expr="y = sin(x) * exp(-x/5)">2D 衰减波</button>
+				<button class="graph-example-btn" data-expr="z = sin(sqrt(x^2 + y^2))">3D 波浪</button>
+				<button class="graph-example-btn" data-expr="z = x^2 - y^2">3D 马鞍面</button>
+			</div>
+			<div class="graph-input-group">
+				<input type="text" id="graph-equation-input" placeholder="输入公式，如 y = sin(x) 或 z = x^2+y^2" value="z = sin(sqrt(x^2 + y^2))">
+				<button id="graph-plot-btn" class="graph-plot-btn">生成</button>
+			</div>
+		</div>
+		<div id="graph-chart-container">
+			<div id="graph-chart"></div>
+			<div id="graph-error-msg" class="graph-error-msg"></div>
+			<div class="graph-hint">单指旋转 · 双指缩放/平移 · 双击重置</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	/* 全屏模态框样式 */
+	.graph-modal {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0,0,0,0.9);
+		
+		z-index: 8000;	
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		backdrop-filter: blur(5px);
+	}
+	.graph-modal-content {
+		width: 95%;
+		height: 95%;
+		background: var(--card);
+		border-radius: 20px;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+		border: 1px solid var(--border);
+	}
+	.graph-modal-header {
+		padding: 15px 20px;
+		background: var(--accent);
+		color: white;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 18px;
+		font-weight: bold;
+	}
+	.graph-close-btn {
+		background: transparent;
+		border: none;
+		color: white;
+		font-size: 28px;
+		cursor: pointer;
+		line-height: 1;
+		padding: 0 8px;
+	}
+	.graph-controls {
+		padding: 15px;
+		background: var(--bg);
+		border-bottom: 1px solid var(--border);
+	}
+	.graph-examples {
+		display: flex;
+		gap: 8px;
+		margin-bottom: 12px;
+		overflow-x: auto;
+		white-space: nowrap;
+	}
+	.graph-examples::-webkit-scrollbar { display: none; }
+	.graph-example-btn {
+		flex-shrink: 0;
+		padding: 6px 12px;
+		background: #334155;
+		color: var(--text);
+		border: none;
+		border-radius: 20px;
+		font-size: 13px;
+		cursor: pointer;
+	}
+	.graph-example-btn:active { background: var(--accent); }
+	.graph-input-group {
+		display: flex;
+		gap: 10px;
+	}
+	.graph-input-group input {
+		flex: 1;
+		padding: 12px;
+		background: var(--bg);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		color: var(--text);
+		font-size: 16px;
+		outline: none;
+	}
+	.graph-input-group input:focus { border-color: var(--accent); }
+	.graph-plot-btn {
+		padding: 0 20px;
+		background: var(--accent);
+		color: white;
+		border: none;
+		border-radius: 8px;
+		font-weight: bold;
+		cursor: pointer;
+	}
+	#graph-chart-container {
+		flex: 1;
+		position: relative;
+		min-height: 0;
+	}
+	#graph-chart {
+		width: 100%;
+		height: 100%;
+	}
+	.graph-error-msg {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: rgba(239,68,68,0.9);
+		color: white;
+		padding: 15px 25px;
+		border-radius: 8px;
+		display: none;
+		z-index: 10;
+		text-align: center;
+	}
+	.graph-hint {
+		position: absolute;
+		bottom: 15px;
+		left: 0;
+		right: 0;
+		text-align: center;
+		color: var(--text-muted);
+		font-size: 12px;
+		pointer-events: none;
+	}
+</style>
+
+<script>
+	// ========== 绘图模块（独立于主终端） ==========
+	(function() {
+		let chartElem = null;
+		let errorDiv = null;
+
+		function showGraphError(msg) {
+			if (errorDiv) {
+				errorDiv.innerText = msg;
+				errorDiv.style.display = 'block';
+				setTimeout(() => { if (errorDiv) errorDiv.style.display = 'none'; }, 3000);
+			} else {
+				alert(msg);
+			}
+		}
+
+		function hideGraphError() {
+			if (errorDiv) errorDiv.style.display = 'none';
+		}
+
+		function plot2D(exprStr, xVar = 'x') {
+			try {
+				const compiled = math.compile(exprStr);
+				const xVals = [], yVals = [];
+				for (let x = -10; x <= 10; x += 0.04) {
+					try {
+						let y = compiled.evaluate({ [xVar]: x });
+						if (typeof y === 'number' && isFinite(y)) {
+							xVals.push(x);
+							yVals.push(y);
+						}
+					} catch(e) {}
+				}
+				const trace = {
+					x: xVals, y: yVals,
+					type: 'scatter', mode: 'lines',
+					line: { color: '#3b82f6', width: 3 }
+				};
+				const layout = {
+					paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+					margin: { l: 30, r: 20, t: 20, b: 30 },
+					font: { color: '#94a3b8' },
+					xaxis: { gridcolor: '#334155', zerolinecolor: '#475569', title: xVar },
+					yaxis: { gridcolor: '#334155', zerolinecolor: '#475569', title: 'y' }
+				};
+				Plotly.newPlot('graph-chart', [trace], layout, { responsive: true, displayModeBar: false });
+			} catch(e) {
+				showGraphError('绘图错误: ' + e.message);
+			}
+		}
+
+		function plot3D(exprStr) {
+			try {
+				const compiled = math.compile(exprStr);
+				const xArr = [], yArr = [], zArr = [];
+				const step = 0.2;
+				for (let x = -5; x <= 5; x += step) {
+					const rowX = [], rowY = [], rowZ = [];
+					for (let y = -5; y <= 5; y += step) {
+						try {
+							let z = compiled.evaluate({ x, y });
+							if (typeof z !== 'number' || !isFinite(z)) z = null;
+							rowX.push(x);
+							rowY.push(y);
+							rowZ.push(z);
+						} catch(e) {
+							rowX.push(x); rowY.push(y); rowZ.push(null);
+						}
+					}
+					xArr.push(rowX);
+					yArr.push(rowY);
+					zArr.push(rowZ);
+				}
+				const trace = {
+					z: zArr, x: xArr, y: yArr,
+					type: 'surface',
+					colorscale: 'Viridis',
+					opacity: 0.95,
+					contours: { z: { show: true, usecolormap: true, highlightcolor: "#fff" } }
+				};
+				const layout = {
+					paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+					margin: { l: 0, r: 0, t: 0, b: 0 },
+					scene: {
+						xaxis: { title: 'X', color: '#94a3b8', gridcolor: '#334155' },
+						yaxis: { title: 'Y', color: '#94a3b8', gridcolor: '#334155' },
+						zaxis: { title: 'Z', color: '#94a3b8', gridcolor: '#334155' },
+						bgcolor: 'rgba(0,0,0,0)',
+						camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+					}
+				};
+				Plotly.newPlot('graph-chart', [trace], layout, { responsive: true, displayModeBar: false });
+			} catch(e) {
+				showGraphError('3D绘图错误: ' + e.message);
+			}
+		}
+
+		function processGraphInput() {
+			hideGraphError();
+			const raw = document.getElementById('graph-equation-input').value.trim();
+			if (!raw) return;
+			let targetVar = 'y';
+			let expr = raw;
+			if (raw.includes('=')) {
+				const parts = raw.split('=');
+				targetVar = parts[0].trim();
+				expr = parts[1].trim();
+			}
+			try {
+				const node = math.parse(expr);
+				const symbols = new Set();
+				node.traverse(n => { if (n.isSymbolNode) symbols.add(n.name); });
+				const builtIns = ['pi', 'e', 'i', 'PI', 'E'];
+				const vars = [...symbols].filter(s => !builtIns.includes(s));
+				const is3D = vars.includes('x') && vars.includes('y') && targetVar.toLowerCase() === 'z';
+				if (is3D) plot3D(expr);
+				else plot2D(expr, vars[0] || 'x');
+			} catch(e) {
+				showGraphError('公式语法错误: ' + e.message);
+			}
+		}
+
+		// 初始化绘图模态框事件
+		function initGraphModal() {
+			chartElem = document.getElementById('graph-chart');
+			errorDiv = document.getElementById('graph-error-msg');
+			const modal = document.getElementById('fullscreen-graph-modal');
+			const openBtn = document.getElementById('graph-modal-btn');
+			const closeBtn = document.getElementById('graph-close-modal');
+			const plotBtn = document.getElementById('graph-plot-btn');
+			const inputElem = document.getElementById('graph-equation-input');
+
+			if (!openBtn || !modal) return;
+
+			openBtn.onclick = () => {
+				modal.style.display = 'flex';
+				// 显示后重新绘制当前表达式（确保图表尺寸正确）
+				setTimeout(() => processGraphInput(), 100);
+			};
+			closeBtn.onclick = () => { modal.style.display = 'none'; };
+			modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+			plotBtn.onclick = processGraphInput;
+			inputElem.onkeyup = (e) => { if (e.key === 'Enter') processGraphInput(); };
+
+			// 示例按钮
+			document.querySelectorAll('.graph-example-btn').forEach(btn => {
+				btn.onclick = () => {
+					const expr = btn.getAttribute('data-expr');
+					if (expr) {
+						inputElem.value = expr;
+						processGraphInput();
+					}
+				};
+			});
+
+			// 默认绘制一次
+			processGraphInput();
+		}
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initGraphModal);
+		} else {
+			initGraphModal();
+		}
+	})();
+</script>
+
+
 </body>
 </html>
