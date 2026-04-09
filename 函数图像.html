@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>掌上数学实验室</title>
+	<!-- 引入数学解析库 math.js -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.2.1/math.min.js"></script>
+	<!-- 引入绘图库 Plotly.js -->
+	<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+	<style>
+		:root {
+			--bg-color: #0f172a;
+			--card-bg: #1e293b;
+			--text-main: #f1f5f9;
+			--text-muted: #94a3b8;
+			--accent: #3b82f6;
+			--accent-hover: #2563eb;
+			--error: #ef4444;
+		}
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+			background-color: var(--bg-color);
+			color: var(--text-main);
+			height: 100vh;
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+		}
+		header {
+			padding: 15px;
+			text-align: center;
+			background-color: var(--card-bg);
+			border-bottom: 1px solid #334155;
+			font-size: 18px;
+			font-weight: bold;
+			letter-spacing: 1px;
+		}
+		.controls {
+			padding: 15px;
+			background-color: var(--card-bg);
+			border-bottom: 1px solid #334155;
+		}
+		.examples {
+			display: flex;
+			gap: 8px;
+			margin-bottom: 12px;
+			overflow-x: auto;
+			padding-bottom: 5px;
+		}
+		.examples::-webkit-scrollbar { display: none; }
+		.example-btn {
+			flex-shrink: 0;
+			padding: 6px 12px;
+			font-size: 13px;
+			background-color: #334155;
+			color: var(--text-main);
+			border: none;
+			border-radius: 20px;
+			cursor: pointer;
+			white-space: nowrap;
+		}
+		.example-btn:active { background-color: var(--accent); }
+		.input-group {
+			display: flex;
+			gap: 10px;
+		}
+		input[type="text"] {
+			flex: 1;
+			padding: 12px;
+			background-color: #0f172a;
+			border: 1px solid #475569;
+			border-radius: 8px;
+			color: var(--text-main);
+			font-size: 16px; /* 防止 iOS 自动缩放 */
+			outline: none;
+		}
+		input[type="text"]:focus { border-color: var(--accent); }
+		button.plot-btn {
+			padding: 0 20px;
+			background-color: var(--accent);
+			color: white;
+			border: none;
+			border-radius: 8px;
+			font-size: 16px;
+			font-weight: bold;
+			cursor: pointer;
+		}
+		button.plot-btn:active { background-color: var(--accent-hover); }
+		#chart-container {
+			flex-grow: 1;
+			position: relative;
+		}
+		#chart { width: 100%; height: 100%; }
+		.error-msg {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			background: rgba(239, 68, 68, 0.9);
+			color: white;
+			padding: 15px 25px;
+			border-radius: 8px;
+			font-size: 14px;
+			text-align: center;
+			display: none;
+			z-index: 10;
+			max-width: 80%;
+		}
+		.hint {
+			position: absolute;
+			bottom: 15px;
+			left: 0;
+			right: 0;
+			text-align: center;
+			color: var(--text-muted);
+			font-size: 12px;
+			pointer-events: none;
+			opacity: 0.8;
+		}
+	</style>
+</head>
+<body>
+
+	<header>📐 掌上数学实验室</header>
+	
+	<div class="controls">
+		<div class="examples">
+			<button class="example-btn" onclick="setExample('y = x^2 - 4')">2D 抛物线</button>
+			<button class="example-btn" onclick="setExample('y = sin(x) * exp(-x/5)')">2D 衰减波</button>
+			<button class="example-btn" onclick="setExample('z = sin(sqrt(x^2 + y^2))')">3D 波浪</button>
+			<button class="example-btn" onclick="setExample('z = x^2 - y^2')">3D 马鞍面</button>
+		</div>
+		<div class="input-group">
+			<input type="text" id="equation-input" placeholder="输入公式，如 y = sin(x) 或 z = x^2+y^2" value="z = sin(sqrt(x^2 + y^2))">
+			<button class="plot-btn" onclick="processInput()">生成</button>
+		</div>
+	</div>
+
+	<div id="chart-container">
+		<div id="chart"></div>
+		<div id="error-msg" class="error-msg"></div>
+		<div class="hint">单指旋转 · 双指缩放/平移 · 双击重置</div>
+	</div>
+
+	<script>
+		// 快捷示例点击事件
+		function setExample(text) {
+			document.getElementById('equation-input').value = text;
+			processInput();
+		}
+
+		// 监听回车键
+		document.getElementById('equation-input').addEventListener('keyup', function(e) {
+			if (e.key === 'Enter') processInput();
+		});
+
+		// 隐藏错误提示
+		function hideError() {
+			document.getElementById('error-msg').style.display = 'none';
+		}
+
+		// 显示错误提示
+		function showError(msg) {
+			const errDiv = document.getElementById('error-msg');
+			errDiv.innerText = msg;
+			errDiv.style.display = 'block';
+		}
+
+		// 核心处理逻辑
+		function processInput() {
+			hideError();
+			let rawInput = document.getElementById('equation-input').value.trim();
+			if (!rawInput) return;
+
+			let targetVar = 'y';
+			let exprStr = rawInput;
+
+			// 解析等号左边
+			if (rawInput.includes('=')) {
+				let parts = rawInput.split('=');
+				targetVar = parts[0].trim();
+				exprStr = parts[1].trim();
+			}
+
+			try {
+				// 使用 math.js 解析公式提取变量
+				const node = math.parse(exprStr);
+				const symbols = new Set();
+				node.traverse(function (n) {
+					if (n.isSymbolNode) symbols.add(n.name);
+				});
+
+				// 过滤掉内置常数
+				const builtIns = ['pi', 'e', 'i', 'PI', 'E'];
+				const vars = [...symbols].filter(s => !builtIns.includes(s));
+
+				// 判断维度
+				const is3D = vars.includes('x') && vars.includes('y') && targetVar.toLowerCase() === 'z';
+				
+				if (is3D) {
+					plot3D(exprStr);
+				} else {
+					// 默认把自变量当作 x，因变量当作 y
+					plot2D(exprStr, vars[0] || 'x');
+				}
+			} catch (err) {
+				showError("公式语法错误:\n" + err.message);
+			}
+		}
+
+		// 绘制 2D 图形
+		function plot2D(exprStr, xVar) {
+			const compiled = math.compile(exprStr);
+			const xVals = [];
+			const yVals = [];
+
+			// 生成从 -10 到 10 的 500 个点
+			for (let i = -10; i <= 10; i += 0.04) {
+				try {
+					let y = compiled.evaluate({ [xVar]: i });
+					if (typeof y === 'number' && isFinite(y)) {
+						xVals.push(i);
+						yVals.push(y);
+					}
+				} catch (e) { /* 忽略无法计算的点 */ }
+			}
+
+			const trace = {
+				x: xVals, y: yVals,
+				type: 'scatter', mode: 'lines',
+				line: { color: '#3b82f6', width: 3 }
+			};
+
+			const layout = {
+				paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+				margin: { l: 30, r: 20, t: 20, b: 30 },
+				font: { color: '#94a3b8' },
+				xaxis: { gridcolor: '#334155', zerolinecolor: '#475569', title: xVar },
+				yaxis: { gridcolor: '#334155', zerolinecolor: '#475569', title: 'y' }
+			};
+
+			Plotly.newPlot('chart', [trace], layout, { responsive: true, displayModeBar: false });
+		}
+
+		// 绘制 3D 图形
+		function plot3D(exprStr) {
+			const compiled = math.compile(exprStr);
+			const xArr = [], yArr = [], zArr = [];
+			const step = 0.2;
+
+			// 生成网格
+			for (let x = -5; x <= 5; x += step) {
+				const rowX = [], rowY = [], rowZ = [];
+				for (let y = -5; y <= 5; y += step) {
+					try {
+						let z = compiled.evaluate({ x: x, y: y });
+						if (typeof z !== 'number' || !isFinite(z)) z = null; // 处理断点
+						rowX.push(x);
+						rowY.push(y);
+						rowZ.push(z);
+					} catch (e) {
+						rowX.push(x); rowY.push(y); rowZ.push(null);
+					}
+				}
+				xArr.push(rowX); yArr.push(rowY); zArr.push(rowZ);
+			}
+
+			const trace = {
+				z: zArr, x: xArr, y: yArr,
+				type: 'surface',
+				colorscale: 'Viridis',
+				opacity: 0.95,
+				contours: { z: { show: true, usecolormap: true, highlightcolor: "#fff", project: { z: false } } }
+			};
+
+			const layout = {
+				paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+				margin: { l: 0, r: 0, t: 0, b: 0 },
+				scene: {
+					xaxis: { title: 'X', color: '#94a3b8', gridcolor: '#334155' },
+					yaxis: { title: 'Y', color: '#94a3b8', gridcolor: '#334155' },
+					zaxis: { title: 'Z', color: '#94a3b8', gridcolor: '#334155' },
+					bgcolor: 'rgba(0,0,0,0)',
+					camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+				}
+			};
+
+			Plotly.newPlot('chart', [trace], layout, { responsive: true, displayModeBar: false });
+		}
+
+		// 页面加载时先画个默认图
+		window.onload = processInput;
+	</script>
+</body>
+</html>

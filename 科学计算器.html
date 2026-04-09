@@ -13,6 +13,10 @@
 	<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.2/Algebra.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.2/Calculus.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.2/Solve.js"></script>
+	
+	
+
+	
 	<style>
 		:root { --bg: #0d1117; --card: #161b22; --text: #c9d1d9; --accent: #58a6ff; --green: #3fb950; --err: #f85149; --border: #30363d; }
 		* { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,14 +48,669 @@
 		.modal-content p { font-size: 13px; margin-bottom: 8px; color: var(--text); }
 		.modal-content code { background: var(--bg); padding: 2px 5px; border-radius: 3px; color: var(--green); }
 		.close-modal { float: right; background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer; }
+		
+
+		
+		
+		
+/* 重置 header 布局为 flex，确保三栏分布 */
+header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: var(--card);
+	padding: 8px 15px;
+	border-bottom: 1px solid var(--border);
+	gap: 12px;
+	flex-wrap: nowrap;
+	min-width: 0;
+	overflow-x: visible;
+	scrollbar-width: none;
+}
+
+/* 左侧按钮固定 */
+#menu-button {
+	flex-shrink: 0;
+}
+
+/* 中间垂直容器：宽度由内容撑开，不压缩，确保文字完整显示 */
+.title-time-container {
+	flex: 0 0 auto;          /* 关键：宽度由内容决定，不伸缩 */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	line-height: 1.3;
+	/* 删除 overflow: hidden，避免裁剪 */
+	margin-right: 12px;      /* 与右侧保持间距 */
+}
+
+.title-time-container h1 {
+	font-size: 0.9rem;
+	margin: 0;
+	white-space: nowrap;     /* 强制单行，不换行 */
+	/* 删除 overflow 和 text-overflow，确保不截断 */
+	color: var(--accent);
+}
+
+#time-display {
+	font-size: 0.7rem;
+	color: #f0a500;
+	background: transparent;
+	border: none;
+	padding: 0;
+	margin: 0;
+	white-space: nowrap;     /* 时间单行 */
+	/* 删除 overflow 和 text-overflow */
+}
+
+/* 右侧滑动区域：占据剩余所有空间，内部可滚动 */
+.header-actions {
+	flex: 1;                 /* 占据剩余宽度 */
+	min-width: 0;            /* 允许收缩，防止溢出父容器 */
+	display: flex;
+	gap: 8px;
+	overflow-x: auto;        /* 横向滚动 */
+	overflow-y: hidden;
+	white-space: nowrap;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+	padding: 4px 0;
+	justify-content: flex-start;
+	-webkit-overflow-scrolling: touch;
+	/* 删除 max-width 限制 */
+}
+
+.header-actions::-webkit-scrollbar {
+	display: none;
+}
+
+/* 右侧按钮样式统一 */
+.help-btn, .upgrade-btn {
+	font-size: 0.8rem;
+	background: var(--border);
+	color: var(--text);
+	border: none;
+	padding: 4px 12px;
+	border-radius: 20px;
+	cursor: pointer;
+	transition: 0.1s;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.upgrade-btn {
+	background: #4a90e2;
+	color: white;
+	border: 1px solid #4a90e2;
+}
+
+.upgrade-btn:hover {
+	background: #3a7bc8;
+}
+
+.help-btn:hover {
+	background: #3a3f4b;
+}
+
+.upgrade-btn1 {
+	font-size: 0.8rem;
+	background: #4a90e2;
+	color: white;
+	border: 1px solid #4a90e2;
+	padding: 4px 12px;
+	border-radius: 20px;
+	cursor: pointer;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+
+
+/* 下拉菜单悬浮层样式 */
+.menu-dropdown {
+	position: absolute;
+	top: 60px;              /* 根据 header 高度微调，使菜单出现在按钮下方 */
+	left: 12px;
+	background: var(--card);
+	border: 1px solid var(--border);
+	border-radius: 12px;
+	box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+	z-index: 1000;
+	display: none;
+	min-width: 160px;
+	backdrop-filter: blur(4px);
+}
+
+.menu-dropdown ul {
+	list-style: none;
+	margin: 0;
+	padding: 8px 0;
+}
+
+.menu-dropdown li {
+	padding: 10px 20px;
+	cursor: pointer;
+	color: var(--text);
+	font-size: 0.9rem;
+	transition: background 0.1s;
+	white-space: nowrap;
+}
+
+.menu-dropdown li:hover {
+	background: var(--border);
+}
+
+.menu-dropdown button {
+	display: block;
+	width: calc(100% - 32px);
+	margin: 8px 16px;
+	background: #4a90e2;
+	color: white;
+	border: none;
+	padding: 6px 12px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 0.85rem;
+	text-align: center;
+}
+
+.menu-dropdown button:hover {
+	background: #3a7bc8;
+}
+
+
+
+
+/* 调试清除按键 */
+
+.debug-clear-btn {
+	background: #ff9800;
+	color: #000;
+	border: none;
+	padding: 4px 12px;
+	border-radius: 20px;
+	cursor: pointer;
+	font-size: 0.8rem;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+.debug-clear-btn:hover {
+	background: #fb8c00;
+}
+
+
+
+
+
+/* 广告*/
+/* ==================== 广告系统核心样式 ==================== */
+
+#ad-container {
+	position: fixed;
+	top: 100px;
+	right: 20px;
+	z-index: 9998;
+	transition: all 0.3s ease;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.ad-content {
+	background: white;
+	border-radius: 10px;
+	overflow: hidden;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+	width: 320px;
+	position: relative;
+	border: 1px solid #e0e0e0;
+}
+
+/* 广告图片容器 - 自适应修改 */
+.ad-image-container {
+	width: 100%;
+	height: auto !important; /* 改为自适应高度 */
+	min-height: 150px;
+	max-height: 300px; /* 设置最大高度限制 */
+	overflow: hidden;
+	position: relative;
+	background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+}
+
+/* 图片自适应样式 */
+.ad-image-container img {
+	width: 100% !important;
+	height: auto !important;
+	max-height: 300px !important;
+	object-fit: contain !important; /* 关键：保持图片完整比例 */
+	object-position: center !important;
+	border-radius: 6px !important;
+	background: white !important;
+	padding: 10px !important;
+	box-sizing: border-box !important;
+}
+
+/* 专门针对竖屏图片的样式 */
+.ad-image-container img[data-portrait="true"] {
+	width: auto !important;
+	max-width: 90% !important;
+	height: auto !important;
+	max-height: 400px !important;
+	margin: 0 auto !important;
+	display: block !important;
+}
+
+/* 移动端响应式 */
+@media (max-width: 768px) {
+	#ad-container {
+		top: 80px !important;
+		right: 10px !important;
+		left: 10px !important;
+		display: flex !important;
+		justify-content: center !important;
+		transform: scale(0.85) !important; /* 缩小广告 */
+		transform-origin: top right !important;
+	}
+	
+	.ad-content {
+		width: 100% !important;
+		max-width: 280px !important; /* 移动端更小 */
+	}
+	
+	.ad-image-container {
+		min-height: 120px !important;
+		max-height: 200px !important;
+	}
+	
+	.ad-image-container img {
+		max-height: 200px !important;
+		padding: 5px !important;
+	}
+}
+
+@media (max-width: 480px) {
+	#ad-container {
+		transform: scale(0.7) !important;
+		top: 60px !important;
+	}
+	
+	.ad-content {
+		max-width: 240px !important;
+	}
+	
+	.ad-image-container {
+		min-height: 100px !important;
+		max-height: 160px !important;
+	}
+	
+	.ad-image-container img {
+		max-height: 160px !important;
+	}
+}
+
+/* 广告其他元素样式保持不变 */
+.ad-text-content {
+	padding: 20px;
+	background: white;
+}
+
+.ad-title {
+	margin: 0 0 8px 0;
+	font-size: 18px;
+	font-weight: 600;
+	color: #333;
+	line-height: 1.3;
+}
+
+.ad-description {
+	margin: 0 0 15px 0;
+	font-size: 14px;
+	color: #666;
+	line-height: 1.5;
+}
+
+.ad-close-btn {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background: rgba(0, 0, 0, 0.5);
+	color: white;
+	border: none;
+	border-radius: 50%;
+	width: 28px;
+	height: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	font-size: 18px;
+	z-index: 100;
+}
+
+.ad-action-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	border: none;
+	border-radius: 6px;
+	padding: 10px 20px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	min-width: 140px;
+}
+
+.ad-timer {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 15px;
+	padding: 8px 12px;
+	background: #f8f9fa;
+	border-radius: 6px;
+	font-size: 13px;
+	color: #666;
+}
+
+/* 专业版隐藏广告 */
+.pro-version #ad-container {
+	display: none !important;
+}
+
+
+
+
+
+
+
+
+/*==============时间限制覆盖层=============*/
+
+/* time-limit-system.css - 时间限制系统样式 */
+
+/* 覆盖层样式 */
+/* 覆盖层样式 - 缩小版 */
+.tls-overlay {
+	display: none;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 280px;  /* 缩小为280px */
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+	z-index: 1000;
+	border: 2px solid #FF9800;
+}
+.tls-overlay-content {
+	background: white;
+	border-radius: 12px;
+	padding: 30px;
+	text-align: center;
+	max-width: 400px;
+	width: 90%;
+	border: 3px solid #FF9800;
+	box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+	animation: tls-slideUp 0.3s ease;
+}
+
+.tls-icon {
+	font-size: 50px;
+	color: #FF9800;
+	margin-bottom: 20px;
+}
+
+.tls-title {
+	color: #333;
+	margin-bottom: 10px;
+	font-size: 20px;
+}
+
+.tls-message {
+	color: #666;
+	margin-bottom: 30px;
+	font-size: 15px;
+	line-height: 1.5;
+}
+
+.tls-upgrade-btn {
+	padding: 12px 30px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	margin: 10px;
+	min-width: 200px;
+	transition: all 0.3s;
+}
+
+.tls-upgrade-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* 弹窗样式 */
+.tls-popup {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.8);
+	z-index: 10000;
+	overflow-y: auto;
+	animation: tls-fadeIn 0.3s ease;
+}
+
+.tls-popup-inner {
+	background: white;
+	border-radius: 12px;
+	width: 90%;
+	max-width: 500px;
+	margin: 20px auto 50px auto;
+	box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+	animation: tls-slideUp 0.3s ease;
+}
+
+.tls-popup-header {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	padding: 20px;
+	border-radius: 12px 12px 0 0;
+}
+
+.tls-popup-title {
+	margin: 0 0 15px 0;
+	font-size: 20px;
+}
+
+.tls-pro-badge {
+	display: inline-block;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	padding: 4px 12px;
+	border-radius: 20px;
+	font-size: 12px;
+	font-weight: bold;
+	margin-left: 10px;
+}
+
+.tls-password-input {
+	width: 100%;
+	padding: 12px 15px;
+	border: 2px solid #2196F3;
+	border-radius: 6px;
+	font-size: 16px;
+	outline: none;
+	box-sizing: border-box;
+}
+
+.tls-password-input.error {
+	border-color: #f44336;
+	animation: tls-shake 0.5s;
+}
+
+.tls-error-message {
+	color: #f44336;
+	font-size: 14px;
+	margin-top: 10px;
+	display: none;
+}
+
+.tls-btn {
+	padding: 12px 25px;
+	border: none;
+	border-radius: 6px;
+	font-size: 16px;
+	cursor: pointer;
+	transition: all 0.2s;
+	font-weight: bold;
+}
+
+.tls-btn-primary {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+}
+
+.tls-btn-primary:hover {
+	opacity: 0.9;
+	transform: translateY(-1px);
+}
+
+.tls-btn-secondary {
+	background: #f5f5f5;
+	color: #666;
+}
+
+.tls-btn-copy {
+	background: #4CAF50;
+	color: white;
+}
+
+.tls-btn-copy.copied {
+	background: #2E7D32;
+}
+
+/* 警告提示 */
+.tls-warning {
+	position: fixed;
+	top: 70px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #FF9800;
+	color: white;
+	padding: 10px 20px;
+	border-radius: 20px;
+	font-size: 14px;
+	z-index: 9998;
+	box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	animation: tls-slideDown 0.3s ease;
+}
+
+/* 动画 */
+@keyframes tls-fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes tls-slideUp {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes tls-slideDown {
+	from {
+		opacity: 0;
+		transform: translate(-50%, -20px);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+}
+
+@keyframes tls-shake {
+	0%, 100% { transform: translateX(0); }
+	10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+	20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* 响应式调整 */
+@media (max-width: 480px) {
+	.tls-popup-inner {
+		width: 95%;
+		margin: 10px auto 30px auto;
+	}
+	
+	.tls-btn {
+		padding: 10px 20px;
+		font-size: 15px;
+		min-width: 140px;
+	}
+	
+	.tls-overlay-content {
+		padding: 20px;
+	}
+}
+								
 	</style>
 </head>
 <body>
 
 <header>
-	数学终端 v7.0 (符号计算引擎)
-	<button class="help-btn" onclick="document.getElementById('helpModal').style.display='flex'">语法帮助</button>
+	<!-- 最左边：三横菜单按钮 -->
+	<button class="file-btn" id="menu-button" style="border: none; background: transparent; font-size: 1.8em; padding: 0 12px 0 0; cursor: pointer; color: var(--accent);">☰</button>
+
+	<!-- 中间：垂直排列的标题和会员信息 -->
+	<div class="title-time-container">
+		<h1>数学终端 v7.0 (符号计算引擎)</h1>
+		<div id="time-display">
+			<span id="time-text">⏱️ 会员（1月）剩余 30天</span>
+		</div>
+	</div>
+
+	<!-- 右侧：可左右滑动的按钮组（语法帮助 + 升级 + 未来扩展） -->
+	<div class="header-actions" id="header-actions">
+		<button class="help-btn" onclick="document.getElementById('helpModal').style.display='flex'">语法帮助</button>
+		<button id="upgrade-btn1" class="upgrade-btn1">⭐ 升级</button>
+		<button id="upgrade-btn2" class="upgrade-btn1">⭐ 升级</button>
+		<button id="upgrade-btn3" class="upgrade-btn1">⭐ 升级</button>
+		<button id="upgrade-btn4" class="upgrade-btn1">⭐ 升级</button>
+		<button id="upgrade-btn4" class="upgrade-btn1">⭐ 升级</button>
+		<!-- 添加调试按钮 -->
+		<button id="debug-clear-membership" class="debug-clear-btn" style="background:#ff9800; color:black;">🧹 清除会员</button>
+		
+		<!-- 未来更多按钮可直接加在这里，自动支持滑动 -->
+	</div>
 </header>
+
+<!-- 下拉菜单（位置需要微调，建议放在 header 内或相对定位） -->
+<div id="menu-dropdown" class="menu-dropdown">
+	<ul>
+		<li onclick="window.open('https://ningchaojie.github.io/', '_blank')">🌐 我的网站</li>
+		<li id="upgrade-btna" >⭐ 升级</li>
+		
+	</ul>
+</div>
+
 
 <div class="console-container">
 	<div id="output">
@@ -67,7 +726,9 @@
 
 <div id="helpModal" class="modal" onclick="if(event.target===this)this.style.display='none'">
 	<div class="modal-content">
+		
 		<button class="close-modal" onclick="document.getElementById('helpModal').style.display='none'">✕</button>
+		
 		<h3>1. 基础计算与函数</h3>
 		<p><code>2^10 + sin(pi/4)</code> (支持复数、矩阵，如 <code>det([[1,2],[3,4]])</code>)</p>
 		
@@ -112,6 +773,96 @@
 </div>
 
 <script>
+
+
+
+// 调试功能：清除会员状态
+document.addEventListener('DOMContentLoaded', function() {
+	const clearBtn = document.getElementById('debug-clear-membership');
+	if (clearBtn) {
+		clearBtn.addEventListener('click', function() {
+			// 清除 localStorage 中的会员记录
+			localStorage.removeItem('app_membership');
+			localStorage.removeItem('pro_version');
+			// 可选：清除使用记录，让时间重新从0开始
+			localStorage.removeItem('app_usage');
+			sessionStorage.removeItem('app_usage');
+			// 重新初始化 TimeLimitSystem
+			if (window.TimeLimitSystem) {
+				TimeLimitSystem.state.membership = null;
+				TimeLimitSystem.loadMembership();      // 重新加载（会清空会员）
+				TimeLimitSystem.loadUsageRecord();     // 重新加载使用记录
+				TimeLimitSystem.applyMembershipFeatures(); // 重新应用（会启动监控）
+				TimeLimitSystem.updateTimeDisplay();   // 更新时间显示
+				// 如果覆盖层显示中，则隐藏
+				if (TimeLimitSystem.state.overlayVisible) {
+					TimeLimitSystem.hideLimitOverlay();
+				}
+				TimeLimitSystem.showNotification('会员状态已清除，现在为免费用户', false);
+				// 刷新页面可选项（可选）
+				// location.reload();
+			} else {
+				alert('TimeLimitSystem 未加载');
+			}
+		});
+	}
+});
+
+		// 菜单显示/隐藏逻辑
+		document.addEventListener('DOMContentLoaded', function() {
+			const menuBtn = document.getElementById('menu-button');
+			const menuDropdown = document.getElementById('menu-dropdown');
+		
+			menuBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				menuDropdown.style.display = menuDropdown.style.display === 'block' ? 'none' : 'block';
+			});
+		
+			document.addEventListener('click', () => {
+				menuDropdown.style.display = 'none';
+			});
+		
+			menuDropdown.addEventListener('click', (e) => {
+				e.stopPropagation();
+			});
+		
+		});	
+		
+				// 确保 TimeLimitSystem 已初始化
+		document.addEventListener('DOMContentLoaded', function() {
+			if (window.TimeLimitSystem) {
+				// 初始化（如果之前没调用）
+				TimeLimitSystem.init();
+		
+				// 立即更新时间显示
+				TimeLimitSystem.updateTimeDisplay();
+		
+				// 每秒更新一次
+				setInterval(function() {
+					TimeLimitSystem.updateTimeDisplay();
+				}, 1000);
+		
+				console.log('时间显示定时器已启动');
+			} else {
+				console.error('TimeLimitSystem 未定义，请检查语法错误');
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', function() {
+			const upgradeBtn = document.getElementById('upgrade-btna');
+			if (upgradeBtn) {
+				upgradeBtn.addEventListener('click', function() {
+					// 调用 TimeLimitSystem 显示专业版弹窗
+					if (window.TimeLimitSystem) {
+						TimeLimitSystem.showProPopup();
+					} else {
+						alert('时间系统未初始化');
+					}
+				});
+			}
+		});
+
+
 	// ---------- DOM 元素 ----------
 	const cmdInput = document.getElementById('cmd');
 	const outputDiv = document.getElementById('output');
@@ -314,10 +1065,12 @@
 		
 		function parseRange(rangeStr) {
 			rangeStr = rangeStr.trim();
-			if (rangeStr.startsWith('[') && rangeStr.endsWith(']')) {
+			if (rangeStr.startsWith('[') && rangeStr.endsWith(']')) 
+			{
 				let inner = rangeStr.slice(1, -1);
 				const parts = inner.split(',').map(p => parseFloat(p.trim()));
-				if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+				if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) 
+				{
 					return parts;
 				}
 			}
@@ -745,6 +1498,1354 @@ result
 			log(`错误: ${err.message}`, 'err');
 		}
 	}
+	
+	
+	
+(function(window, document) {
+	'use strict';
+
+	function debugLog(msg, isError = false) {
+		const prefix = isError ? '❌' : '📢';
+		console.log(prefix, msg);
+		const debugDiv = document.getElementById('ad-debug');
+		if (debugDiv) {
+			const line = document.createElement('div');
+			line.style.color = isError ? '#ff6b6b' : '#0f0';
+			line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+			debugDiv.appendChild(line);
+			debugDiv.scrollTop = debugDiv.scrollHeight;
+		}
+	}
+
+	const AdSystem = {
+		config: {
+			initialDelay: 3000,
+			showDuration: 8000,
+			hideDuration: 20000,
+			positionOptions: [
+				{ top: 10, right: 10 },
+				{ top: 10, left: 10 },
+				{ bottom: 10, right: 10 },
+				{ bottom: 10, left: 10 }
+			]
+		},
+
+		ads: [],
+		state: {
+			isShowing: false,
+			currentAd: null,
+			lastAdId: null,
+			adQueue: [],
+			timers: { showTimer: null, hideTimer: null }
+		},
+		container: null,
+		currentPosition: null,
+
+		checkAndShowAd: function() {
+			if (this.isProVersion()) {
+				debugLog('会员有效，不显示广告');
+				this.stopAds();      // 停止所有广告计时器，隐藏容器
+				return;
+			}
+			if (this.state.isShowing) return;
+			if (this.ads.length === 0) {
+				debugLog('广告列表为空，等待远程加载');
+				// 可选：显示一个“加载中”的占位效果
+				return;
+			}
+			this.showAd();
+		},
+
+		showAd: function() {
+			let ad;
+			let attempts = 0;
+			do {
+				const idx = Math.floor(Math.random() * this.ads.length);
+				ad = this.ads[idx];
+				attempts++;
+				if (attempts >= this.ads.length * 2) break;
+			} while (ad.id === this.state.lastAdId && this.ads.length > 1);
+
+			debugLog(`显示广告: ${ad.title} (ID: ${ad.id})`);
+			this.state.lastAdId = ad.id;
+			this.state.isShowing = true;
+			this.state.currentAd = ad;
+
+			const posIndex = Math.floor(Math.random() * this.config.positionOptions.length);
+			this.currentPosition = this.config.positionOptions[posIndex];
+
+			if (!this.container) this.createContainer();
+			else this.updateContainerPosition();
+
+			this.container.innerHTML = this.createAdHTML(ad);
+			this.container.style.display = 'block';
+
+			if (this.state.timers.showTimer) clearTimeout(this.state.timers.showTimer);
+			this.state.timers.showTimer = setTimeout(() => this.hideAd(), this.config.showDuration);
+		},
+
+		updateContainerPosition: function() {
+			if (!this.container || !this.currentPosition) return;
+			const pos = this.currentPosition;
+			let styleText = `position: fixed; z-index: 10000; transform: scale(0.85); transform-origin: top right; transition: all 0.3s ease;`;
+			if (pos.top !== undefined) styleText += `top: ${pos.top}px;`;
+			if (pos.bottom !== undefined) styleText += `bottom: ${pos.bottom}px;`;
+			if (pos.left !== undefined) styleText += `left: ${pos.left}px;`;
+			if (pos.right !== undefined) styleText += `right: ${pos.right}px;`;
+			this.container.style.cssText = styleText;
+		},
+
+		hideAd: function() {
+			debugLog('隐藏广告');
+			this.state.isShowing = false;
+			this.state.currentAd = null;
+			if (this.container) this.container.style.display = 'none';
+			if (this.state.timers.hideTimer) clearTimeout(this.state.timers.hideTimer);
+			this.state.timers.hideTimer = setTimeout(() => this.checkAndShowAd(), this.config.hideDuration);
+		},
+
+		closeAd: function() {
+			debugLog('用户手动关闭广告');
+			this.hideAd();
+		},
+
+		// 广告卡片宽度 160px（更小巧）
+		createAdHTML: function(ad) {
+			const baseWidth = 160; // 缩小到 160px
+			const imgHeight = baseWidth / (ad.aspectRatio || 16/9);
+			return `
+				<div style="
+					background: white;
+					border-radius: 16px;
+					padding: 8px;
+					width: ${baseWidth}px;
+					box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+					border: 1px solid rgba(0,0,0,0.05);
+					position: relative;
+					display: flex;
+					flex-direction: column;
+					font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+				">
+					<button onclick="AdSystem.closeAd()" style="
+						position: absolute;
+						top: 4px;
+						right: 4px;
+						background: rgba(0,0,0,0.4);
+						color: white;
+						border: none;
+						border-radius: 50%;
+						width: 20px;
+						height: 20px;
+						cursor: pointer;
+						font-size: 12px;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						z-index: 101;
+						backdrop-filter: blur(2px);
+					">×</button>
+					
+					<div style="
+						width: 100%;
+						height: ${imgHeight}px;
+						overflow: hidden;
+						border-radius: 12px;
+						margin-bottom: 6px;
+						background: #f5f5f5;
+					">
+						<img src="${ad.image}" 
+							 alt="${ad.title}"
+							 style="
+								 width: 100%;
+								 height: 100%;
+								 object-fit: cover;
+								 object-position: center;
+							 "
+							 onerror="this.src='https://via.placeholder.com/300x200?text=${encodeURIComponent(ad.title)}'">
+					</div>
+					
+					<div style="flex:1;">
+						<h3 style="margin:0 0 2px 0; font-size:13px; font-weight:600; color:#222; line-height:1.3;">${ad.title}</h3>
+						<p style="margin:0 0 4px 0; font-size:10px; color:#666; line-height:1.4;">${ad.description}</p>
+					</div>
+					
+					<button onclick="AdSystem.handleClick(${ad.id})" style="
+						background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+						color: white;
+						border: none;
+						border-radius: 30px;
+						padding: 5px 0;
+						width: 100%;
+						cursor: pointer;
+						font-size: 11px;
+						font-weight: 500;
+						margin-bottom: 6px;
+						transition: opacity 0.2s;
+					" onmouseover="this.style.opacity=0.9" onmouseout="this.style.opacity=1">查看</button>
+					
+					<div style="
+						display: flex;
+						align-items: center;
+						gap: 4px;
+						padding: 4px 6px;
+						background: #f0f2f5;
+						border-radius: 30px;
+						font-size: 9px;
+						color: #444;
+					">
+						<span>⏱️</span>
+						<div style="flex:1; height:3px; background:#d0d4d9; border-radius:2px; overflow:hidden;">
+							<div style="height:100%; background:linear-gradient(90deg, #4CAF50, #8BC34A); width:100%; animation:progress ${this.config.showDuration/1000}s linear forwards;"></div>
+						</div>
+						<span>${this.config.showDuration/1000}秒</span>
+					</div>
+					
+					<style>
+						@keyframes progress {
+							from { width: 100%; }
+							to { width: 0%; }
+						}
+					</style>
+				</div>
+			`;
+		},
+
+		createContainer: function() {
+			this.container = document.createElement('div');
+			this.container.id = 'simple-ad-container';
+			document.body.appendChild(this.container);
+			this.updateContainerPosition();
+			debugLog('广告容器已创建');
+		},
+
+		handleClick: function(adId) {
+			const ad = this.ads.find(a => a.id === adId);
+			if (!ad) return;
+			debugLog(`点击广告: ${ad.title}`);
+			localStorage.setItem('ad_click_record', JSON.stringify({
+				timestamp: Date.now(),
+				adId: ad.id,
+				status: 'clicked'
+			}));
+			this.hideAd();
+			setTimeout(() => window.open(ad.link, '_blank'), 100);
+		},
+
+		isProVersion: function() {
+			// 优先使用新的会员判断
+			if (window.TimeLimitSystem && typeof TimeLimitSystem.isMembershipValid === 'function') {
+				return TimeLimitSystem.isMembershipValid();
+			}
+			// 降级方案：检查旧的专业版存储
+			try {
+				const pro = localStorage.getItem('pro_version');
+				return pro ? JSON.parse(pro).activated === true : false;
+			} catch(e) {
+				return false;
+			}
+		},
+
+		fetchRemoteAds: function() {
+			debugLog('使用本地广告数据');
+			this.ads = [
+				{ id: 1, title: "下载站", description: "应用资料免费下载", image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80", link: "https://ningchaojie.github.io", aspectRatio: 1.7777777777777777 },
+				{ id: 2, title: "天猫触屏电容笔", description: "iPad/平板通用，免运费", image: "https://raw.githubusercontent.com/ningchaojie/ningchaojie.github.io/main/%E8%A7%A6%E6%91%B8%E7%AC%94.png", link: "https://e.tb.cn/h.7quPuKtqo7oBgPT", aspectRatio: 0.75 },
+				{ id: 3, title: "触摸笔", description: "iPad/平板通用，免运费", image: "https://images.unsplash.com/photo-1509228468518-180dd4864904?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80", link: "https://e.tb.cn/h.7OBJNA3SnYFXa2z", aspectRatio: 1.7777777777777777 },
+				{ id: 4, title: "三星 Note8 手机", description: "国行双卡note9全网通4G曲屏手机", image: "https://ningchaojie.github.io/20260220_020302.jpg", link: "https://e.tb.cn/h.7yk7Yxivt4gPMeh?tk=2kPkUoOgzK6", aspectRatio: 0.75 },
+				{ id: 5, title: "文档编辑器v1.1", description: "专业文档编辑器", image: "https://ningchaojie.github.io/文档编辑器APP图标.jpg", link: "https://ningchaojie.github.io/文档编辑器v1.1介绍.html", aspectRatio: 1.0 },
+				{ id: 6, title: "文档编辑器v1.0", description: "专业文档编辑器", image: "https://ningchaojie.github.io/文档编辑器APP图标.jpg", link: "https://ningchaojie.github.io/文档编辑介绍.html", aspectRatio: 1.0 }
+			];
+			this.initAdQueue();
+			debugLog(`✅ 本地广告加载完成，共 ${this.ads.length} 个`);
+			if (!this.state.isShowing) this.checkAndShowAd();
+		},
+
+		saveAdsToCache: function(ads) {
+			try {
+				localStorage.setItem('cached_ads', JSON.stringify({ data: ads, timestamp: Date.now() }));
+				debugLog('广告已缓存到本地');
+			} catch(e) {
+				debugLog('缓存广告失败', true);
+			}
+		},
+
+		loadAdsFromCache: function() {
+			try {
+				const cached = localStorage.getItem('cached_ads');
+				if (!cached) return null;
+				const { data, timestamp } = JSON.parse(cached);
+				if (Date.now() - timestamp > 7*24*60*60*1000) {
+					debugLog('缓存广告已过期');
+					return null;
+				}
+				debugLog('从缓存加载广告成功');
+				return data;
+			} catch(e) {
+				debugLog('从缓存加载广告失败', true);
+				return null;
+			}
+		},
+
+		initAdQueue: function() {
+			if (this.ads.length > 0) {
+				this.state.adQueue = [...this.ads].sort(() => Math.random() - 0.5);
+				debugLog(`广告队列初始化，共 ${this.ads.length} 个广告`);
+			} else {
+				this.state.adQueue = [];
+			}
+		},
+
+		init: function() {
+			debugLog('🚀 启动广告系统');
+			if (this.isProVersion()) {
+				debugLog('专业版用户，跳过广告');
+				return;
+			}
+
+			const cached = this.loadAdsFromCache();
+			if (cached) {
+				this.ads = cached;
+				this.initAdQueue();
+				setTimeout(() => {
+					if (!this.state.isShowing) this.checkAndShowAd();
+				}, 1000);
+			}
+
+			this.fetchRemoteAds();
+
+			setTimeout(() => {
+				debugLog('首次广告显示尝试');
+				this.checkAndShowAd();
+			}, this.config.initialDelay);
+
+			setInterval(() => {
+				if (!this.state.isShowing && !this.isProVersion() && this.ads.length > 0) {
+					debugLog('定期检查广告');
+					this.checkAndShowAd();
+				}
+			}, 90000);
+		},
+
+		stopAds: function() {
+			if (this.state.timers.showTimer) clearTimeout(this.state.timers.showTimer);
+			if (this.state.timers.hideTimer) clearTimeout(this.state.timers.hideTimer);
+			if (this.container) this.container.style.display = 'none';
+			this.state.isShowing = false;
+			this.state.currentAd = null;
+			debugLog('所有广告已停止');
+		},
+
+		debugShowAd: function() {
+			debugLog('手动触发显示广告');
+			this.checkAndShowAd();
+		}
+	};
+
+	window.AdSystem = AdSystem;
+
+	document.addEventListener('DOMContentLoaded', () => {
+		setTimeout(() => AdSystem.init(), 2000);
+	});
+})(window, document);	
+
+
+
+
+// time-limit-system.js - 会员系统（支持1天/1月/永久，基于日期+私钥的密码验证）
+(function(window, document) {
+	'use strict';
+	
+	const TimeLimitSystem = {
+		// 私钥常量（与密码生成器一致）
+		PRIVATE_KEYS: {
+			DAY: 'ncj科学计算器1天1元',
+			MONTH: 'ncj科学计算器1月5元',
+			PERMANENT: 'ncj科学计算器永久50元'
+		},
+
+		config: {
+			appName: '科学计算器',
+			appVersion: '1.0.0',
+			freeLimits: {
+				maxMinutes: 2,      // 2分钟免费使用
+				maxOperations: 10
+			},
+			// 会员套餐（用于弹窗展示）
+			membershipPlans: {
+				day: { name: '1天会员', price: '¥1', duration: '24小时' },
+				month: { name: '1月会员', price: '¥5', duration: '30天' },
+				permanent: { name: '永久会员', price: '¥50', duration: '永久' }
+			},
+			proVersion: {  // 保留原配置结构以兼容
+				price: '¥29.9',
+				wechatId: 'Ncj13450098946',
+				features: []
+			},
+			passwordConfig: {
+				salt: 'ncjwdbj',    // 原salt保留，但不再使用
+				length: 20,
+				algorithm: 'v1'
+			},
+			uiConfig: {
+				showRemainingTime: true,
+				warningBeforeEnd: 30,
+				autoCheckInterval: 10000,
+				overlayZIndex: 9999
+			}
+		},
+		
+		state: {
+			initialized: false,
+			membership: null,        // { type, expireTime }
+			overlayVisible: false,
+			monitoring: false,
+			usageRecord: null,
+			timers: {
+				checkTimer: null,
+				warningTimer: null,
+				saveTimer: null
+			}
+		},
+		
+		elements: {
+			overlay: null,
+			popup: null,
+			warning: null
+		},
+		
+		// ==================== 密码生成函数（与生成器完全一致） ====================
+		// 生成指定私钥和日期的20位密码
+		generatePassword: function(privateKey, date) {
+			const year = date.getFullYear();
+			const month = String(date.getMonth() + 1).padStart(2, '0');
+			const day = String(date.getDate()).padStart(2, '0');
+			const dateStr = `${year}-${month}-${day}`;
+			
+			const length = this.config.passwordConfig.length;
+			
+			const chars = {
+				upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+				lower: 'abcdefghijklmnopqrstuvwxyz',
+				numbers: '0123456789',
+				symbols: '!@#$%^&*()_+~`|}{[]:;?><,./-='
+			};
+			
+			const stringToHash = function(str) {
+				let hash = 5381;
+				for (let i = 0; i < str.length; i++) {
+					hash = ((hash << 5) + hash) + str.charCodeAt(i);
+				}
+				return hash;
+			};
+			
+			class SeededRandom {
+				constructor(seed) { this.seed = seed; }
+				next() {
+					const x = Math.sin(this.seed++) * 10000;
+					return x - Math.floor(x);
+				}
+				nextInt(max) { return Math.floor(this.next() * max); }
+			}
+			
+			const seedString = dateStr + privateKey;
+			const seedHash = stringToHash(seedString);
+			const rng = new SeededRandom(seedHash);
+			
+			let fullCharset = chars.upper + chars.lower + chars.numbers + chars.symbols;
+			let password = '';
+			
+			let requiredChars = [
+				chars.upper[rng.nextInt(chars.upper.length)],
+				chars.lower[rng.nextInt(chars.lower.length)],
+				chars.numbers[rng.nextInt(chars.numbers.length)],
+				chars.symbols[rng.nextInt(chars.symbols.length)]
+			];
+			
+			for (let i = 0; i < length - requiredChars.length; i++) {
+				password += fullCharset[rng.nextInt(fullCharset.length)];
+			}
+			
+			password += requiredChars.join('');
+			return password.split('').sort(() => rng.next() - 0.5).join('');
+		},
+		
+		// 获取最近N天的日期数组（包括今天）
+		getRecentDates: function(days = 7) {
+			const dates = [];
+			const today = new Date();
+			for (let i = 0; i < days; i++) {
+				const d = new Date(today);
+				d.setDate(today.getDate() - i);
+				dates.push(d);
+			}
+			return dates;
+		},
+		
+		// ==================== 会员验证与激活 ====================
+		// 验证密码并返回会员类型
+		validateMembershipCode: function(inputCode) {
+			const trimmed = inputCode.trim();
+			if (!trimmed) return null;
+			
+			const dates = this.getRecentDates(7); // 检查最近7天
+			for (const date of dates) {
+				for (const [type, key] of Object.entries(this.PRIVATE_KEYS)) {
+					const generated = this.generatePassword(key, date);
+					if (trimmed === generated) {
+						// 转换为小写类型标识
+						const typeMap = { DAY: 'day', MONTH: 'month', PERMANENT: 'permanent' };
+						return typeMap[type];
+					}
+				}
+			}
+			return null;
+		},
+		
+		// 激活会员
+		activateMembership: function(code) {
+			const type = this.validateMembershipCode(code);
+			if (!type) {
+				this.showNotification('密码无效，请检查后重试', true);
+				return false;
+			}
+			
+			let expireTime;
+			switch (type) {
+				case 'day':
+					expireTime = Date.now() + 24 * 3600 * 1000;
+					break;
+				case 'month':
+					expireTime = Date.now() + 30 * 24 * 3600 * 1000;
+					break;
+				case 'permanent':
+					expireTime = new Date('2099-12-31').getTime();
+					break;
+				default:
+					return false;
+			}
+			
+			this.state.membership = { type, expireTime };
+			localStorage.setItem('app_membership', JSON.stringify(this.state.membership));
+			
+			// 清除旧专业版记录
+			localStorage.removeItem('pro_version');
+			// 可选：清除免费使用记录
+			// localStorage.removeItem('app_usage');
+			
+			this.updateTimeDisplay();
+			this.showNotification(`🎉 激活成功！${this.config.membershipPlans[type].name}已开通`);
+			this.hideLimitPopup();
+			this.hideLimitOverlay();
+			
+			// 重新开始监控（如果是免费用户转会员）
+			if (!this.state.monitoring) {
+				this.startMonitoring();
+			}
+			return true;
+		},
+		
+		// 加载会员信息，检查过期
+		loadMembership: function() {
+			const stored = localStorage.getItem('app_membership');
+			if (stored) {
+				try {
+					const membership = JSON.parse(stored);
+					if (membership.expireTime && Date.now() > membership.expireTime) {
+						localStorage.removeItem('app_membership');
+						this.state.membership = null;
+					} else {
+						this.state.membership = membership;
+						return;
+					}
+				} catch (e) {}
+			}
+			
+			// 兼容旧专业版（pro_version = true）
+			const oldPro = localStorage.getItem('pro_version');
+			if (oldPro === 'true') {
+				this.state.membership = {
+					type: 'permanent',
+					expireTime: new Date('2099-12-31').getTime()
+				};
+				localStorage.setItem('app_membership', JSON.stringify(this.state.membership));
+				localStorage.removeItem('pro_version');
+				console.log('已将旧专业版转换为永久会员');
+			} else {
+				this.state.membership = null;
+			}
+		},
+		
+		isMembershipValid: function() {
+			return this.state.membership && this.state.membership.expireTime > Date.now();
+		},
+		
+		// 获取会员剩余时间文案
+		getMembershipDisplayText: function() {
+			if (!this.isMembershipValid()) return '';
+			const membership = this.state.membership;
+			const remaining = membership.expireTime - Date.now();
+			if (remaining <= 0) return '';
+			
+			switch (membership.type) {
+				case 'day':
+					const hours = Math.ceil(remaining / (3600 * 1000));
+					return `会员（1天）剩余 ${hours}小时`;
+				case 'month':
+					const days = Math.ceil(remaining / (24 * 3600 * 1000));
+					return `会员（1月）剩余 ${days}天`;
+				case 'permanent':
+					return '永久会员';
+				default:
+					return '';
+			}
+		},
+		
+		// ==================== 广告奖励与时间限制（保留原逻辑，仅调整会员判断） ====================
+		setupAdVisibilityListener: function() {
+			document.addEventListener('visibilitychange', () => {
+				if (document.hidden) {
+					if (this.state.monitoring && !this.isMembershipValid()) {
+						this.saveUsageRecord();
+					}
+				} else {
+					this.checkAdReturnAndReward();
+				}
+			});
+		},
+		
+		checkAdReturnAndReward: function() {
+			try {
+				const recordStr = localStorage.getItem('ad_click_record');
+				if (!recordStr) return false;
+				const record = JSON.parse(recordStr);
+				if (!record || record.status !== 'clicked') return false;
+				
+				const now = Date.now();
+				const secondsAway = Math.floor((now - record.timestamp) / 1000);
+				if (secondsAway >= 10) {
+					const success = this.addTimeFromAd(5);
+					if (success) {
+						localStorage.removeItem('ad_click_record');
+						return true;
+					}
+				} else if (secondsAway > 30) {
+					localStorage.removeItem('ad_click_record');
+				}
+				return false;
+			} catch (e) {
+				console.error('检查广告返回失败:', e);
+				return false;
+			}
+		},
+		
+		init: function(userConfig) {
+			if (this.state.initialized) return this;
+			if (userConfig) this.mergeConfig(userConfig);
+			this.createDOMElements();
+			this.loadMembership();
+			this.loadUsageRecord();
+			this.applyMembershipFeatures();
+			this.setupAutoSave();
+			this.initAdRewardSystem();
+			this.setupAdVisibilityListener();
+			this.state.initialized = true;
+			console.log('✅ TimeLimitSystem 初始化完成');
+			return this;
+		},
+		
+		initAdRewardSystem: function() {
+			window.addEventListener('load', () => {
+				setTimeout(() => this.checkAdReturnAndReward(), 2000);
+			});
+			setInterval(() => {
+				if (!this.isMembershipValid() && this.state.monitoring) {
+					this.saveUsageRecord();
+				}
+			}, 60000);
+		},
+		
+		addTimeFromAd: function(minutes) {
+			if (this.isMembershipValid()) {
+				console.log('会员用户，无需增加时间');
+				return true;
+			}
+			const record = this.state.usageRecord || this.loadUsageRecord();
+			const today = new Date().toISOString().split('T')[0];
+			if (record.adBonusTodayDate !== today) {
+				record.adBonusToday = 0;
+				record.adBonusTodayDate = today;
+			}
+			if (record.adBonusToday + minutes > 120) {
+				this.showNotification('每天广告奖励时间最多2小时，你已用完，明天可以继续使用，或者升级会员无限制使用。');
+				return false;
+			}
+			//临时解除标志
+			const wasVisible = this.state.overlayVisible;
+			this.state.overlayVisible = false;
+			
+			// 🔑 关键：重置 startTime 为当前时间，防止空转时间被累加
+			record.startTime = Date.now();
+			
+			record.adBonusToday += minutes;
+			record.adBonusMinutes = (record.adBonusMinutes || 0) + minutes;
+			record.adBonusCount = (record.adBonusCount || 0) + 1;
+
+			this.saveUsageRecord();
+			this.state.overlayVisible = wasVisible;
+			this.updateTimeDisplay();
+			this.checkAndCloseOverlay();
+			this.showNotification(`🎁 获得${minutes}分钟！今日还可获取 ${120 - record.adBonusToday} 分钟`);
+			return true;
+		},
+		
+		updateTimeDisplay: function() {
+			const timeDisplay = document.getElementById('time-display');
+			const timeText = document.getElementById('time-text');
+			if (!timeDisplay || !timeText) return;
+		
+			// 会员优先显示
+			if (this.isMembershipValid()) {
+				timeText.textContent = this.getMembershipDisplayText();
+				const gainSpan = document.getElementById('ad-gained');
+				const remainSpan = document.getElementById('ad-remaining');
+				if (gainSpan) gainSpan.style.display = 'none';
+				if (remainSpan) remainSpan.style.display = 'none';
+				timeDisplay.style.cursor = 'default';
+				timeDisplay.onclick = null;
+				return;
+			}
+		
+			// ========== 以下为原版免费用户逻辑（完全不变） ==========
+			// 创建奖励显示元素（如果不存在）
+			let gainSpan = document.getElementById('ad-gained');
+			let remainSpan = document.getElementById('ad-remaining');
+			if (!gainSpan) {
+				gainSpan = document.createElement('span');
+				gainSpan.id = 'ad-gained';
+				gainSpan.style.marginLeft = '8px';
+				gainSpan.style.background = '#FFD700';
+				gainSpan.style.color = '#333';
+				gainSpan.style.padding = '2px 6px';
+				gainSpan.style.borderRadius = '12px';
+				gainSpan.style.fontSize = '0.7em';
+				gainSpan.style.fontWeight = 'bold';
+				timeDisplay.appendChild(gainSpan);
+			}
+			if (!remainSpan) {
+				remainSpan = document.createElement('span');
+				remainSpan.id = 'ad-remaining';
+				remainSpan.style.marginLeft = '5px';
+				remainSpan.style.background = '#4CAF50';
+				remainSpan.style.color = 'white';
+				remainSpan.style.padding = '2px 6px';
+				remainSpan.style.borderRadius = '12px';
+				remainSpan.style.fontSize = '0.7em';
+				timeDisplay.appendChild(remainSpan);
+			}
+		
+			const record = this.state.usageRecord || this.loadUsageRecord();
+			const now = Date.now();
+			const sessionMinutes = (now - record.startTime) / 60000;
+			const totalUsedMinutes = sessionMinutes + (record.totalMinutes || 0);
+			const totalAvailableMinutes = this.config.freeLimits.maxMinutes + (record.adBonusMinutes || 0);
+			const remainingMinutes = totalAvailableMinutes - totalUsedMinutes;
+		
+			if (remainingMinutes <= 0) {
+				timeText.textContent = '⏰ 时间已用完，点击升级';
+				gainSpan.style.display = 'none';
+				remainSpan.style.display = 'none';
+				timeDisplay.style.cursor = 'pointer';
+				timeDisplay.onclick = () => this.showLimitPopup('upgrade');
+				return;
+			}
+		
+			const remainingMins = Math.floor(remainingMinutes);
+			const remainingSecs = Math.floor((remainingMinutes - remainingMins) * 60);
+			if (remainingMins > 0) {
+				timeText.textContent = `⏱️ ${remainingMins}分${remainingSecs}秒`;
+			} else {
+				timeText.textContent = `⏱️ ${remainingSecs}秒`;
+			}
+		
+			const today = new Date().toISOString().split('T')[0];
+			const adToday = (record.adBonusTodayDate === today) ? (record.adBonusToday || 0) : 0;
+			const adRemaining = Math.max(0, 120 - adToday);
+		
+			if (adToday > 0) {
+				gainSpan.textContent = `🎁+${adToday}`;
+				gainSpan.style.display = 'inline';
+			} else {
+				gainSpan.style.display = 'none';
+			}
+			remainSpan.textContent = `⏳${adRemaining}`;
+			remainSpan.style.display = 'inline';
+		
+			timeDisplay.style.cursor = 'default';
+			timeDisplay.onclick = null;
+		},
+		
+		getRemainingMinutes: function() {
+			if (this.isMembershipValid()) return Infinity;
+			const record = this.state.usageRecord || this.loadUsageRecord();
+			const now = Date.now();
+			const sessionMinutes = (now - record.startTime) / 60000;
+			const totalUsedMinutes = sessionMinutes + (record.totalMinutes || 0);
+			const totalAvailableMinutes = this.config.freeLimits.maxMinutes + (record.adBonusMinutes || 0);
+			return totalAvailableMinutes - totalUsedMinutes;
+		},
+		
+		// 以下方法保持原逻辑，仅调整会员判断
+		// 加载使用记录
+		loadUsageRecord: function() {
+			const today = new Date().toISOString().split('T')[0];
+			const defaultRecord = {
+				date: today,
+				startTime: Date.now(),
+				totalMinutes: 0,
+				adBonusMinutes: 0,
+				adBonusCount: 0,
+				adBonusToday: 0,
+				adBonusTodayDate: today,
+				lastWarning: null
+			};
+			try {
+				let stored = localStorage.getItem('app_usage') || sessionStorage.getItem('app_usage');
+				if (!stored) {
+					this.state.usageRecord = defaultRecord;
+					this.saveUsageRecord();
+					return defaultRecord;
+				}
+				const record = JSON.parse(stored);
+				if (record.date !== today) {
+					record.date = today;
+					record.totalMinutes = 0;
+					record.adBonusMinutes = 0;
+					record.adBonusCount = 0;
+					record.startTime = Date.now();
+					record.adBonusToday = 0;
+					record.adBonusTodayDate = today;
+				}
+				if (record.adBonusToday === undefined) record.adBonusToday = 0;
+				if (record.adBonusTodayDate === undefined) record.adBonusTodayDate = today;
+				record.startTime = Date.now();
+				this.state.usageRecord = record;
+				return record;
+			} catch (e) {
+				console.error('加载使用记录失败', e);
+				this.state.usageRecord = defaultRecord;
+				return defaultRecord;
+			}
+		},
+		
+		// 保存使用记录
+		saveUsageRecord: function() {
+			if (this.state.overlayVisible) {
+				console.log('⏸️ 覆盖层已显示，跳过保存');
+				return false;
+			}
+			if (!this.state.usageRecord) return false;
+			if (this.isMembershipValid()) return true; // 会员无需记录
+			const now = Date.now();
+			const sessionMinutes = (now - this.state.usageRecord.startTime) / 60000;
+			this.state.usageRecord.totalMinutes += sessionMinutes;
+			this.state.usageRecord.startTime = now;
+			const dataStr = JSON.stringify(this.state.usageRecord);
+			localStorage.setItem('app_usage', dataStr);
+			sessionStorage.setItem('app_usage', dataStr);
+			const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+			document.cookie = `app_usage=${encodeURIComponent(dataStr)}; expires=${expires}; path=/`;
+			return true;
+		},
+		
+		// 自动保存（可选，但建议保留）
+		setupAutoSave: function() {
+			const self = this;
+			document.addEventListener('visibilitychange', function() {
+				if (document.hidden) {
+					self.saveUsageRecord();
+				}
+			});
+			window.addEventListener('beforeunload', function() {
+				self.saveUsageRecord();
+			});
+			setInterval(function() {
+				if (!self.isMembershipValid() && self.state.monitoring) {
+					self.saveUsageRecord();
+				}
+			}, 10000);
+		},
+		
+		// 合并配置（保持原逻辑）
+		mergeConfig: function(userConfig) {
+			const deepMerge = (target, source) => {
+				for (const key in source) {
+					if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+						if (!target[key] || typeof target[key] !== 'object') target[key] = {};
+						deepMerge(target[key], source[key]);
+					} else {
+						target[key] = source[key];
+					}
+				}
+				return target;
+			};
+			deepMerge(this.config, userConfig);
+		},
+		
+		checkTimeLimit: function() {
+			if (this.isMembershipValid()) {
+				if (this.state.overlayVisible) this.hideLimitOverlay();
+				return true;
+			}
+		    // 🔑 覆盖层已显示时，不再进行任何时间检查
+			if (this.state.overlayVisible) return false;
+			const record = this.state.usageRecord || this.loadUsageRecord();
+		
+			// 先保存当前时间，确保记录是最新的
+			this.saveUsageRecord();
+		
+			const now = Date.now();
+			const sessionMinutes = (now - record.startTime) / 60000;
+			const totalUsedMinutes = (record.totalMinutes || 0) + sessionMinutes;
+			const totalAvailableMinutes = this.config.freeLimits.maxMinutes + (record.adBonusMinutes || 0);
+			const remainingMinutes = totalAvailableMinutes - totalUsedMinutes;
+		
+			console.log(`⏱️ 时间检查: 已用 ${totalUsedMinutes.toFixed(2)} 分钟, 总可用 ${totalAvailableMinutes} 分钟, 剩余 ${remainingMinutes.toFixed(2)} 分钟`);
+		
+			if (remainingMinutes <= 0) {
+				console.log(`⏰ 时间超限: 已用 ${totalUsedMinutes.toFixed(2)} 分钟, 总可用 ${totalAvailableMinutes} 分钟`);
+				this.showLimitOverlay('time');
+				return false;
+			}
+		
+			if (remainingMinutes <= (this.config.uiConfig.warningBeforeEnd / 60)) {
+				this.showTimeWarning(remainingMinutes);
+			}
+			return true;
+		},
+		
+		// 创建DOM元素（覆盖层和弹窗）
+		createDOMElements: function() {
+			const overlay = document.createElement('div');
+			overlay.id = 'time-limit-overlay';
+			overlay.className = 'tls-overlay';
+			overlay.innerHTML = `
+				<div class="tls-overlay-content">
+					<div class="tls-icon">⏰</div>
+					<h2 class="tls-title">免费时间已用完</h2>
+					<p class="tls-message">
+						您今天的免费使用时间已用完<br>
+						升级会员可无限制使用，并去除广告<br>
+						看广告满10秒奖励5分鈡使用时间，每天最多奖励2小时<br>
+						<button class="tls-upgrade-btn">立即升级</button>
+					</p>
+				</div>
+			`;
+			document.body.appendChild(overlay);
+			this.elements.overlay = overlay;
+			
+			const popup = document.createElement('div');
+			popup.id = 'tls-limit-popup';
+			popup.className = 'tls-popup';
+			document.body.appendChild(popup);
+			this.elements.popup = popup;
+			
+			const upgradeBtn = overlay.querySelector('.tls-upgrade-btn');
+			if (upgradeBtn) {
+				upgradeBtn.addEventListener('click', () => this.showLimitPopup('upgrade'));
+			}
+			overlay.addEventListener('click', (e) => {
+				if (e.target === overlay) this.showLimitPopup('upgrade');
+			});
+			
+			// 警告栏
+			const warning = document.createElement('div');
+			warning.id = 'tls-time-warning';
+			warning.className = 'tls-warning';
+			warning.innerHTML = `<span class="tls-warning-text"></span><button id="tls-hide-warning-btn">×</button>`;
+			document.body.appendChild(warning);
+			this.elements.warning = warning;
+			const hideBtn = warning.querySelector('#tls-hide-warning-btn');
+			if (hideBtn) hideBtn.onclick = () => this.hideWarning();
+			
+			// 样式
+			if (!document.getElementById('tls-animations')) 
+			{
+				const style = document.createElement('style');
+				style.id = 'tls-animations';
+				style.textContent = `
+					//.tls-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:9999; }
+					//.tls-overlay-content { background:white; border-radius:12px; padding:30px; text-align:center; max-width:90%; }
+					.tls-upgrade-btn { background:#4a90e2; color:white; border:none; padding:10px 20px; border-radius:6px; margin-top:15px; cursor:pointer; }
+					.tls-popup { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:10000; }
+					.tls-popup-inner { background:white; border-radius:16px; width:600px; max-width:90%; max-height:80vh; overflow:auto; box-shadow:0 20px 40px rgba(0,0,0,0.3); }
+					.tls-popup-header { background:#4a90e2; color:white; padding:16px 20px; border-radius:16px 16px 0 0; }
+					.tls-popup-content { padding:20px; }
+					.tls-popup-footer { border-top:1px solid #eee; padding:15px; text-align:center; }
+					.tls-password-input { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:14px; }
+					.tls-btn { padding:8px 16px; border:none; border-radius:6px; cursor:pointer; font-size:14px; }
+					.tls-btn-primary { background:#4a90e2; color:white; }
+					.tls-btn-secondary { background:#f1f3f4; color:#333; border:1px solid #ccc; }
+					.tls-btn-copy { background:#f0f0f0; border:1px solid #ccc; }
+				
+					@keyframes fadeInRight 
+					{ from { opacity:0; transform:translateX(100%); } to { opacity:1; transform:translateX(0); } }
+				`;
+				document.head.appendChild(style);
+			}
+		},
+		
+		showLimitOverlay: function(type) {
+			if (this.isMembershipValid() || this.state.overlayVisible) return;
+			
+			// 1. 结算当前会话时间（正常累加）
+			this.saveUsageRecord();
+			
+			// 2. 修正 totalMinutes 不超过总可用时间
+			const record = this.state.usageRecord;
+			const totalAvailable = this.config.freeLimits.maxMinutes + (record.adBonusMinutes || 0);
+			if (record.totalMinutes > totalAvailable) {
+			record.totalMinutes = totalAvailable;
+			}
+			
+			// 3. 🔑 重置 startTime 为当前时间，冻结后续时间累加
+			record.startTime = Date.now();
+			
+			// 4. 保存修正后的记录（此时 overlayVisible 还是 false）
+			this.saveUsageRecord();
+			
+			// 5. 显示覆盖层（原有 UI 内容保持不变）
+			const overlay = this.elements.overlay;
+			if (!overlay) return;
+			
+			
+			
+			//const overlay = this.elements.overlay;
+			//if (!overlay) return;
+			overlay.style.display = 'flex';
+			this.state.overlayVisible = true;
+			this.stopMonitoring();
+		},
+		
+		hideLimitOverlay: function() {
+			const overlay = this.elements.overlay;
+			if (overlay) {
+				overlay.style.display = 'none';
+				this.state.overlayVisible = false;
+			}
+			if (!this.state.monitoring && !this.isMembershipValid()) {
+				this.startMonitoring();
+			}
+		},
+		
+		showLimitPopup: function(type) {
+			const popup = this.elements.popup;
+			if (!popup) return;
+			popup.innerHTML = this.generatePopupHTML();
+			popup.style.display = 'block';
+			this.bindPopupEvents();
+			popup.onclick = (e) => { if (e.target === popup) this.hideLimitPopup(); };
+			const escHandler = (e) => {
+				if (e.key === 'Escape') {
+					this.hideLimitPopup();
+					document.removeEventListener('keydown', escHandler);
+				}
+			};
+			document.addEventListener('keydown', escHandler);
+			popup._escHandler = escHandler;
+		},
+		
+		generatePopupHTML: function() {
+			const plans = this.config.membershipPlans;
+			return `
+				<div class="tls-popup-inner">
+					<div class="tls-popup-header">
+						<h3 class="tls-popup-title">📝科学计算器· 会员升级</h3>
+					</div>
+					<div class="tls-popup-content">
+						<div style="margin-bottom: 20px;">
+							<div style="display: flex; gap: 15px; justify-content: space-around; flex-wrap: wrap;">
+								<div style="text-align: center; padding: 10px; background: #f8f9fa; border-radius: 8px; flex:1;">
+									<div><strong>${plans.day.name}</strong></div>
+									<div>${plans.day.price}</div>
+								</div>
+								<div style="text-align: center; padding: 10px; background: #f8f9fa; border-radius: 8px; flex:1;">
+									<div><strong>${plans.month.name}</strong></div>
+									<div>${plans.month.price}</div>
+								</div>
+								<div style="text-align: center; padding: 10px; background: #f8f9fa; border-radius: 8px; flex:1;">
+									<div><strong>${plans.permanent.name}</strong></div>
+									<div>${plans.permanent.price}</div>
+								</div>
+							</div>
+						</div>
+						<div style="font-size: 14px; line-height: 1.6;">
+							1. 添加微信 <strong>${this.config.proVersion.wechatId}</strong>
+							<button id="copy-wechat-btn" style="margin-left: 8px;">复制</button>
+							<button id="open-wechat-btn" style="margin-left: 8px;">打开微信</button><br>
+							2. 发送消息：<strong>科学计算器 + 所选套餐（1天/1月/永久）</strong><br>
+							3. 微信支付对应金额<br>
+							4. 您会收到一个 <strong>20位激活密码</strong><br>
+							5. 在下方输入密码，点击“激活会员”即可解锁
+						</div>
+						<div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+							<input type="text" id="membership-code-input" placeholder="请输入20位激活密码" class="tls-password-input" style="width:100%; padding:12px; margin-bottom:10px;">
+							<button id="activate-membership-btn" class="tls-btn tls-btn-primary" style="width:100%; padding:12px;">激活会员</button>
+							<div id="code-error-msg" style="color:#f44336; font-size:12px; margin-top:8px;"></div>
+						</div>
+						
+						<div style="font-size: 10px; line-height: 1.6; color:green; ">
+							.密码当天有效，请尽快激活。如有问题，请微信联系。<br>
+							.会员权限:解除时间限制，去除广告。<br>
+						</div>
+					</div>
+					<div class="tls-popup-footer">
+						<button id="close-popup-btn" class="tls-btn tls-btn-secondary">关闭</button>
+					</div>
+				</div>
+			`;
+		},
+		
+		bindPopupEvents: function() {
+			const popup = this.elements.popup;
+			if (!popup) return;
+			
+			const codeInput = popup.querySelector('#membership-code-input');
+			const activateBtn = popup.querySelector('#activate-membership-btn');
+			const errorMsg = popup.querySelector('#code-error-msg');
+			const copyWechatBtn = popup.querySelector('#copy-wechat-btn');
+			const closeBtn = popup.querySelector('#close-popup-btn');
+			
+			// 打开微信按钮
+			const openWechatBtn = popup.querySelector('#open-wechat-btn');
+			if (openWechatBtn) {
+				openWechatBtn.onclick = () => {
+					this.openWeChat();
+				};
+			}
+			
+			
+			if (activateBtn && codeInput) {
+				activateBtn.onclick = async () => {
+					const code = codeInput.value.trim();
+					errorMsg.textContent = '';
+					const success = await this.activateMembership(code);
+					if (!success) {
+						errorMsg.textContent = '密码无效或已过期，请核对后重试。';
+					}
+				};
+				codeInput.onkeypress = (e) => { if (e.key === 'Enter') activateBtn.click(); };
+			}
+			
+			if (copyWechatBtn) {
+				copyWechatBtn.onclick = () => {
+					const wechatId = this.config.proVersion.wechatId;
+					if (window.Android && Android.copyToClipboard) {
+						Android.copyToClipboard(wechatId);
+					} else {
+						navigator.clipboard.writeText(wechatId).then(() => {
+							this.showNotification('微信号已复制');
+						}).catch(() => {
+							alert('复制失败，请手动复制');
+						});
+					}
+				};
+			}
+			
+			if (closeBtn) {
+				closeBtn.onclick = () => this.hideLimitPopup();
+			}
+		},
+		
+		hideLimitPopup: function() {
+			const popup = this.elements.popup;
+			if (popup) {
+				popup.style.display = 'none';
+				if (popup._escHandler) {
+					document.removeEventListener('keydown', popup._escHandler);
+					delete popup._escHandler;
+				}
+			}
+		},
+		
+		showTimeWarning: function(remainingMinutes) {
+			if (this.isMembershipValid()) return;
+			const minutes = Math.floor(remainingMinutes);
+			const seconds = Math.floor((remainingMinutes - minutes) * 60);
+			if (!this.elements.warning) return;
+			const warning = this.elements.warning;
+			const textSpan = warning.querySelector('.tls-warning-text');
+			if (textSpan) textSpan.textContent = `⏰ 剩余时间: ${minutes}分${seconds}秒 `;
+			warning.style.display = 'flex';
+			clearTimeout(this.state.timers.warningTimer);
+			this.state.timers.warningTimer = setTimeout(() => {
+				if (this.elements.warning) this.elements.warning.style.display = 'none';
+			}, 10000);
+		},
+		
+		hideWarning: function() {
+			if (this.elements.warning) this.elements.warning.style.display = 'none';
+		},
+		
+		startMonitoring: function() {
+			if (this.isMembershipValid()) {
+				console.log('会员用户，跳过监控');
+				return;
+			}
+			if (this.state.monitoring) return;
+			this.state.monitoring = true;
+			this.checkTimeLimit();
+			this.state.timers.checkTimer = setInterval(() => {
+				if (!this.isMembershipValid()) this.checkTimeLimit();
+			}, this.config.uiConfig.autoCheckInterval);
+			this.state.timers.saveTimer = setInterval(() => {
+				if (!this.isMembershipValid()) this.saveUsageRecord();
+			}, 60000);
+		},
+		
+		stopMonitoring: function() {
+			this.state.monitoring = false;
+			if (this.state.timers.checkTimer) clearInterval(this.state.timers.checkTimer);
+			if (this.state.timers.saveTimer) clearInterval(this.state.timers.saveTimer);
+			if (this.state.timers.warningTimer) clearTimeout(this.state.timers.warningTimer);
+		},
+		
+		applyMembershipFeatures: function() {
+			if (this.isMembershipValid()) {
+				this.hideLimitOverlay();
+				this.hideWarning();
+				if (!this.state.monitoring) this.startMonitoring();
+			} else {
+				this.startMonitoring();
+			}
+		},
+		
+		// 公共API
+		checkSave: function() { return this.checkTimeLimit(); },
+		checkExport: function() { return this.checkTimeLimit(); },
+		checkTime: function() { return this.checkTimeLimit(); },
+		resetUsage: function() {
+			localStorage.removeItem('app_usage');
+			this.state.usageRecord = null;
+			this.loadUsageRecord();
+			return true;
+		},
+		showProPopup: function() { this.showLimitPopup('upgrade'); },
+		getStatus: function() { return this.getRemainingInfo(); },
+		
+		// 辅助方法
+		getRemainingInfo: function() {
+			if (this.isMembershipValid()) return { minutes: Infinity, totalMinutes: 0 };
+			const record = this.state.usageRecord || this.loadUsageRecord();
+			const now = Date.now();
+			const sessionMinutes = (now - record.startTime) / 60000;
+			const totalUsedMinutes = sessionMinutes + (record.totalMinutes || 0);
+			const totalAvailableMinutes = this.config.freeLimits.maxMinutes + (record.adBonusMinutes || 0);
+			const remainingMinutes = totalAvailableMinutes - totalUsedMinutes;
+			return { minutes: Math.max(0, remainingMinutes), totalMinutes: totalUsedMinutes };
+		},
+		
+		showNotification: function(message, isError = false) {
+			const notif = document.createElement('div');
+			notif.style.cssText = `
+				position: fixed;
+				top: 100px;
+				right: 20px;
+				background: ${isError ? '#f44336' : '#4CAF50'};
+				color: white;
+				padding: 12px 20px;
+				border-radius: 6px;
+				z-index: 10001;
+				box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+				animation: fadeInRight 0.3s ease;
+			`;
+			notif.textContent = message;
+			document.body.appendChild(notif);
+			setTimeout(() => notif.remove(), 3000);
+		},
+		
+		checkAndCloseOverlay: function() {
+			if (!this.state.overlayVisible) return false;
+			const remainingMinutes = this.getRemainingMinutes();
+			if (remainingMinutes > 0) {
+				this.hideLimitOverlay();
+				if (!this.state.monitoring && !this.isMembershipValid()) this.startMonitoring();
+				this.showStatusMessage('时间已恢复，继续使用');
+				return true;
+			}
+			return false;
+		},
+		
+		showStatusMessage: function(message) {
+			const statusMsg = document.getElementById('status-msg');
+			if (statusMsg) {
+				statusMsg.textContent = message;
+				statusMsg.style.opacity = '1';
+				setTimeout(() => statusMsg.style.opacity = '0', 3000);
+			}
+		},
+		
+		// 复制微信号（优先 Android 接口）
+		copyWeChatId: function() {
+			const wechatId = this.config.proVersion.wechatId;
+			if (window.Android && Android.copyToClipboard) {
+				Android.copyToClipboard(wechatId);
+			} else if (navigator.clipboard) {
+				navigator.clipboard.writeText(wechatId).then(() => {
+					this.showNotification('微信号已复制');
+				}).catch(() => {
+					this.fallbackCopy(wechatId);
+				});
+			} else {
+				this.fallbackCopy(wechatId);
+			}
+		},
+		
+		fallbackCopy: function(text) {
+			const textarea = document.createElement('textarea');
+			textarea.value = text;
+			document.body.appendChild(textarea);
+			textarea.select();
+			document.execCommand('copy');
+			document.body.removeChild(textarea);
+			this.showNotification('微信号已复制: ' + text);
+		},
+		
+		// 打开微信（先复制微信号，再尝试打开微信）
+		openWeChat: function() {
+			const wechatId = this.config.proVersion.wechatId;
+			this.copyWeChatId();  // 先复制
+			if (window.Android && Android.openWeChat) {
+				Android.openWeChat(wechatId);
+			} else {
+				window.location.href = 'weixin://';
+				setTimeout(() => {
+					this.showNotification('请手动在微信中搜索添加好友: ' + wechatId);
+				}, 800);
+			}
+		},		
+		
+		
+		// 保留原方法但不再使用
+		getDailyPassword: function() { return ''; },
+		validatePassword: function() { return { valid: false, message: '此方法已废弃' }; },
+		activateProVersion: function() { return false; },
+		checkProVersion: function() { return false; },
+		saveProVersion: function() { return false; },
+		removeProVersion: function() { return false; },
+		addProBadge: function() {}
+	};
+	
+	window.TimeLimitSystem = TimeLimitSystem;
+	
+	if (typeof window.TLS_AUTO_INIT !== 'undefined' && window.TLS_AUTO_INIT) {
+		document.addEventListener('DOMContentLoaded', function() {
+			TimeLimitSystem.init(window.TLS_CONFIG);
+		});
+	}
+})(window, document);
+	
+	
+	
 </script>
 </body>
 </html>
