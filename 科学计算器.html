@@ -782,28 +782,35 @@ document.addEventListener('DOMContentLoaded', function() {
 	const clearBtn = document.getElementById('debug-clear-membership');
 	if (clearBtn) {
 		clearBtn.addEventListener('click', function() {
-			// 清除 localStorage 中的会员记录
-			localStorage.removeItem('app_membership');
-			localStorage.removeItem('pro_version');
-			// 可选：清除使用记录，让时间重新从0开始
-			localStorage.removeItem('app_usage');
-			sessionStorage.removeItem('app_usage');
-			// 重新初始化 TimeLimitSystem
-			if (window.TimeLimitSystem) {
-				TimeLimitSystem.state.membership = null;
-				TimeLimitSystem.loadMembership();      // 重新加载（会清空会员）
-				TimeLimitSystem.loadUsageRecord();     // 重新加载使用记录
-				TimeLimitSystem.applyMembershipFeatures(); // 重新应用（会启动监控）
-				TimeLimitSystem.updateTimeDisplay();   // 更新时间显示
-				// 如果覆盖层显示中，则隐藏
-				if (TimeLimitSystem.state.overlayVisible) {
-					TimeLimitSystem.hideLimitOverlay();
+		
+			const pwd = prompt('这是开发者调试按键，需要密码才能清除');
+			if (pwd === null) return; // 用户取消
+		    if (pwd.trim() === 'ncj科学计算器') {
+				// 清除 localStorage 中的会员记录
+				localStorage.removeItem('app_membership');
+				localStorage.removeItem('pro_version');
+				// 可选：清除使用记录，让时间重新从0开始
+				localStorage.removeItem('app_usage');
+				sessionStorage.removeItem('app_usage');
+				// 重新初始化 TimeLimitSystem
+				if (window.TimeLimitSystem) {
+					TimeLimitSystem.state.membership = null;
+					TimeLimitSystem.loadMembership();      // 重新加载（会清空会员）
+					TimeLimitSystem.loadUsageRecord();     // 重新加载使用记录
+					TimeLimitSystem.applyMembershipFeatures(); // 重新应用（会启动监控）
+					TimeLimitSystem.updateTimeDisplay();   // 更新时间显示
+					// 如果覆盖层显示中，则隐藏
+					if (TimeLimitSystem.state.overlayVisible) {
+						TimeLimitSystem.hideLimitOverlay();
+					}
+					TimeLimitSystem.showNotification('会员状态已清除，现在为免费用户', false);
+					// 刷新页面可选项（可选）
+					// location.reload();
+				} else {
+					alert('TimeLimitSystem 未加载');
 				}
-				TimeLimitSystem.showNotification('会员状态已清除，现在为免费用户', false);
-				// 刷新页面可选项（可选）
-				// location.reload();
 			} else {
-				alert('TimeLimitSystem 未加载');
+				alert('这是开发者调试，用户不能清除');
 			}
 		});
 	}
