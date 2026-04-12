@@ -1,5 +1,5 @@
 {
-  "version": "2.1",
-  "releaseNotes": "手写功能增强：1.点击手写图片可以再手写,2.添加颜色、粗细、撤销、重做、橡皮擦功能,3.套索、复制粘贴、移动、缩放等",
-  "url": "https://ningchaojie.github.io/文档编辑器v2.1.apk"
+  "version": "2.2",
+  "releaseNotes": "新版本新增功能：1. 粘贴自动渲染带公式latex代码长内容,2. 对粘贴的长内容latex公式代码智能添加()[]以便给编辑器渲染，3. 编辑器集成科学计算器，可以计算微积分、微分方程等高级计算、函数2d3d图形化",
+  "url": "https://ningchaojie.github.io/文档编辑器v2.2.apk"
 }
