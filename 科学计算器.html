@@ -691,6 +691,8 @@ header {
 	<div class="header-actions" id="header-actions">
 		<button class="help-btn" onclick="document.getElementById('helpModal').style.display='flex'">语法帮助</button>
 		<button id="graph-modal-btn" class="upgrade-btn1" style="background:#3b82f6;">📈 图像</button>
+		<button id="angle-mode-btn" class="upgrade-btn1" style="background:#6c5ce7;">📐 Deg/Rad</button>
+		
 		<button id="upgrade-btn1" class="upgrade-btn1">⭐ 升级</button>
 		<button id="upgrade-btn2" class="upgrade-btn1">⭐ 升级</button>
 		<button id="upgrade-btn3" class="upgrade-btn1">⭐ 升级</button>
@@ -777,6 +779,12 @@ header {
 
 
 
+// ========== 角度/弧度模式切换 ==========
+// ========== 角度/弧度模式切换（修复版） ==========
+// ========== 角度/弧度模式切换（劫持 Math 函数，确保生效） ==========
+// ========== 角度/弧度模式切换（劫持所有三角函数，包括 math.js 扩展函数） ==========
+
+
 // 调试功能：清除会员状态
 document.addEventListener('DOMContentLoaded', function() {
 	const clearBtn = document.getElementById('debug-clear-membership');
@@ -815,6 +823,93 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 });
+
+
+// ========== 角度/弧度实时切换（使用 math.config） ==========
+// ========== 角度/弧度实时切换（劫持 math 对象的所有三角函数） ==========
+(function() {
+	// 保存原始三角函数
+	const originalMathTrig = {
+		sin: math.sin, cos: math.cos, tan: math.tan,
+		asin: math.asin, acos: math.acos, atan: math.atan, atan2: math.atan2,
+		sec: math.sec, csc: math.csc, cot: math.cot,
+		asec: math.asec, acsc: math.acsc, acot: math.acot,
+		sinh: math.sinh, cosh: math.cosh, tanh: math.tanh,
+		asinh: math.asinh, acosh: math.acosh, atanh: math.atanh,
+		sech: math.sech, csch: math.csch, coth: math.coth,
+		asech: math.asech, acsch: math.acsch, acoth: math.acoth
+	};
+
+	let angleMode = localStorage.getItem('math_angle_mode') || 'rad';
+	const angleBtn = document.getElementById('angle-mode-btn');
+	if (!angleBtn) return;
+
+	const toRad = (x) => x * Math.PI / 180;
+	const toDeg = (x) => x * 180 / Math.PI;
+
+	function applyAngleMode() {
+		if (angleMode === 'deg') {
+			// 正向：输入角度，转为弧度再调用原函数
+			math.sin = (x) => originalMathTrig.sin(toRad(x));
+			math.cos = (x) => originalMathTrig.cos(toRad(x));
+			math.tan = (x) => originalMathTrig.tan(toRad(x));
+			math.sec = (x) => originalMathTrig.sec(toRad(x));
+			math.csc = (x) => originalMathTrig.csc(toRad(x));
+			math.cot = (x) => originalMathTrig.cot(toRad(x));
+			// 反向：输入值，结果转为角度
+			math.asin = (x) => toDeg(originalMathTrig.asin(x));
+			math.acos = (x) => toDeg(originalMathTrig.acos(x));
+			math.atan = (x) => toDeg(originalMathTrig.atan(x));
+			math.atan2 = (y, x) => toDeg(originalMathTrig.atan2(y, x));
+			math.asec = (x) => toDeg(originalMathTrig.asec(x));
+			math.acsc = (x) => toDeg(originalMathTrig.acsc(x));
+			math.acot = (x) => toDeg(originalMathTrig.acot(x));
+			// 双曲函数（角度模式不改变，但为了完整恢复，保持原样）
+			math.sinh = originalMathTrig.sinh;
+			math.cosh = originalMathTrig.cosh;
+			math.tanh = originalMathTrig.tanh;
+			math.asinh = originalMathTrig.asinh;
+			math.acosh = originalMathTrig.acosh;
+			math.atanh = originalMathTrig.atanh;
+			math.sech = originalMathTrig.sech;
+			math.csch = originalMathTrig.csch;
+			math.coth = originalMathTrig.coth;
+			math.asech = originalMathTrig.asech;
+			math.acsch = originalMathTrig.acsch;
+			math.acoth = originalMathTrig.acoth;
+		} else {
+			// 恢复原始函数
+			for (let key in originalMathTrig) {
+				if (typeof originalMathTrig[key] === 'function') {
+					math[key] = originalMathTrig[key];
+				}
+			}
+		}
+		console.log('角度模式已设置为:', angleMode);
+	}
+
+	function updateButtonText() {
+		angleBtn.textContent = angleMode === 'rad' ? '📐 弧度' : '📐 角度';
+	}
+
+	function toggleAngleMode() {
+		angleMode = angleMode === 'rad' ? 'deg' : 'rad';
+		localStorage.setItem('math_angle_mode', angleMode);
+		applyAngleMode();
+		updateButtonText();
+		const msg = `已切换到${angleMode === 'rad' ? '弧度 (Rad)' : '角度 (Deg)'}模式,重启生效`;
+		if (window.TimeLimitSystem && window.TimeLimitSystem.showNotification) {
+			window.TimeLimitSystem.showNotification(msg, false);
+		} else {
+			alert(msg);
+		}
+	}
+
+	angleBtn.addEventListener('click', toggleAngleMode);
+	applyAngleMode();
+	updateButtonText();
+})();
+
 
 		// 菜单显示/隐藏逻辑
 		document.addEventListener('DOMContentLoaded', function() {
@@ -1279,6 +1374,8 @@ result
 
 	// ---------- 主求值入口：符号指令走 nerdamer，数值/绘图走 math.js，dsolve 走 Pyodide ----------
 	function parseAndEval(input) {
+	
+
 		// 绘图指令优先拦截
 		if (input.startsWith('plot3d(')) {
 			return handlePlot3D(input);
@@ -1455,9 +1552,14 @@ result
 
 	// ---------- 执行入口 (异步支持 dsolve) ----------
 	async function execute() {
+	
+
+		
 		let input = cmdInput.value.trim();
 		if (!input) return;
 		log(`>> ${input}`, 'in');
+		
+			
 		cmdInput.value = '';
 		cmdInput.style.height = '45px';
 		
@@ -1507,7 +1609,7 @@ result
 		}
 	}
 	
-	
+//=================广告=================	
 	
 (function(window, document) {
 	'use strict';
@@ -1857,7 +1959,7 @@ result
 })(window, document);	
 
 
-
+//==============时间限制覆盖层==================
 
 // time-limit-system.js - 会员系统（支持1天/1月/永久，基于日期+私钥的密码验证）
 (function(window, document) {
