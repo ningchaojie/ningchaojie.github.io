@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+	<title>文档编辑器 v2.3 · 手写模块 — 云记级专业手写体验</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			background: radial-gradient(circle at 10% 30%, #f8fafd, #eef2f8);
+			font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+			color: #1e293b;
+			scroll-behavior: smooth;
+		}
+
+		/* 渐变装饰 */
+		.bg-blur {
+			position: fixed;
+			top: -20%;
+			right: -10%;
+			width: 60%;
+			height: 60%;
+			background: radial-gradient(circle, rgba(74,144,226,0.08) 0%, rgba(74,144,226,0) 70%);
+			pointer-events: none;
+			z-index: 0;
+		}
+
+		.container {
+			max-width: 1300px;
+			margin: 0 auto;
+			padding: 2rem 1.5rem 4rem;
+			position: relative;
+			z-index: 2;
+		}
+
+		/* 头部 */
+		.hero {
+			text-align: center;
+			margin-bottom: 3rem;
+		}
+
+		.chip {
+			display: inline-flex;
+			align-items: center;
+			background: rgba(74, 144, 226, 0.12);
+			backdrop-filter: blur(4px);
+			padding: 0.3rem 1.2rem;
+			border-radius: 40px;
+			font-size: 0.8rem;
+			font-weight: 600;
+			color: #2c6eaf;
+			letter-spacing: 0.3px;
+			margin-bottom: 1.2rem;
+			border: 0.5px solid rgba(74, 144, 226, 0.25);
+		}
+
+		h1 {
+			font-size: 3.2rem;
+			font-weight: 800;
+			background: linear-gradient(135deg, #1a2c3e, #2c5282);
+			background-clip: text;
+			-webkit-background-clip: text;
+			color: transparent;
+			letter-spacing: -0.02em;
+			margin-bottom: 0.5rem;
+		}
+
+		.version-badge {
+			display: inline-block;
+			background: #2c3e50;
+			color: white;
+			font-size: 0.9rem;
+			font-weight: 600;
+			padding: 0.2rem 1rem;
+			border-radius: 30px;
+			margin-bottom: 1rem;
+		}
+
+		.subhead {
+			font-size: 1.2rem;
+			color: #4a627a;
+			max-width: 680px;
+			margin: 0.8rem auto 0;
+			line-height: 1.4;
+		}
+
+		/* 下载条 */
+		.download-bar {
+			background: white;
+			border-radius: 3rem;
+			padding: 0.8rem 1.5rem;
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1.2rem;
+			margin: 2rem 0 2.5rem;
+			box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+			border: 1px solid rgba(0,0,0,0.03);
+		}
+
+		.apk-info {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+		}
+
+		.apk-icon {
+			background: #1e2a3a;
+			width: 52px;
+			height: 52px;
+			border-radius: 28px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.8rem;
+			box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+		}
+
+		.apk-text h3 {
+			font-size: 1.3rem;
+			font-weight: 700;
+		}
+
+		.apk-text p {
+			font-size: 0.8rem;
+			color: #5b6e8c;
+		}
+
+		.download-btn {
+			background: #1e2a3a;
+			color: white;
+			padding: 0.8rem 2rem;
+			border-radius: 60px;
+			font-weight: 600;
+			text-decoration: none;
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			transition: 0.2s;
+			box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+		}
+
+		.download-btn:hover {
+			background: #2c5282;
+			transform: scale(1.02);
+		}
+
+		/* 功能网格 */
+		.section-title {
+			font-size: 1.8rem;
+			font-weight: 700;
+			margin: 2.5rem 0 1.5rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.section-title span {
+			background: #e9f0f9;
+			padding: 0.2rem 0.8rem;
+			border-radius: 40px;
+			font-size: 0.9rem;
+			font-weight: 500;
+			color: #2c6eaf;
+		}
+
+		.feature-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+			gap: 1.8rem;
+			margin: 2rem 0;
+		}
+
+		.feature-card {
+			background: rgba(255,255,255,0.85);
+			backdrop-filter: blur(2px);
+			border-radius: 2rem;
+			padding: 1.5rem;
+			transition: all 0.25s ease;
+			border: 1px solid rgba(255,255,255,0.7);
+			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+		}
+
+		.feature-card:hover {
+			transform: translateY(-4px);
+			background: white;
+			box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.1);
+			border-color: rgba(74,144,226,0.2);
+		}
+
+		.card-icon {
+			font-size: 2.5rem;
+			margin-bottom: 1rem;
+		}
+
+		.feature-card h3 {
+			font-size: 1.3rem;
+			font-weight: 700;
+			margin-bottom: 0.5rem;
+		}
+
+		.feature-card p {
+			color: #4b5e7c;
+			font-size: 0.9rem;
+			line-height: 1.4;
+		}
+
+		.tag {
+			display: inline-block;
+			background: #eef2ff;
+			border-radius: 20px;
+			padding: 0.2rem 0.8rem;
+			font-size: 0.7rem;
+			font-weight: 600;
+			color: #2c6eaf;
+			margin-top: 0.8rem;
+		}
+
+		/* 演示区 - 静态模拟 */
+		.showcase-area {
+			background: linear-gradient(135deg, #fefefe, #f7faff);
+			border-radius: 2rem;
+			padding: 1.8rem;
+			margin: 2.5rem 0;
+			border: 1px solid rgba(74,144,226,0.2);
+			box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+		}
+
+		.showcase-title {
+			display: flex;
+			align-items: center;
+			gap: 0.8rem;
+			margin-bottom: 1.5rem;
+			font-weight: 600;
+		}
+
+		.mock-tools {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.8rem;
+			margin-bottom: 1.5rem;
+			justify-content: center;
+		}
+
+		.mock-btn {
+			background: #eef3fc;
+			border-radius: 40px;
+			padding: 0.4rem 1rem;
+			font-size: 0.8rem;
+			font-weight: 500;
+			color: #1e2a3a;
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+		}
+
+		.mock-canvas {
+			background: #fef9ef;
+			border-radius: 1.5rem;
+			padding: 1rem;
+			text-align: center;
+			border: 1px solid #e2edf7;
+			box-shadow: inset 0 1px 4px #00000008, 0 8px 20px rgba(0,0,0,0.02);
+		}
+
+		.mock-stroke {
+			width: 100%;
+			height: 100px;
+			background: repeating-linear-gradient(45deg, #ccc2b0 0px, #ccc2b0 2px, #e9e2d4 2px, #e9e2d4 8px);
+			border-radius: 20px;
+			margin: 10px 0;
+			position: relative;
+		}
+
+		.badge-icon {
+			font-size: 0.8rem;
+			background: #4a90e2;
+			color: white;
+			border-radius: 50px;
+			padding: 0.2rem 0.6rem;
+		}
+
+		footer {
+			text-align: center;
+			margin-top: 3rem;
+			padding-top: 2rem;
+			border-top: 1px solid #dce5f0;
+			color: #5f7d9c;
+			font-size: 0.8rem;
+		}
+
+		@media (max-width: 680px) {
+			.container { padding: 1.5rem; }
+			h1 { font-size: 2.2rem; }
+			.section-title { font-size: 1.5rem; }
+			.download-bar { flex-direction: column; align-items: flex-start; }
+		}
+	</style>
+</head>
+<body>
+<div class="bg-blur"></div>
+<div class="container">
+	<div class="hero">
+		<div class="chip">✍️ 专业手写引擎 · 云记级体验</div>
+		<h1>文档编辑器 v2.3</h1>
+		<div class="version-badge">手写模块 · 独立进化</div>
+		<div class="subhead">集智能画笔、套索编辑、惯性平移、双指缩放、直线化等旗舰能力于一体，让手写批注如纸般自由。</div>
+	</div>
+
+	<!-- 下载区域 -->
+	<div class="download-bar">
+		<div class="apk-info">
+			<div class="apk-icon">📱</div>
+			<div class="apk-text">
+				<h3>文档编辑器 v2.3 (Android)</h3>
+				<p>手写模块完整集成 · 适配手机/平板</p>
+			</div>
+		</div>
+		<a href="https://ningchaojie.github.io/文档编辑器v2.3.apk" class="download-btn" download>
+			⬇️ 下载 APK
+			<span style="font-size:0.75rem;">v2.3</span>
+		</a>
+	</div>
+
+	<!-- 功能亮点 12个核心 -->
+	<div class="section-title">
+		🧠 手写模块 · 核心能力 <span>12+ 项专业特性</span>
+	</div>
+	<div class="feature-grid">
+		<div class="feature-card"><div class="card-icon">🖌️</div><h3>智能画笔</h3><p>RGB全色域 & 1~20px 无级粗细，笔画平滑无锯齿，支持压感级响应。</p><div class="tag">即绘即显</div></div>
+		<div class="feature-card"><div class="card-icon">🧽</div><h3>动态橡皮擦</h3><p>半径5~40px可调，精准擦除任意笔画，基于线段相交检测，擦除干净利落。</p><div class="tag">路径擦除</div></div>
+		<div class="feature-card"><div class="card-icon">🖱️</div><h3>智能套索</h3><p>框选、点选，移动/缩放选中笔画（等比例/单向），线宽同步缩放，矢量感十足。</p><div class="tag">8控点变换</div></div>
+		<div class="feature-card"><div class="card-icon">✋</div><h3>丝滑平移 + 惯性</h3><p>单指拖拽移动画布，松手后惯性滑动，手感媲美原生地图应用。</p><div class="tag">物理减速</div></div>
+		<div class="feature-card"><div class="card-icon">🔍</div><h3>双指缩放·无跳转</h3><p>以双指中心为基准，缩放范围0.2x~5x，精准防抖，缩放时绝不偏移。</p><div class="tag">中心锁定</div></div>
+		<div class="feature-card"><div class="card-icon">📐</div><h3>适应内容 / 重置视图</h3><p>一键将全部笔画居中并自动调整缩放比例；重置视图回到标准大小。</p><div class="tag">全局视野</div></div>
+		<div class="feature-card"><div class="card-icon">⏸️</div><h3>长按变直线</h3><p>画笔绘制中静止0.5秒，曲线瞬间变直，并支持拖拽终点调整方向，手绘直线神器。</p><div class="tag">停顿触发</div></div>
+		<div class="feature-card"><div class="card-icon">📋</div><h3>剪切/复制/粘贴</h3><p>套索选中后浮动工具栏，支持跨区域粘贴，自动计算偏移，创作效率倍增。</p><div class="tag">跨笔画复用</div></div>
+		<div class="feature-card"><div class="card-icon">🎨</div><h3>批量改色</h3><p>选中多个笔画后，直接选取新颜色，所有选中笔画同步变色，保留历史可撤销。</p><div class="tag">快速重设</div></div>
+		<div class="feature-card"><div class="card-icon">↩️</div><h3>50步撤销/重做</h3><p>任意操作均入栈，自由回溯，创作无忧。</p><div class="tag">完整历史</div></div>
+		<div class="feature-card"><div class="card-icon">🖼️</div><h3>导出 & Quill集成</h3><p>导出为高清PNG，或直接嵌入富文本编辑器，保存笔画数据，支持二次编辑。</p><div class="tag">跨平台兼容</div></div>
+		<div class="feature-card"><div class="card-icon">📱</div><h3>全触控/鼠标双模</h3><p>同时支持触摸屏与鼠标事件，长按、拖拽、手势全部适配。</p><div class="tag">无缝交互</div></div>
+	</div>
+
+	<!-- 演示区：手势示意 -->
+	<div class="showcase-area">
+		<div class="showcase-title">
+			<span>✨ 手势 & 操作演示</span>
+			<span class="badge-icon">Live 示意</span>
+		</div>
+		<div class="mock-tools">
+			<span class="mock-btn">✍️ 笔刷</span>
+			<span class="mock-btn">🧽 橡皮</span>
+			<span class="mock-btn">🖱️ 套索</span>
+			<span class="mock-btn">✋ 平移</span>
+			<span class="mock-btn">🔍 双指缩放</span>
+			<span class="mock-btn">📐 适应视图</span>
+		</div>
+		<div class="mock-canvas">
+			<div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+				<div style="font-size: 0.8rem; background: #eef2fa; padding: 0.3rem 1rem; border-radius: 30px;">⚡ 停顿变直线</div>
+				<div style="font-size: 0.8rem; background: #eef2fa; padding: 0.3rem 1rem; border-radius: 30px;">📌 套索缩放同步线宽</div>
+				<div style="font-size: 0.8rem; background: #eef2fa; padding: 0.3rem 1rem; border-radius: 30px;">🔄 惯性平移</div>
+			</div>
+			<div class="mock-stroke" style="margin: 20px 0;">
+				<div style="position: relative; height: 100%; display: flex; align-items: center; justify-content: center; gap: 1.5rem; font-size: 1.8rem; color: #5a6e8a;">
+					<span>✍️</span>  ———  <span style="font-size: 1rem;">长按直线化</span>  ———  <span>🖱️</span>
+				</div>
+			</div>
+			<div style="font-size: 0.75rem; color: #4a627a;">✔ 支持双指缩放中心锁定 ✔ 缩放后无跳转残留 ✔ 直线化拖拽终点实时调整</div>
+		</div>
+		<div style="margin-top: 1rem; text-align: center; font-size: 0.8rem; background: #eef3fc; border-radius: 2rem; padding: 0.5rem;">
+			💡 长按画板空白处 (选择模式下) 可调出「粘贴」菜单，将剪贴板笔画放置于指定位置。
+		</div>
+	</div>
+
+	<!-- 更多技术亮点 -->
+	<div class="section-title">
+		⚙️ 高级机制 <span>为什么手写如此跟手</span>
+	</div>
+	<div class="feature-grid">
+		<div class="feature-card"><div class="card-icon">🧩</div><h3>防跳转双指逻辑</h3><p>缩放结束若有手指残留，自动屏蔽平移，完全消除视图跳跃，保证画面稳定。</p></div>
+		<div class="feature-card"><div class="card-icon">🎯</div><h3>坐标系统独立</h3><p>逻辑坐标与视图变换分离，无限画布 + 精细缩放，任意变换不丢失精度。</p></div>
+		<div class="feature-card"><div class="card-icon">📈</div><h3>惯性滑动物理模拟</h3><p>记录速度向量，自适应帧率衰减，松手后平滑停止。</p></div>
+		<div class="feature-card"><div class="card-icon">🖨️</div><h3>笔画数据持久化</h3><p>支持导出JSON结构，可重新载入编辑，为二次开发提供基础。</p></div>
+	</div>
+
+	<!-- 下载号召 -->
+	<div style="background: linear-gradient(120deg, #1e2a3a 0%, #2c3e50 100%); border-radius: 2rem; padding: 2rem; text-align: center; margin: 2rem 0 1rem; color: white;">
+		<div style="font-size: 1.8rem; margin-bottom: 0.5rem;">📱 立即体验</div>
+		<div style="opacity: 0.9; margin-bottom: 1.5rem;">文档编辑器 v2.3 · 手写模块全新升级</div>
+		<a href="https://ningchaojie.github.io/文档编辑器v2.3.apk" class="download-btn" style="background: white; color: #1e2a3a; box-shadow: 0 8px 18px rgba(0,0,0,0.2);">⬇️ 下载 Android APK</a>
+		<div style="font-size: 0.7rem; margin-top: 1.2rem; opacity: 0.7;">版本 v2.3 | 大小 18.2MB | 兼容 Android 7.0+</div>
+	</div>
+
+	<footer>
+		© 文档编辑器 · 手写模块采用云记风格交互，流畅度与功能深度优化。<br>
+		官网提供更多资讯 | 下载安装后即可使用悬浮手写按钮
+	</footer>
+</div>
+</body>
+</html>
