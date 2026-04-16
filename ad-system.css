@@ -1,0 +1,177 @@
+/* ==================== 广告系统核心样式 ==================== */
+
+#ad-container {
+	position: fixed;
+	top: 100px;
+	right: 20px;
+	z-index: 9998;
+	transition: all 0.3s ease;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.ad-content {
+	background: white;
+	border-radius: 10px;
+	overflow: hidden;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+	width: 320px;
+	position: relative;
+	border: 1px solid #e0e0e0;
+}
+
+/* 广告图片容器 - 自适应修改 */
+.ad-image-container {
+	width: 100%;
+	height: auto !important; /* 改为自适应高度 */
+	min-height: 150px;
+	max-height: 300px; /* 设置最大高度限制 */
+	overflow: hidden;
+	position: relative;
+	background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+}
+
+/* 图片自适应样式 */
+.ad-image-container img {
+	width: 100% !important;
+	height: auto !important;
+	max-height: 300px !important;
+	object-fit: contain !important; /* 关键：保持图片完整比例 */
+	object-position: center !important;
+	border-radius: 6px !important;
+	background: white !important;
+	padding: 10px !important;
+	box-sizing: border-box !important;
+}
+
+/* 专门针对竖屏图片的样式 */
+.ad-image-container img[data-portrait="true"] {
+	width: auto !important;
+	max-width: 90% !important;
+	height: auto !important;
+	max-height: 400px !important;
+	margin: 0 auto !important;
+	display: block !important;
+}
+
+/* 移动端响应式 */
+@media (max-width: 768px) {
+	#ad-container {
+		top: 80px !important;
+		right: 10px !important;
+		left: 10px !important;
+		display: flex !important;
+		justify-content: center !important;
+		transform: scale(0.85) !important; /* 缩小广告 */
+		transform-origin: top right !important;
+	}
+	
+	.ad-content {
+		width: 100% !important;
+		max-width: 280px !important; /* 移动端更小 */
+	}
+	
+	.ad-image-container {
+		min-height: 120px !important;
+		max-height: 200px !important;
+	}
+	
+	.ad-image-container img {
+		max-height: 200px !important;
+		padding: 5px !important;
+	}
+}
+
+@media (max-width: 480px) {
+	#ad-container {
+		transform: scale(0.7) !important;
+		top: 60px !important;
+	}
+	
+	.ad-content {
+		max-width: 240px !important;
+	}
+	
+	.ad-image-container {
+		min-height: 100px !important;
+		max-height: 160px !important;
+	}
+	
+	.ad-image-container img {
+		max-height: 160px !important;
+	}
+}
+
+/* 广告其他元素样式保持不变 */
+.ad-text-content {
+	padding: 20px;
+	background: white;
+}
+
+.ad-title {
+	margin: 0 0 8px 0;
+	font-size: 18px;
+	font-weight: 600;
+	color: #333;
+	line-height: 1.3;
+}
+
+.ad-description {
+	margin: 0 0 15px 0;
+	font-size: 14px;
+	color: #666;
+	line-height: 1.5;
+}
+
+.ad-close-btn {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background: rgba(0, 0, 0, 0.5);
+	color: white;
+	border: none;
+	border-radius: 50%;
+	width: 28px;
+	height: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	font-size: 18px;
+	z-index: 100;
+}
+
+.ad-action-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	border: none;
+	border-radius: 6px;
+	padding: 10px 20px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	min-width: 140px;
+}
+
+.ad-timer {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 15px;
+	padding: 8px 12px;
+	background: #f8f9fa;
+	border-radius: 6px;
+	font-size: 13px;
+	color: #666;
+}
+
+/* 专业版隐藏广告 */
+.pro-version #ad-container {
+	display: none !important;
+}
