@@ -1,0 +1,3990 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>掌上数学实验室 - 符号计算版</title>
+	<!-- 数值计算库 Math.js -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.2.1/math.min.js"></script>
+	<!-- 绘图库 Plotly -->
+	<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+	<!-- 符号计算库 Nerdamer 及其插件 -->
+	<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.2/nerdamer.core.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.2/Algebra.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.2/Calculus.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.2/Solve.js"></script>
+	
+	
+<script src="https://ningchaojie.github.io/ad-system.js"></script> 
+
+<link href="https://ningchaojie.github.io/ad-system.css" rel="stylesheet">
+	
+	<style>
+		:root { --bg: #0d1117; --card: #161b22; --text: #c9d1d9; --accent: #58a6ff; --green: #3fb950; --err: #f85149; --border: #30363d; }
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		body { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; }
+		
+		header { padding: 10px 15px; background: var(--card); border-bottom: 1px solid var(--border); font-size: 16px; font-weight: bold; color: var(--accent); display: flex; justify-content: space-between; align-items: center; }
+		.help-btn { font-size: 12px; background: var(--border); color: var(--text); border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+
+		.console-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+		
+		#output { flex: 1; overflow-y: auto; padding: 15px; font-size: 14px; line-height: 1.6; }
+		#output::-webkit-scrollbar { width: 4px; }
+		#output::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+		.log-in { color: var(--accent); white-space: pre-wrap; word-break: break-all; margin-bottom: 4px; }
+		.log-out { color: var(--green); white-space: pre-wrap; word-break: break-all; margin-bottom: 15px; border-left: 2px solid var(--border); padding-left: 10px; }
+		.log-err { color: var(--err); white-space: pre-wrap; margin-bottom: 15px; }
+		.log-sys { color: #8b949e; font-style: italic; margin-bottom: 15px; }
+
+		#chart-box { height: 300px; width: 100%; border-top: 1px solid var(--border); display: none; background: var(--bg); }
+
+		.input-area { background: var(--card); border-top: 1px solid var(--border); padding: 15px; display: flex; gap: 10px; align-items: flex-end; }
+		textarea { flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: inherit; font-size: 15px; padding: 10px; border-radius: 6px; resize: none; height: 45px; min-height: 100px; max-height: 200px; outline: none; }
+		textarea:focus { border-color: var(--accent); }
+		button.run { background: var(--accent); color: #000; border: none; padding: 0 20px; height: 45px; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; }
+
+		.modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
+		.modal-content { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; max-width: 650px; width: 100%; max-height: 80vh; overflow-y: auto; }
+		.modal-content h3 { color: var(--accent); margin: 15px 0 5px 0; font-size: 16px; }
+		.modal-content p { font-size: 13px; margin-bottom: 8px; color: var(--text); }
+		.modal-content code { background: var(--bg); padding: 2px 5px; border-radius: 3px; color: var(--green); }
+		.close-modal { float: right; background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer; }
+		
+
+		
+		
+		
+/* 重置 header 布局为 flex，确保三栏分布 */
+header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: var(--card);
+	padding: 8px 15px;
+	border-bottom: 1px solid var(--border);
+	gap: 12px;
+	flex-wrap: nowrap;
+	min-width: 0;
+	overflow-x: visible;
+	scrollbar-width: none;
+}
+
+/* 左侧按钮固定 */
+#menu-button {
+	flex-shrink: 0;
+}
+
+/* 中间垂直容器：宽度由内容撑开，不压缩，确保文字完整显示 */
+.title-time-container {
+	flex: 0 0 auto;          /* 关键：宽度由内容决定，不伸缩 */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	line-height: 1.3;
+	/* 删除 overflow: hidden，避免裁剪 */
+	margin-right: 12px;      /* 与右侧保持间距 */
+}
+
+.title-time-container h1 {
+	font-size: 0.9rem;
+	margin: 0;
+	white-space: nowrap;     /* 强制单行，不换行 */
+	/* 删除 overflow 和 text-overflow，确保不截断 */
+	color: var(--accent);
+}
+
+#time-display {
+	font-size: 0.7rem;
+	color: #f0a500;
+	background: transparent;
+	border: none;
+	padding: 0;
+	margin: 0;
+	white-space: nowrap;     /* 时间单行 */
+	/* 删除 overflow 和 text-overflow */
+}
+
+/* 右侧滑动区域：占据剩余所有空间，内部可滚动 */
+.header-actions {
+	flex: 1;                 /* 占据剩余宽度 */
+	min-width: 0;            /* 允许收缩，防止溢出父容器 */
+	display: flex;
+	gap: 8px;
+	overflow-x: auto;        /* 横向滚动 */
+	overflow-y: hidden;
+	white-space: nowrap;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+	padding: 4px 0;
+	justify-content: flex-start;
+	-webkit-overflow-scrolling: touch;
+	/* 删除 max-width 限制 */
+}
+
+.header-actions::-webkit-scrollbar {
+	display: none;
+}
+
+/* 右侧按钮样式统一 */
+.help-btn, .upgrade-btn {
+	font-size: 0.8rem;
+	background: var(--border);
+	color: var(--text);
+	border: none;
+	padding: 4px 12px;
+	border-radius: 20px;
+	cursor: pointer;
+	transition: 0.1s;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.upgrade-btn {
+	background: #4a90e2;
+	color: white;
+	border: 1px solid #4a90e2;
+}
+
+.upgrade-btn:hover {
+	background: #3a7bc8;
+}
+
+.help-btn:hover {
+	background: #3a3f4b;
+}
+
+.upgrade-btn1 {
+	font-size: 0.8rem;
+	background: #4a90e2;
+	color: white;
+	border: 1px solid #4a90e2;
+	padding: 4px 12px;
+	border-radius: 20px;
+	cursor: pointer;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+
+
+/* 下拉菜单悬浮层样式 */
+.menu-dropdown {
+	position: absolute;
+	top: 60px;              /* 根据 header 高度微调，使菜单出现在按钮下方 */
+	left: 12px;
+	background: var(--card);
+	border: 1px solid var(--border);
+	border-radius: 12px;
+	box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+	z-index: 1000;
+	display: none;
+	min-width: 160px;
+	backdrop-filter: blur(4px);
+}
+
+.menu-dropdown ul {
+	list-style: none;
+	margin: 0;
+	padding: 8px 0;
+}
+
+.menu-dropdown li {
+	padding: 10px 20px;
+	cursor: pointer;
+	color: var(--text);
+	font-size: 0.9rem;
+	transition: background 0.1s;
+	white-space: nowrap;
+}
+
+.menu-dropdown li:hover {
+	background: var(--border);
+}
+
+.menu-dropdown button {
+	display: block;
+	width: calc(100% - 32px);
+	margin: 8px 16px;
+	background: #4a90e2;
+	color: white;
+	border: none;
+	padding: 6px 12px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 0.85rem;
+	text-align: center;
+}
+
+.menu-dropdown button:hover {
+	background: #3a7bc8;
+}
+
+
+
+
+/* 调试清除按键 */
+
+.debug-clear-btn {
+	background: #ff9800;
+	color: #000;
+	border: none;
+	padding: 4px 12px;
+	border-radius: 20px;
+	cursor: pointer;
+	font-size: 0.8rem;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+.debug-clear-btn:hover {
+	background: #fb8c00;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*==============时间限制覆盖层=============*/
+
+/* time-limit-system.css - 时间限制系统样式 */
+
+/* 覆盖层样式 */
+/* 覆盖层样式 - 缩小版 */
+.tls-overlay {
+	display: none;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 280px;  /* 缩小为280px */
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+	z-index: 10000;
+	border: 2px solid #FF9800;
+}
+.tls-overlay-content {
+	background: white;
+	border-radius: 12px;
+	padding: 30px;
+	text-align: center;
+	max-width: 400px;
+	width: 90%;
+	border: 3px solid #FF9800;
+	box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+	animation: tls-slideUp 0.3s ease;
+}
+
+.tls-icon {
+	font-size: 50px;
+	color: #FF9800;
+	margin-bottom: 20px;
+}
+
+.tls-title {
+	color: #333;
+	margin-bottom: 10px;
+	font-size: 20px;
+}
+
+.tls-message {
+	color: #666;
+	margin-bottom: 30px;
+	font-size: 15px;
+	line-height: 1.5;
+}
+
+.tls-upgrade-btn {
+	padding: 12px 30px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	margin: 10px;
+	min-width: 200px;
+	transition: all 0.3s;
+}
+
+.tls-upgrade-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* 弹窗样式 */
+.tls-popup {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.8);
+	z-index: 10000;
+	overflow-y: auto;
+	animation: tls-fadeIn 0.3s ease;
+}
+
+.tls-popup-inner {
+	background: white;
+	border-radius: 12px;
+	width: 90%;
+	max-width: 500px;
+	margin: 20px auto 50px auto;
+	box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+	animation: tls-slideUp 0.3s ease;
+}
+
+.tls-popup-header {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	padding: 20px;
+	border-radius: 12px 12px 0 0;
+}
+
+.tls-popup-title {
+	margin: 0 0 15px 0;
+	font-size: 20px;
+}
+
+.tls-pro-badge {
+	display: inline-block;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	padding: 4px 12px;
+	border-radius: 20px;
+	font-size: 12px;
+	font-weight: bold;
+	margin-left: 10px;
+}
+
+.tls-password-input {
+	width: 100%;
+	padding: 12px 15px;
+	border: 2px solid #2196F3;
+	border-radius: 6px;
+	font-size: 16px;
+	outline: none;
+	box-sizing: border-box;
+}
+
+.tls-password-input.error {
+	border-color: #f44336;
+	animation: tls-shake 0.5s;
+}
+
+.tls-error-message {
+	color: #f44336;
+	font-size: 14px;
+	margin-top: 10px;
+	display: none;
+}
+
+.tls-btn {
+	padding: 12px 25px;
+	border: none;
+	border-radius: 6px;
+	font-size: 16px;
+	cursor: pointer;
+	transition: all 0.2s;
+	font-weight: bold;
+}
+
+.tls-btn-primary {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+}
+
+.tls-btn-primary:hover {
+	opacity: 0.9;
+	transform: translateY(-1px);
+}
+
+.tls-btn-secondary {
+	background: #f5f5f5;
+	color: #666;
+}
+
+.tls-btn-copy {
+	background: #4CAF50;
+	color: white;
+}
+
+.tls-btn-copy.copied {
+	background: #2E7D32;
+}
+
+/* 警告提示 */
+.tls-warning {
+	position: fixed;
+	top: 70px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #FF9800;
+	color: white;
+	padding: 10px 20px;
+	border-radius: 20px;
+	font-size: 14px;
+	z-index: 9998;
+	box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	animation: tls-slideDown 0.3s ease;
+}
+
+/* 动画 */
+@keyframes tls-fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes tls-slideUp {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes tls-slideDown {
+	from {
+		opacity: 0;
+		transform: translate(-50%, -20px);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+}
+
+@keyframes tls-shake {
+	0%, 100% { transform: translateX(0); }
+	10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+	20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* 响应式调整 */
+@media (max-width: 480px) {
+	.tls-popup-inner {
+		width: 95%;
+		margin: 10px auto 30px auto;
+	}
+	
+	.tls-btn {
+		padding: 10px 20px;
+		font-size: 15px;
+		min-width: 140px;
+	}
+	
+	.tls-overlay-content {
+		padding: 20px;
+	}
+}
+								
+	</style>
+</head>
+<body>
+
+<header>
+	<!-- 最左边：三横菜单按钮 -->
+	<button class="file-btn" id="menu-button" style="border: none; background: transparent; font-size: 1.8em; padding: 0 12px 0 0; cursor: pointer; color: var(--accent);">☰</button>
+
+	<!-- 中间：垂直排列的标题和会员信息 -->
+	<div class="title-time-container">
+		<h1>数学终端 v7.0 (符号计算引擎)</h1>
+		<div id="time-display">
+			<span id="time-text">⏱️ 会员（1月）剩余 30天</span>
+		</div>
+	</div>
+
+	<!-- 右侧：可左右滑动的按钮组（语法帮助 + 升级 + 未来扩展） -->
+	<div class="header-actions" id="header-actions">
+		<button class="help-btn" onclick="document.getElementById('helpModal').style.display='flex'">语法帮助</button>
+		<button id="graph-modal-btn" class="upgrade-btn1" style="background:#3b82f6;">📈 图像</button>
+		<button id="angle-mode-btn" class="upgrade-btn1" style="background:#6c5ce7;">📐 Deg/Rad</button>
+		
+		<button id="upgrade-btn1" class="upgrade-btn1">⭐ 升级</button>
+		<button id="upgrade-btn2" class="upgrade-btn1">⭐ 升级</button>
+		<button id="upgrade-btn3" class="upgrade-btn1">⭐ 升级</button>
+		<button id="upgrade-btn4" class="upgrade-btn1">⭐ 升级</button>
+		<button id="upgrade-btn4" class="upgrade-btn1">⭐ 升级</button>
+		<!-- 添加调试按钮 -->
+		<button id="debug-clear-membership" class="debug-clear-btn" style="background:#ff9800; color:black;">🧹 清除会员</button>
+		
+		<!-- 未来更多按钮可直接加在这里，自动支持滑动 -->
+	</div>
+</header>
+
+<!-- 下拉菜单（位置需要微调，建议放在 header 内或相对定位） -->
+<div id="menu-dropdown" class="menu-dropdown">
+	<ul>
+		<li onclick="window.open('https://ningchaojie.github.io/', '_blank')">🌐 我的网站</li>
+		<li id="upgrade-btna" >⭐ 升级</li>
+		
+	</ul>
+</div>
+
+
+<div class="console-container">
+	<div id="output">
+		<div class="log-sys">欢迎使用数学终端。符号运算由 Nerdamer 驱动，支持不定积分、方程求解、微分/代数化简及2D/3D绘图。新增 dsolve 符号求解常微分方程 (Pyodide+SymPy)。</div>
+	</div>
+	<div id="chart-box"></div>
+</div>
+
+<div class="input-area">
+	<textarea id="cmd" placeholder="输入指令，如 int(x^2, x)  或  solve(x^2-4=0, x)" rows="1" oninput="this.style.height='45px';this.style.height=this.scrollHeight+'px'"></textarea>
+	<button class="run" onclick="execute()">RUN</button>
+</div>
+
+<div id="helpModal" class="modal" onclick="if(event.target===this)this.style.display='none'">
+	<div class="modal-content">
+		
+		<button class="close-modal" onclick="document.getElementById('helpModal').style.display='none'">✕</button>
+		
+		<h3>1. 基础计算与函数</h3>
+		<p><code>2^10 + sin(pi/4)</code> (支持复数、矩阵，如 <code>det([[1,2],[3,4]])</code>)</p>
+		
+		<h3>2. 符号运算</h3>
+		<p><code>simplify(表达式)</code> - 化简表达式</p>
+		<p><code>expand(表达式)</code> - 展开多项式</p>
+		<p><code>factor(表达式)</code> - 因式分解</p>
+		
+		<h3>3. 符号求导</h3>
+		<p><code>diff(表达式, 变量)</code> 例: <code>diff(x^3 * sin(x), x)</code></p>
+		
+		<h3>4. 不定积分</h3>
+		<p><code>int(表达式, 变量)</code> 例: <code>int(x^2, x)</code> → x^3/3</p>
+		
+		<h3>5. 定积分 (数值/符号)</h3>
+		<p><code>int(表达式, 变量, 下限, 上限)</code> 优先尝试符号精确值，失败则数值积分。</p>
+		<p>例: <code>int(exp(-x^2), x, 0, 1)</code> 或 <code>int(x^2, x, 0, 2)</code></p>
+		
+		<h3>6. 方程求解</h3>
+		<p><code>solve(方程, 变量)</code> - 符号求解（方程可含等号，如 <code>x^2-4=0</code> 或 <code>x^2-4</code> 自动补0）</p>
+		<p>例: <code>solve(x^2 - 4, x)</code> → [-2,2]</p>
+		<p><code>nsolve(方程, 变量, 初始值)</code> - 数值求解（牛顿法）</p>
+		<p>例: <code>nsolve(x^3 - x - 2, x, 2)</code></p>
+		
+		<h3>7. 多元方程组</h3>
+		<p><code>solve([方程1, 方程2], [变量1, 变量2])</code></p>
+		<p>例: <code>solve([x+y=3, x-y=1], [x,y])</code> → {x:2, y:1}</p>
+		
+		<h3>8. 常微分方程 (数值)</h3>
+		<p><code>ode(y', y0, t_end)</code> (默认步长0.1，t从0到t_end) 例: <code>ode(-2*t*y, 1, 3)</code></p>
+		
+		<h3>9. 函数绘图</h3>
+		<p><code>plot(表达式, 变量, 下限, 上限)</code> 例: <code>plot(sin(x)/x, x, -10, 10)</code></p>
+		<p><code>plot3d(表达式, [x下,x上], [y下,y上])</code> 例: <code>plot3d(sin(sqrt(x^2+y^2)), [-5,5], [-5,5])</code></p>
+		
+		<h3>10. 常微分方程符号求解 (SymPy引擎)</h3>
+		<p><code>dsolve(微分方程, 因变量, 自变量)</code> - 符号求解ODE，支持一阶、二阶及常系数线性等。</p>
+		<p>例: <code>dsolve(m*diff(x,t,2)=F, x, t)</code> → x(t) = F*t^2/(2*m) + C1*t + C2</p>
+		<p>例: <code>dsolve(diff(y,x)=2*y, y, x)</code> → y(x) = C1*exp(2*x)</p>
+		<p><span style="color:#f85149">注意：首次使用 dsolve 会加载约6-8MB的Pyodide引擎，请稍等。</span></p>
+	</div>
+</div>
+
+<script>
+
+
+
+	// 步骤存储：key 为自增 id，value 为 { title, steps, finalResult }
+	let stepStorage = new Map();
+	let nextStepId = 0;
+
+
+
+
+	/**
+	 * 输出带步骤按钮的计算结果
+	 * @param {string} text 计算结果文本
+	 * @param {number} stepId 对应的步骤 ID，若为 null 则不添加按钮
+	 */
+	function logWithStep(text, stepId) {
+		const div = document.createElement('div');
+		div.className = 'log-out';
+		
+		const resultSpan = document.createElement('span');
+		resultSpan.innerText = text;
+		div.appendChild(resultSpan);
+		
+		if (stepId !== undefined && stepId !== null && stepStorage.has(stepId)) {
+			const btn = document.createElement('button');
+			btn.textContent = '📖 步骤';
+			btn.className = 'step-btn';
+			btn.style.marginLeft = '10px';
+			btn.style.cursor = 'pointer';
+			btn.style.background = '#238636';
+			btn.style.border = 'none';
+			btn.style.color = 'white';
+			btn.style.borderRadius = '4px';
+			btn.style.padding = '2px 6px';
+			btn.style.fontSize = '12px';
+			
+			// 绑定点击事件，显示步骤
+			btn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				const stepData = stepStorage.get(stepId);
+				if (stepData) {
+					// 在输出区域下方追加步骤（若已存在则不重复添加）
+					const existingStepDiv = div.querySelector('.step-detail');
+					if (existingStepDiv) {
+						existingStepDiv.remove();
+					} else {
+						const stepDiv = document.createElement('div');
+						stepDiv.className = 'step-detail';
+						stepDiv.style.marginTop = '8px';
+						stepDiv.style.paddingLeft = '20px';
+						stepDiv.style.borderLeft = '3px solid #58a6ff';
+						stepDiv.style.backgroundColor = '#161b22';
+						stepDiv.style.borderRadius = '4px';
+						stepDiv.style.padding = '8px';
+						stepDiv.style.fontSize = '12px';
+						
+						let html = `<div style="color: #8b949e;">📐 ${stepData.title}</div>`;
+						for (let step of stepData.steps) {
+							html += `<div style="margin-top: 4px;">   ${escapeHtml(step)}</div>`;
+						}
+						html += `<div style="margin-top: 8px; color: #c9d1d9;">✨ 最终结果: ${stepData.finalResult}</div>`;
+						stepDiv.innerHTML = html;
+						div.appendChild(stepDiv);
+					}
+				}
+			});
+			div.appendChild(btn);
+		}
+		
+		outputDiv.appendChild(div);
+		outputDiv.scrollTop = outputDiv.scrollHeight;
+	}
+	
+	// 简单的防XSS辅助函数
+	function escapeHtml(str) {
+		return str.replace(/[&<>]/g, function(m) {
+			if (m === '&') return '&amp;';
+			if (m === '<') return '&lt;';
+			if (m === '>') return '&gt;';
+			return m;
+		});
+	}
+
+
+// ========== 角度/弧度模式切换 ==========
+// ========== 角度/弧度模式切换（修复版） ==========
+// ========== 角度/弧度模式切换（劫持 Math 函数，确保生效） ==========
+// ========== 角度/弧度模式切换（劫持所有三角函数，包括 math.js 扩展函数） ==========
+
+
+// 调试功能：清除会员状态
+document.addEventListener('DOMContentLoaded', function() {
+	const clearBtn = document.getElementById('debug-clear-membership');
+	if (clearBtn) {
+		clearBtn.addEventListener('click', function() {
+		
+			const pwd = prompt('这是开发者调试按键，需要密码才能清除');
+			if (pwd === null) return; // 用户取消
+		    if (pwd.trim() === 'ncj科学计算器') {
+				// 清除 localStorage 中的会员记录
+				localStorage.removeItem('app_membership');
+				localStorage.removeItem('pro_version');
+				// 可选：清除使用记录，让时间重新从0开始
+				localStorage.removeItem('app_usage');
+				sessionStorage.removeItem('app_usage');
+				// 重新初始化 TimeLimitSystem
+				if (window.TimeLimitSystem) {
+					TimeLimitSystem.state.membership = null;
+					TimeLimitSystem.loadMembership();      // 重新加载（会清空会员）
+					TimeLimitSystem.loadUsageRecord();     // 重新加载使用记录
+					TimeLimitSystem.applyMembershipFeatures(); // 重新应用（会启动监控）
+					TimeLimitSystem.updateTimeDisplay();   // 更新时间显示
+					// 如果覆盖层显示中，则隐藏
+					if (TimeLimitSystem.state.overlayVisible) {
+						TimeLimitSystem.hideLimitOverlay();
+					}
+					TimeLimitSystem.showNotification('会员状态已清除，现在为免费用户', false);
+					// 刷新页面可选项（可选）
+					// location.reload();
+				} else {
+					alert('TimeLimitSystem 未加载');
+				}
+			} else {
+				alert('这是开发者调试，用户不能清除');
+			}
+		});
+	}
+});
+
+
+// ========== 角度/弧度实时切换（使用 math.config） ==========
+// ========== 角度/弧度实时切换（劫持 math 对象的所有三角函数） ==========
+(function() {
+	// 保存原始三角函数
+	const originalMathTrig = {
+		sin: math.sin, cos: math.cos, tan: math.tan,
+		asin: math.asin, acos: math.acos, atan: math.atan, atan2: math.atan2,
+		sec: math.sec, csc: math.csc, cot: math.cot,
+		asec: math.asec, acsc: math.acsc, acot: math.acot,
+		sinh: math.sinh, cosh: math.cosh, tanh: math.tanh,
+		asinh: math.asinh, acosh: math.acosh, atanh: math.atanh,
+		sech: math.sech, csch: math.csch, coth: math.coth,
+		asech: math.asech, acsch: math.acsch, acoth: math.acoth
+	};
+
+	let angleMode = localStorage.getItem('math_angle_mode') || 'rad';
+	const angleBtn = document.getElementById('angle-mode-btn');
+	if (!angleBtn) return;
+
+	const toRad = (x) => x * Math.PI / 180;
+	const toDeg = (x) => x * 180 / Math.PI;
+
+	function applyAngleMode() {
+		if (angleMode === 'deg') {
+			// 正向：输入角度，转为弧度再调用原函数
+			math.sin = (x) => originalMathTrig.sin(toRad(x));
+			math.cos = (x) => originalMathTrig.cos(toRad(x));
+			math.tan = (x) => originalMathTrig.tan(toRad(x));
+			math.sec = (x) => originalMathTrig.sec(toRad(x));
+			math.csc = (x) => originalMathTrig.csc(toRad(x));
+			math.cot = (x) => originalMathTrig.cot(toRad(x));
+			// 反向：输入值，结果转为角度
+			math.asin = (x) => toDeg(originalMathTrig.asin(x));
+			math.acos = (x) => toDeg(originalMathTrig.acos(x));
+			math.atan = (x) => toDeg(originalMathTrig.atan(x));
+			math.atan2 = (y, x) => toDeg(originalMathTrig.atan2(y, x));
+			math.asec = (x) => toDeg(originalMathTrig.asec(x));
+			math.acsc = (x) => toDeg(originalMathTrig.acsc(x));
+			math.acot = (x) => toDeg(originalMathTrig.acot(x));
+			// 双曲函数（角度模式不改变，但为了完整恢复，保持原样）
+			math.sinh = originalMathTrig.sinh;
+			math.cosh = originalMathTrig.cosh;
+			math.tanh = originalMathTrig.tanh;
+			math.asinh = originalMathTrig.asinh;
+			math.acosh = originalMathTrig.acosh;
+			math.atanh = originalMathTrig.atanh;
+			math.sech = originalMathTrig.sech;
+			math.csch = originalMathTrig.csch;
+			math.coth = originalMathTrig.coth;
+			math.asech = originalMathTrig.asech;
+			math.acsch = originalMathTrig.acsch;
+			math.acoth = originalMathTrig.acoth;
+		} else {
+			// 恢复原始函数
+			for (let key in originalMathTrig) {
+				if (typeof originalMathTrig[key] === 'function') {
+					math[key] = originalMathTrig[key];
+				}
+			}
+		}
+		console.log('角度模式已设置为:', angleMode);
+	}
+
+	function updateButtonText() {
+		angleBtn.textContent = angleMode === 'rad' ? '📐 弧度' : '📐 角度';
+	}
+
+	function toggleAngleMode() {
+		angleMode = angleMode === 'rad' ? 'deg' : 'rad';
+		localStorage.setItem('math_angle_mode', angleMode);
+		applyAngleMode();
+		updateButtonText();
+		const msg = `已切换到${angleMode === 'rad' ? '弧度 (Rad)' : '角度 (Deg)'}模式,重启生效`;
+		if (window.TimeLimitSystem && window.TimeLimitSystem.showNotification) {
+			window.TimeLimitSystem.showNotification(msg, false);
+		} else {
+			alert(msg);
+		}
+	}
+
+	angleBtn.addEventListener('click', toggleAngleMode);
+	applyAngleMode();
+	updateButtonText();
+})();
+
+
+		// 菜单显示/隐藏逻辑
+		document.addEventListener('DOMContentLoaded', function() {
+			const menuBtn = document.getElementById('menu-button');
+			const menuDropdown = document.getElementById('menu-dropdown');
+		
+			menuBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				menuDropdown.style.display = menuDropdown.style.display === 'block' ? 'none' : 'block';
+			});
+		
+			document.addEventListener('click', () => {
+				menuDropdown.style.display = 'none';
+			});
+		
+			menuDropdown.addEventListener('click', (e) => {
+				e.stopPropagation();
+			});
+		
+		});	
+		
+				// 确保 TimeLimitSystem 已初始化
+		document.addEventListener('DOMContentLoaded', function() {
+			if (window.TimeLimitSystem) {
+				// 初始化（如果之前没调用）
+				TimeLimitSystem.init();
+		
+				// 立即更新时间显示
+				TimeLimitSystem.updateTimeDisplay();
+		
+				// 每秒更新一次
+				setInterval(function() {
+					TimeLimitSystem.updateTimeDisplay();
+				}, 1000);
+		
+				console.log('时间显示定时器已启动');
+			} else {
+				console.error('TimeLimitSystem 未定义，请检查语法错误');
+			}
+		});
+
+		document.addEventListener('DOMContentLoaded', function() {
+			const upgradeBtn = document.getElementById('upgrade-btna');
+			if (upgradeBtn) {
+				upgradeBtn.addEventListener('click', function() {
+					// 调用 TimeLimitSystem 显示专业版弹窗
+					if (window.TimeLimitSystem) {
+						TimeLimitSystem.showProPopup();
+					} else {
+						alert('时间系统未初始化');
+					}
+				});
+			}
+		});
+
+
+	// ---------- DOM 元素 ----------
+	const cmdInput = document.getElementById('cmd');
+	const outputDiv = document.getElementById('output');
+	const chartBox = document.getElementById('chart-box');
+	
+	// 符号表：存储已声明的符号变量和函数
+	const symTable = {
+		variables: new Set(),   // 普通符号变量，如 m, F
+		functions: new Map()    // 函数映射：因变量 -> 自变量，如 x -> t
+	};
+	
+	function clearSymTable() {
+		symTable.variables.clear();
+		symTable.functions.clear();
+		log("符号表已清空", "sys");
+	}
+	
+	function handleSyms(args) {
+		for (let arg of args) {
+			arg = arg.trim();
+			// 匹配函数声明: x(t) 或 y(t)
+			const funcMatch = arg.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\(([a-zA-Z_][a-zA-Z0-9_]*)\)$/);
+			if (funcMatch) {
+				const depVar = funcMatch[1];
+				const indepVar = funcMatch[2];
+				symTable.functions.set(depVar, indepVar);
+				log(`声明函数: ${depVar}(${indepVar})`, "sys");
+			} 
+			// 匹配普通符号变量: m, F, k 等
+			else if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(arg)) {
+				symTable.variables.add(arg);
+				log(`声明变量: ${arg}`, "sys");
+			} 
+			else {
+				throw new Error(`无效的 syms 参数: ${arg}，请使用格式 "x" 或 "x(t)"`);
+			}
+		}
+	}	
+	
+
+	cmdInput.addEventListener('keydown', function(e) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			execute();
+		}
+	});
+
+	function log(text, type = 'out') {
+		const div = document.createElement('div');
+		div.className = `log-${type}`;
+		div.innerText = text;
+		outputDiv.appendChild(div);
+		outputDiv.scrollTop = outputDiv.scrollHeight;
+	}
+
+
+	function logDetailedSteps(title, steps, finalResult) {
+		log(`📐 ${title}`, 'sys');
+		for (let step of steps) {
+			log(`   ${step}`, 'sys');
+		}
+		log(`✨ 最终结果: ${finalResult}`, 'out');
+	}	
+	
+
+	// ---------- 健壮的参数解析器 (支持嵌套括号和方括号) ----------
+	function parseArguments(argsStr) {
+		argsStr = argsStr.trim();
+		if (argsStr === '') return [];
+		const args = [];
+		let current = '';
+		let parenDepth = 0;
+		let bracketDepth = 0;
+		
+		for (let i = 0; i < argsStr.length; i++) {
+			const ch = argsStr[i];
+			if (ch === '(') parenDepth++;
+			else if (ch === ')') parenDepth--;
+			else if (ch === '[') bracketDepth++;
+			else if (ch === ']') bracketDepth--;
+			
+			if (ch === ',' && parenDepth === 0 && bracketDepth === 0) {
+				args.push(current.trim());
+				current = '';
+			} else {
+				current += ch;
+			}
+		}
+		if (current.trim()) args.push(current.trim());
+		return args;
+	}
+
+	// ---------- 辅助函数：方程预处理 (若无等号则补上 =0) ----------
+	function normalizeEquation(expr) {
+		expr = expr.trim();
+		if (!expr.includes('=')) {
+			return expr + '=0';
+		}
+		return expr;
+	}
+
+	// 格式化 nerdamer 解 (对象/数组)
+	function formatNerdamerResult(result) {
+		if (result === undefined || result === null) return '无解';
+		if (typeof result === 'object') {
+			if (Array.isArray(result)) {
+				if (result.length === 0) return '无解';
+				return result.map(v => v.toString()).join(', ');
+			}
+			const entries = Object.entries(result);
+			if (entries.length) {
+				return entries.map(([k, v]) => `${k} = ${v.toString()}`).join(', ');
+			}
+		}
+		return result.toString();
+	}
+
+	// 数值定积分 (辛普森, 后备方案)
+	function simpsonIntegrate(exprStr, varName, a, b, n = 1000) {
+		const compiled = math.compile(exprStr);
+		const h = (b - a) / n;
+		let sum = compiled.evaluate({[varName]: a}) + compiled.evaluate({[varName]: b});
+		for (let i = 1; i < n; i++) {
+			let x = a + i * h;
+			let val = compiled.evaluate({[varName]: x});
+			sum += (i % 2 === 0 ? 2 : 4) * val;
+		}
+		return (h / 3) * sum;
+	}
+
+	// 牛顿法数值求解
+	function newtonSolve(exprStr, varName, x0, tol = 1e-10, maxIter = 100) {
+		const f = math.compile(exprStr);
+		const fPrime = math.compile(math.derivative(exprStr, varName).toString());
+		let x = x0;
+		for (let i = 0; i < maxIter; i++) {
+			let fx = f.evaluate({[varName]: x});
+			let fpx = fPrime.evaluate({[varName]: x});
+			if (Math.abs(fpx) < 1e-15) throw new Error("导数为0，牛顿法失效。请更换初始值。");
+			let xNew = x - fx / fpx;
+			if (Math.abs(xNew - x) < tol) return xNew;
+			x = xNew;
+		}
+		throw new Error("超过最大迭代次数，可能不收敛。");
+	}
+
+	// ---------- ODE 数值求解 (RK4) ----------
+	function handleODE(input) {
+		const args = parseArguments(input.substring(4, input.length - 1));
+		if (args.length < 3) throw new Error("ode 语法: ode(y', y0, t_end)");
+		const exprStr = args[0];
+		const y0 = parseFloat(args[1]);
+		const tEnd = parseFloat(args[2]);
+		const dt = args[3] ? parseFloat(args[3]) : 0.1;
+		const f = math.compile(exprStr);
+		let t = 0, y = y0;
+		let tArr = [t], yArr = [y];
+		while (t < tEnd) {
+			let currentDt = (t + dt > tEnd) ? (tEnd - t) : dt;
+			let k1 = currentDt * f.evaluate({t: t, y: y});
+			let k2 = currentDt * f.evaluate({t: t + currentDt/2, y: y + k1/2});
+			let k3 = currentDt * f.evaluate({t: t + currentDt/2, y: y + k2/2});
+			let k4 = currentDt * f.evaluate({t: t + currentDt, y: y + k3});
+			y = y + (k1 + 2*k2 + 2*k3 + k4) / 6;
+			t += currentDt;
+			tArr.push(t);
+			yArr.push(y);
+		}
+		Plotly.newPlot(chartBox, [{
+			x: tArr, y: yArr, type: 'scatter', mode: 'lines',
+			line: { color: '#3fb950', width: 3 }
+		}], {
+			paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+			margin: { l: 40, r: 20, t: 30, b: 40 },
+			font: { color: '#8b949e', family: 'monospace' },
+			xaxis: { title: 't', gridcolor: '#21262d' },
+			yaxis: { title: 'y(t)', gridcolor: '#21262d' }
+		}, {responsive: true, displayModeBar: false});
+		chartBox.style.display = 'block';
+		log(`[系统] ODE 求解完成，已绘制 y(t) 曲线。末端值 y(${tEnd}) = ${y}`, 'sys');
+		return undefined;
+	}
+
+	// ---------- 2D 绘图 (math.js) ----------
+	function handlePlot2D(input) {
+		const args = parseArguments(input.substring(5, input.length - 1));
+		if (args.length < 4) throw new Error("plot 语法: plot(表达式, 变量, 下限, 上限)");
+		const expr = args[0], varName = args[1], min = parseFloat(args[2]), max = parseFloat(args[3]);
+		const compiled = math.compile(expr);
+		let xArr = [], yArr = [];
+		const step = (max - min) / 800;
+		for (let x = min; x <= max + step/2; x += step) {
+			try {
+				let y = compiled.evaluate({[varName]: x});
+				if (typeof y === 'number' && isFinite(y)) { xArr.push(x); yArr.push(y); }
+			} catch(e) {}
+		}
+		Plotly.newPlot(chartBox, [{x: xArr, y: yArr, type: 'scatter', mode: 'lines', line: {color: '#58a6ff', width: 3}}], 
+		{paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)', margin:{l:40,r:20,t:30,b:40}, font:{color:'#8b949e',family:'monospace'}, xaxis:{gridcolor:'#21262d'}, yaxis:{gridcolor:'#21262d'}}, 
+		{responsive:true, displayModeBar:false});
+		chartBox.style.display = 'block';
+		return undefined;
+	}
+
+	// ---------- 3D 绘图 (math.js) 修复参数解析 ----------
+	function handlePlot3D(input) {
+		const args = parseArguments(input.substring(7, input.length - 1));
+		if (args.length < 3) throw new Error("plot3d 语法: plot3d(表达式, [x下,x上], [y下,y上])");
+		const expr = args[0];
+		
+		function parseRange(rangeStr) {
+			rangeStr = rangeStr.trim();
+			if (rangeStr.startsWith('[') && rangeStr.endsWith(']')) 
+			{
+				let inner = rangeStr.slice(1, -1);
+				const parts = inner.split(',').map(p => parseFloat(p.trim()));
+				if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) 
+				{
+					return parts;
+				}
+			}
+			throw new Error(`范围参数格式错误，应为 [下限,上限] 但得到: ${rangeStr}`);
+		}
+		
+		const xRange = parseRange(args[1]);
+		const yRange = parseRange(args[2]);
+		
+		const compiled = math.compile(expr);
+		let xArr = [], yArr = [], zArr = [];
+		const stepX = (xRange[1] - xRange[0]) / 50;
+		const stepY = (yRange[1] - yRange[0]) / 50;
+		for (let x = xRange[0]; x <= xRange[1] + stepX/2; x += stepX) {
+			let rowX = [], rowY = [], rowZ = [];
+			for (let y = yRange[0]; y <= yRange[1] + stepY/2; y += stepY) {
+				try {
+					let z = compiled.evaluate({x, y});
+					if (typeof z === 'number' && isFinite(z)) rowZ.push(z);
+					else rowZ.push(null);
+				} catch(e) {
+					rowZ.push(null);
+				}
+				rowX.push(x);
+				rowY.push(y);
+			}
+			xArr.push(rowX);
+			yArr.push(rowY);
+			zArr.push(rowZ);
+		}
+		
+		Plotly.newPlot(chartBox, [{z: zArr, x: xArr, y: yArr, type: 'surface', colorscale: 'Cividis', opacity: 0.9}], 
+		{paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)', margin:{l:0,r:0,t:0,b:0}, scene: {bgcolor:'rgba(0,0,0,0)', xaxis:{gridcolor:'#21262d'}, yaxis:{gridcolor:'#21262d'}, zaxis:{gridcolor:'#21262d'}, camera:{eye:{x:1.5, y:1.5, z:1.2}}}}, 
+		{responsive:true, displayModeBar:false});
+		chartBox.style.display = 'block';
+		return undefined;
+	}
+
+	// ==================== 新增：Pyodide + SymPy 支持 dsolve ====================
+	let pyodideReadyPromise = null;
+	let pyodide = null;
+
+	function showLoading(msg) {
+		log(`[系统] ${msg}`, 'sys');
+	}
+
+	function loadPyodideAndPackages() {
+		if (pyodideReadyPromise) return pyodideReadyPromise;
+		
+		showLoading("正在加载符号计算引擎（Pyodide + SymPy），首次加载约需几秒，请稍后...");
+		pyodideReadyPromise = new Promise(async (resolve, reject) => {
+			try {
+				// 动态加载 Pyodide 脚本
+				const script = document.createElement('script');
+				script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js';
+				script.onload = async () => {
+					try {
+						pyodide = await loadPyodide({
+							indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.1/full/'
+							//env: { PYODIDE_USE_SAB: false }   // 关键行：禁用 SharedArrayBuffer	
+						});
+						await pyodide.loadPackage('sympy');
+						showLoading("符号计算引擎加载完成，现在可以使用 dsolve 命令。");
+						resolve(pyodide);
+					} catch (err) {
+						reject(err);
+					}
+				};
+				script.onerror = () => reject(new Error("Pyodide 脚本加载失败，请检查网络。"));
+				document.head.appendChild(script);
+			} catch (err) {
+				reject(err);
+			}
+		});
+		return pyodideReadyPromise;
+	}
+
+	// 将 nerdamer 风格的微分表达式转换为 SymPy 可识别的字符串
+	function convertOdeToSympy(odeStr, depVar, indepVar) {
+		// 1. 处理等号，转换为 expr = 0 的形式
+		let eq = odeStr.trim();
+		eq = eq.replace(/==/g, '=');   // 支持 ==
+		if (!eq.includes('=')) {
+			eq = eq + '=0';
+		}
+		let sides = eq.split('=');
+		let left = sides[0];
+		let right = sides[1];
+		let expr = `${left} - (${right})`;
+		
+		// 2. 替换 diff 函数： diff(y, t)    -> Derivative(y, t)
+		//             diff(y, t, 2) -> Derivative(y, t, t)
+		const diffPattern = new RegExp(`diff\\(\\s*${depVar}\\s*,\\s*${indepVar}(?:\\s*,\\s*(\\d+))?\\s*\\)`, 'g');
+		expr = expr.replace(diffPattern, (match, order) => {
+			if (order === undefined || order === '1') {
+				return `Derivative(${depVar}, ${indepVar})`;
+			} else {
+				let args = Array(parseInt(order)).fill(indepVar).join(', ');
+				return `Derivative(${depVar}, ${args})`;
+			}
+		});
+		
+		// 注意：不再需要将独立因变量替换为函数形式，因为 Python 代码中已定义 depVar = depVar_func(indepVar)
+		// 此时 depVar 本身已经代表 depVar(indepVar)，直接使用即可。
+		
+		return expr;
+	}
+
+	// dsolve 处理函数
+// dsolve 处理函数
+async function handleDsolve(input) {
+	const args = parseArguments(input.substring(7, input.length - 1));
+	if (args.length !== 3) {
+		throw new Error("dsolve 语法: dsolve(微分方程, 因变量, 自变量)\n例如: dsolve(m*diff(x,t,2)=F, x, t)");
+	}
+	const [odeStr, depVar, indepVar] = args;
+
+	// 验证因变量是否已通过 syms 声明为函数
+	const declaredIndep = symTable.functions.get(depVar);
+	if (!declaredIndep) {
+		throw new Error(`因变量 ${depVar} 未声明为函数，请先执行: syms ${depVar}(${indepVar}) 或 syms(${depVar}(${indepVar}))`);
+	}
+	if (declaredIndep !== indepVar) {
+		throw new Error(`函数 ${depVar} 的自变量声明为 ${declaredIndep}，但与求解使用的 ${indepVar} 不一致`);
+	}
+
+	// 从符号表中提取额外参数（排除因变量和自变量）
+	const extraVars = [...symTable.variables].filter(v => v !== depVar && v !== indepVar);
+	let extraVarsStr = '';
+	if (extraVars.length === 1) {
+		extraVarsStr = `${extraVars[0]} = symbols('${extraVars[0]}')`;
+	} else if (extraVars.length > 1) {
+		extraVarsStr = `${extraVars.join(', ')} = symbols('${extraVars.join(' ')}')`;
+	}
+
+	// 转换 ODE 表达式（已支持 ==）
+	let sympyExpr;
+	try {
+		sympyExpr = convertOdeToSympy(odeStr, depVar, indepVar);
+	} catch (e) {
+		throw new Error(`ODE 表达式转换失败: ${e.message}`);
+	}
+
+	// 确保 Pyodide 已加载
+	await loadPyodideAndPackages();
+
+	// 构建安全的 Python 代码
+const pythonCode = `
+from sympy import (
+	symbols, Function, Eq, Derivative, dsolve,
+	sin, cos, tan, cot, sec, csc,
+	asin, acos, atan, acot, asec, acsc,
+	sinh, cosh, tanh, coth, sech, csch,
+	asinh, acosh, atanh, acoth, asech, acsch,
+	exp, log, ln, sqrt, root,
+	pi, E, I, oo, nan,
+	gamma, erf, erfc, erfi, erfinv,
+	factorial, binomial,
+	Abs, im, re, conjugate,
+	floor, ceiling, frac,
+	Matrix, zeros, ones, eye,
+	integrate, limit, series,
+	solve, roots, Poly,
+	expand, factor, simplify, cancel, apart,
+	trigsimp, powsimp, combsimp, radsimp,
+	diff, Derivative, Integral, Limit,
+	O
+)
+${indepVar} = symbols('${indepVar}')
+${extraVarsStr}
+${depVar}_func = Function('${depVar}')
+${depVar} = ${depVar}_func(${indepVar})
+ode_expr = ${sympyExpr}
+ode_eq = Eq(ode_expr, 0)
+try:
+	sol = dsolve(ode_eq, ${depVar})
+	if sol is None:
+		result = "无解析解"
+	else:
+		result = str(sol.rhs)
+except Exception as e:
+	result = f"SymPy求解失败: {str(e)}"
+result
+`;
+
+	try {
+		const result = await pyodide.runPythonAsync(pythonCode);
+		if (result.startsWith("SymPy求解失败")) {
+			throw new Error(result);
+		}
+		// 将幂符号 ** 替换为 ^ 更符合习惯
+		let prettyResult = result.replace(/\*\*/g, '^');
+		return `${depVar}(${indepVar}) = ${prettyResult}`;
+	} catch (err) {
+		throw new Error(`ODE 求解失败: ${err.message}`);
+	}
+}
+
+
+// ==================== 详细步骤生成器（完整版） ====================
+
+/**
+ * 分割字符串，忽略括号内的分隔符
+ */
+function splitByOperator(str, op) {
+	const parts = [];
+	let current = "";
+	let depth = 0;
+	for (let i = 0; i < str.length; i++) {
+		const ch = str[i];
+		if (ch === '(') depth++;
+		else if (ch === ')') depth--;
+		if (depth === 0 && ch === op) {
+			parts.push(current.trim());
+			current = "";
+		} else {
+			current += ch;
+		}
+	}
+	if (current.trim()) parts.push(current.trim());
+	return parts;
+}
+
+
+/**
+ * 完善版求导步骤生成器（彻底修复化简问题）
+ * 支持：幂函数、指数/对数、三角函数、和差积商、链式法则
+ * @param {string} exprStr - 表达式，如 "x^2 + sin(x)"
+ * @param {string} varName - 自变量，如 "x"
+ * @returns {object} { steps: array, result: string }
+ */
+function generateDerivativeSteps(exprStr, varName) {
+	const steps = [];
+	steps.push(`对 ${exprStr} 关于 ${varName} 求导：`);
+
+	// 辅助：节点转字符串（仅用于步骤显示）
+	function toStr(node) {
+		let s = node.toString();
+		s = s.replace(/\*1(?![0-9])/g, '').replace(/1\*([a-zA-Z(])/g, '$1');
+		return s;
+	}
+
+	function isConstantNode(node) {
+		return node.type === 'ConstantNode';
+	}
+
+	// 递归求导生成步骤（不依赖化简，只生成原始表达式）
+	function derive(node, depth = 0) {
+		const type = node.type;
+		const op = node.op;
+		const indent = '  '.repeat(depth);
+
+		if (type === 'ConstantNode') {
+			return { steps: [`${indent}${toStr(node)} 是常数，导数为 0`], deriv: '0' };
+		}
+		if (type === 'SymbolNode') {
+			if (node.name === varName) {
+				return { steps: [`${indent}${varName} 的导数是 1`], deriv: '1' };
+			} else {
+				return { steps: [`${indent}${node.name} 是与 ${varName} 无关的常数，导数为 0`], deriv: '0' };
+			}
+		}
+		if (type === 'OperatorNode' && (op === '+' || op === '-')) {
+			const left = derive(node.args[0], depth+1);
+			const right = derive(node.args[1], depth+1);
+			const raw = `${left.deriv} ${op} ${right.deriv}`;
+			const step = `${indent}【和差法则】(${toStr(node.args[0])} ${op} ${toStr(node.args[1])})' = (${toStr(node.args[0])})' ${op} (${toStr(node.args[1])})'`;
+			const stepsArr = [step, ...left.steps, ...right.steps];
+			stepsArr.push(`${indent}结果：${raw}`);
+			return { steps: stepsArr, deriv: raw };
+		}
+		if (type === 'OperatorNode' && op === '*') {
+			const u = node.args[0];
+			const v = node.args[1];
+			if (isConstantNode(u) && !isConstantNode(v)) {
+				const c = u.value;
+				const innerRes = derive(v, depth+1);
+				const raw = `${c} * (${innerRes.deriv})`;
+				const step = `${indent}【常数倍法则】(${c}·${toStr(v)})' = ${c}·(${toStr(v)})'`;
+				const stepsArr = [step, ...innerRes.steps];
+				stepsArr.push(`${indent}代入得：${raw}`);
+				return { steps: stepsArr, deriv: raw };
+			}
+			if (isConstantNode(v) && !isConstantNode(u)) {
+				const c = v.value;
+				const innerRes = derive(u, depth+1);
+				const raw = `${c} * (${innerRes.deriv})`;
+				const step = `${indent}【常数倍法则】(${toStr(u)}·${c})' = ${c}·(${toStr(u)})'`;
+				const stepsArr = [step, ...innerRes.steps];
+				stepsArr.push(`${indent}代入得：${raw}`);
+				return { steps: stepsArr, deriv: raw };
+			}
+			const uRes = derive(u, depth+1);
+			const vRes = derive(v, depth+1);
+			const raw = `(${uRes.deriv})*(${toStr(v)}) + (${toStr(u)})*(${vRes.deriv})`;
+			const step = `${indent}【乘积法则】(${toStr(u)}·${toStr(v)})' = u'·v + u·v'`;
+			const stepsArr = [step, ...uRes.steps, ...vRes.steps];
+			stepsArr.push(`${indent}代入得：${raw}`);
+			return { steps: stepsArr, deriv: raw };
+		}
+		if (type === 'OperatorNode' && op === '/') {
+			const u = node.args[0];
+			const v = node.args[1];
+			const uRes = derive(u, depth+1);
+			const vRes = derive(v, depth+1);
+			const raw = `((${uRes.deriv})*(${toStr(v)}) - (${toStr(u)})*(${vRes.deriv}))/(${toStr(v)})^2`;
+			const step = `${indent}【商法则】(${toStr(u)}/${toStr(v)})' = (u'·v - u·v')/v²`;
+			const stepsArr = [step, ...uRes.steps, ...vRes.steps];
+			stepsArr.push(`${indent}代入得：${raw}`);
+			return { steps: stepsArr, deriv: raw };
+		}
+		if (type === 'OperatorNode' && op === '^') {
+			const base = node.args[0];
+			const exp = node.args[1];
+			if (exp.type === 'ConstantNode') {
+				const n = exp.value;
+				if (base.type === 'SymbolNode' && base.name === varName) {
+					if (n === 1) return { steps: [`${indent}${varName} 的导数是 1`], deriv: '1' };
+					const derivRaw = `${n}*${varName}^${n-1}`;
+					const step = `${indent}【幂函数求导】(${varName}^${n})' = ${n}·${varName}^${n-1}`;
+					return { steps: [step], deriv: derivRaw };
+				}
+				const inner = base;
+				const innerStr = toStr(inner);
+				const innerRes = derive(inner, depth+1);
+				const powerStep = (n-1 === 1) ? 'u' : `u^${n-1}`;
+				const raw = `${n}*(${innerStr})^${n-1} * (${innerRes.deriv})`;
+				const step1 = `${indent}这是一个复合幂函数，令 u = ${innerStr}，则原函数为 y = u^${n}。`;
+				const step2 = `${indent}链式法则：dy/d${varName} = dy/du · du/d${varName}`;
+				const step3 = `${indent}幂函数求导：dy/du = ${n}·${powerStep}`;
+				const step4 = `${indent}现在计算 du/d${varName}：`;
+				const stepsArr = [step1, step2, step3, step4, ...innerRes.steps];
+				stepsArr.push(`${indent}代回得：dy/d${varName} = ${n}·(${innerStr})^${n-1} · (${innerRes.deriv}) = ${raw}`);
+				return { steps: stepsArr, deriv: raw };
+			}
+		}
+		if (type === 'FunctionNode') {
+			const func = node.name;
+			const inner = node.args[0];
+			const innerStr = toStr(inner);
+			const innerRes = derive(inner, depth+1);
+			let formula = '', outerRaw = '';
+			switch (func) {
+				case 'sin': formula = 'sin(u)'; outerRaw = `cos(${innerStr})`; break;
+				case 'cos': formula = 'cos(u)'; outerRaw = `-sin(${innerStr})`; break;
+				case 'tan': formula = 'tan(u)'; outerRaw = `sec(${innerStr})^2`; break;
+				case 'exp': formula = 'e^u'; outerRaw = `exp(${innerStr})`; break;
+				case 'ln': formula = 'ln(u)'; outerRaw = `1/(${innerStr})`; break;
+				default: formula = null;
+			}
+			if (formula) {
+				const raw = `${outerRaw} * (${innerRes.deriv})`;
+				const step1 = `${indent}这是一个复合函数，令 u = ${innerStr}，则 y = ${formula}。`;
+				const step2 = `${indent}链式法则：dy/d${varName} = dy/du · du/d${varName}`;
+				const outerRawForStep = outerRaw.replace(new RegExp(`\\b${innerStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g'), 'u');
+				const step3 = `${indent}求导得：dy/du = ${outerRawForStep}`;
+				const step4 = `${indent}现在计算 du/d${varName}：`;
+				const stepsArr = [step1, step2, step3, step4, ...innerRes.steps];
+				stepsArr.push(`${indent}代回得：dy/d${varName} = ${outerRaw} · (${innerRes.deriv}) = ${raw}`);
+				return { steps: stepsArr, deriv: raw };
+			}
+		}
+		// 兜底
+		let fallback;
+		try {
+			fallback = nerdamer.diff(toStr(node), varName).toString();
+		} catch(e) {
+			throw new Error(`无法求导: ${e.message}`);
+		}
+		return { steps: [`${indent}表达式 ${toStr(node)} 较复杂，直接求导得：${fallback}`], deriv: fallback };
+	}
+
+	// 解析表达式
+	let tree;
+	try {
+		tree = math.parse(exprStr);
+	} catch(e) {
+		throw new Error(`表达式解析失败: ${e.message}`);
+	}
+	let result;
+	try {
+		result = derive(tree);
+	} catch(e) {
+		throw new Error(`求导步骤生成失败: ${e.message}`);
+	}
+
+	// 收集所有步骤
+	const allSteps = [...steps];
+	for (let s of result.steps) {
+		if (!allSteps.includes(s)) allSteps.push(s);
+	}
+
+	// 最终结果：强制使用 nerdamer 直接求导并彻底化简
+	let finalDeriv;
+	try {
+		let raw = nerdamer.diff(exprStr, varName).toString();
+		// 展开并化简
+		let simplified = nerdamer(raw).expand().simplify().toString();
+		// 清理残余的 ^1, *1, *(1)
+		simplified = simplified.replace(/\^1\b/g, '').replace(/\*1\b/g, '').replace(/\*\(1\)/g, '');
+		// 去除最外层多余括号
+		if (simplified.startsWith('(') && simplified.endsWith(')')) {
+			let inner = simplified.slice(1, -1);
+			// 避免去掉必要的括号，简单判断：如果不包含运算符则去掉
+			if (!inner.includes('+') && !inner.includes('-') && !inner.includes('*') && !inner.includes('/')) {
+				simplified = inner;
+			}
+		}
+		finalDeriv = simplified;
+	} catch(e) {
+		// 降级：使用步骤中累积的原始导数表达式（不推荐，但保底）
+		finalDeriv = result.deriv;
+	}
+
+	// 最后将 log 替换为 ln
+	finalDeriv = finalDeriv.replace(/log/g, 'ln');
+
+	return { steps: allSteps, result: finalDeriv };
+}
+
+
+
+
+/**
+ * 生成不定积分的详细步骤（极简识别版 - 修复 x/(ax^2+b) 步骤）
+ */
+function generateIntegralSteps(expr, varName) {
+	const steps = [];
+	steps.push(`计算不定积分 I = ∫ ${expr} d${varName}`);
+
+	// 去除所有空格
+	let normalized = expr.replace(/\s/g, '');
+ 	// 提前转义变量名，供所有正则使用
+	const escVar = varName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	// 辅助：美化结果（log -> ln）
+	function prettyResultString(raw) {
+		let pretty = raw;
+		pretty = pretty.replace(/log\(/g, 'ln(');
+		pretty = pretty.replace(/atan\(sqrt\((\d+)\)\^\(-1\)\*x\)/g, `(1/sqrt($1))*atan(x/sqrt($1))`);
+		pretty = pretty.replace(/sqrt\((\d+)\)\^\(-1\)/g, `1/sqrt($1)`);
+		pretty = pretty.replace(/\*\(1\/sqrt\(\d+\)\)/g, '');
+		pretty = pretty.replace(/\/sqrt\(\d+\)/g, '');
+		return pretty;
+	}
+
+	// ========== 新增：有理函数（分母为一次多项式）详细步骤 ==========
+	// ========== 有理函数（分母为一次多项式）详细步骤（增强版） ==========
+	const slashIdx = normalized.indexOf('/');
+	if (slashIdx !== -1) {
+		let numerator = normalized.slice(0, slashIdx);
+		let denominator = normalized.slice(slashIdx + 1);
+		// 去掉外层括号
+		if (denominator.startsWith('(') && denominator.endsWith(')')) denominator = denominator.slice(1, -1);
+		if (numerator.startsWith('(') && numerator.endsWith(')')) numerator = numerator.slice(1, -1);
+		
+		// 检查分母是否为一次式（不含 x^2 且不含三角函数/指数等）
+			const hasTrigExp = /sin|cos|tan|cot|sec|csc|exp|log|ln/.test(denominator);
+		const hasSquare = denominator.includes(varName + '^2');
+		if (!hasTrigExp && !hasSquare) 
+		{
+			// 解析分母的系数 a 和常数 b（支持 a*x+b 和 b+a*x 两种顺序）
+			let a = null, b = null;
+			const denomClean = denominator.replace(/\s/g, '');
+			// 模式1: a*x + b  或 a*x - b
+			let match = denomClean.match(new RegExp(`^([+-]?\\d*\\.?\\d*)\\*?${varName}([+-]\\d*\\.?\\d*)$`));
+			if (match) {
+				let coeff = match[1];
+				if (coeff === '' || coeff === '+') a = 1;
+				else if (coeff === '-') a = -1;
+				else a = parseFloat(coeff);
+				b = parseFloat(match[2]);
+			} else {
+				// 模式2: b + a*x  或 b - a*x
+				match = denomClean.match(new RegExp(`^([+-]?\\d*\\.?\\d*)([+-]\\d*\\.?\\d*)\\*?${varName}$`));
+				if (match) {
+					b = parseFloat(match[1]);
+					let coeff = match[2];
+					if (coeff === '' || coeff === '+') a = 1;
+					else if (coeff === '-') a = -1;
+					else a = parseFloat(coeff);
+				}
+			}
+			// 如果成功解析出 a 且 a != 0，则进行手工拆分（确保步骤生成）
+			if (a !== null && a !== 0) 
+			{
+				steps.push(`识别为有理函数，分母是线性式：${denominator}`);
+				
+				// 手工进行多项式除法：分子 / (a*x+b) = 商 + 余数/(a*x+b)
+				// 由于分子可能含有变量，使用 nerdamer 做多项式除法（更可靠）
+				try {
+					const P = nerdamer(numerator);
+					const D = nerdamer(denominator);
+					let Q, R;
+					// 尝试用 nerdamer 的除法函数
+					if (typeof nerdamer.quotient === 'function' && typeof nerdamer.remainder === 'function') 
+					{
+						Q = nerdamer.quotient(P, D, varName);
+						R = nerdamer.remainder(P, D, varName);
+					} else {
+						// 降级方案：手工拆分（针对分子次数低于分母的情况直接得 Q=0, R=P）
+						// 简单检测分子是否含变量且次数低于分母（这里简化处理）
+						if (!numerator.includes(varName) || numerator.match(new RegExp(`${varName}\\^?`)) === null) {
+							Q = nerdamer('0');
+							R = P;
+						} else {
+							throw new Error('nerdamer 除法不可用，跳过');
+						}
+					}
+					const Qstr = Q.toString();
+					const Rstr = R.toString();
+					
+					if (Qstr !== '0' || Rstr !== '0') {
+					    
+						// 新增：避免分子次数低于分母时递归自身
+						if (Qstr === '0' && Rstr === numerator) 
+						{
+							const k = parseFloat(numerator);
+							const aVal = a;   // a 是之前解析的分母一次项系数
+							const bVal = b;   // b 是常数项
+							steps.push(`直接积分：∫ ${k}/(${aVal}${varName}+${bVal}) dx = (${k}/${aVal}) ln|${aVal}${varName}+${bVal}| + C`);
+							const result = `(${k}/${aVal})*ln(abs(${aVal}*${varName}+${bVal}))`;
+							return { steps, result };
+						}
+												
+					
+						steps.push(`多项式除法：`);
+						steps.push(`  ${numerator} ÷ ${denominator} = ${Qstr} + ${Rstr} / (${denominator})`);
+						steps.push(`因此原积分可拆分为：`);
+						steps.push(`  I = ∫ ${Qstr} d${varName} + ∫ ${Rstr}/(${denominator}) d${varName}`);
+						
+						// 积分多项式部分
+						let polyResult = '0';
+						let polySteps = [];
+						if (Qstr !== '0') {
+							const subPoly = generateIntegralSteps(Qstr, varName);
+							polySteps = subPoly.steps.slice(1);
+							polyResult = subPoly.result;
+							steps.push(`  ① 积分多项式部分：`);
+							steps.push(...polySteps);
+						} else {
+							steps.push(`  ① 多项式部分为 0，积分为 0`);
+						}
+						
+						// 积分真分式部分（余数/(ax+b)）
+						const rationalExpr = `${Rstr}/(${denominator})`;
+						const subRat = generateIntegralSteps(rationalExpr, varName);
+						const ratSteps = subRat.steps.slice(1);
+						const ratResult = subRat.result;
+						steps.push(`  ② 积分真分式部分：`);
+						steps.push(...ratSteps);
+						
+						// 合并结果
+						let finalRaw = '';
+						if (polyResult === '0') finalRaw = ratResult;
+						else if (ratResult === '0') finalRaw = polyResult;
+						else finalRaw = `(${polyResult}) + (${ratResult})`;
+						let finalResult;
+						try {
+							finalResult = nerdamer.simplify(finalRaw).toString().replace(/log/g, 'ln');
+						} catch(e) {
+							finalResult = finalRaw;
+						}
+						steps.push(`合并得：I = ${finalResult} + C`);
+						return { steps, result: finalResult };
+					}
+				} catch(e) {
+					// 如果除法失败，使用手工恒等变形（针对分子为一次式或常数的情况）
+					steps.push(`多项式除法失败，尝试手工恒等变形。`);
+					// 将原式化为 A + B/(ax+b) 形式
+					// 例如 x/(2+2*x) = 1/2 - 1/(2+2*x)
+					try {
+						// 使用 nerdamer 进行部分分式分解
+						const parts = nerdamer(`partfrac(${numerator}/(${denominator}), ${varName})`);
+						const partsStr = parts.toString();
+						if (partsStr !== numerator + '/' + denominator) {
+							steps.push(`将原式分解为部分分式：${partsStr}`);
+							const subRes = generateIntegralSteps(partsStr, varName);
+							steps.push(...subRes.steps.slice(1));
+							return { steps, result: subRes.result };
+						}
+					} catch(e2) {
+						// 实在不行，直接输出最终结果（但保留至少一个简单步骤）
+						steps.push(`直接积分得：`);
+					}
+				}
+			}
+		}
+	}
+
+	// ========== 原有各种积分模式（完整保留） ==========
+	// 0. 先处理二次分母有理函数：常数/(a*x^2+b)
+	const fracMatch = normalized.match(/^(\d+(?:\.\d+)?|\([^)]+\))\/(.+)$/);
+	if (fracMatch) {
+		let numeratorStr = fracMatch[1];
+		let denominator = fracMatch[2];
+		if (numeratorStr.startsWith('(') && numeratorStr.endsWith(')')) 
+		{
+			numeratorStr = numeratorStr.slice(1, -1);
+		}
+		if (denominator.startsWith('(') && denominator.endsWith(')')) 
+		{
+			denominator = denominator.slice(1, -1);
+		}
+		if (denominator.includes(varName + '^2')) 
+		{
+			let cStr = null, aStr = null;
+			const parts = denominator.split('+');
+			for (let part of parts) {
+				if (part.includes(varName + '^2')) {
+					let coeffStr = part.replace(`*${varName}^2`, '').replace(varName + '^2', '');
+					if (coeffStr === '' || coeffStr === '+') aStr = '1';
+					else if (coeffStr === '-') aStr = '-1';
+					else aStr = coeffStr;
+				} else {
+					cStr = part;
+				}
+			}
+			if (aStr === null || cStr === null) {
+				const partsMinus = denominator.split('-');
+				if (partsMinus.length === 2) {
+					if (partsMinus[0].includes(varName + '^2')) {
+						let coeffStr = partsMinus[0].replace(`*${varName}^2`, '').replace(varName + '^2', '');
+						aStr = coeffStr === '' ? '1' : coeffStr;
+						cStr = '-' + partsMinus[1];
+					} else if (partsMinus[1].includes(varName + '^2')) {
+						cStr = partsMinus[0];
+						let coeffStr = partsMinus[1].replace(`*${varName}^2`, '').replace(varName + '^2', '');
+						aStr = coeffStr === '' ? '-1' : '-' + coeffStr;
+					}
+				}
+			}
+			if (aStr !== null && cStr !== null) 
+			{
+				const aVal = parseFloat(aStr);
+				if (aVal !== 1) {
+					let newCStr, newNumStr;
+					try {
+						newCStr = nerdamer.simplify(`(${cStr})/(${aStr})`).toString();
+						newNumStr = nerdamer.simplify(`(${numeratorStr})/(${aStr})`).toString();
+					} catch(e) {
+						newCStr = `(${cStr})/(${aStr})`;
+						newNumStr = `(${numeratorStr})/(${aStr})`;
+					}
+					steps.push(`分母中 x² 系数为 ${aStr}，提取公因子：`);
+					steps.push(`  ∫ ${numeratorStr}/(${aStr}x² + ${cStr}) dx = ∫ ${numeratorStr}/(${aStr}(x² + ${newCStr})) dx`);
+					steps.push(`  = (${newNumStr}) ∫ dx/(x² + ${newCStr})`);
+					const newExpr = `(${newNumStr})/(${varName}^2+${newCStr})`;
+					const subRes = generateIntegralSteps(newExpr, varName);
+					steps.push(...subRes.steps.slice(1));
+					return { steps, result: subRes.result };
+				} else {
+					const cVal = parseFloat(cStr);
+					if (cVal > 0) {
+						steps.push(`识别为 ∫ ${numeratorStr}/(x² + ${cStr}) dx 形式，常数因子可提出。`);
+						steps.push(`∫ ${numeratorStr}/(x² + ${cStr}) dx = ${numeratorStr} · ∫ dx/(x² + ${cStr})`);
+						steps.push(`使用反正切公式：∫ dx/(x² + a²) = (1/a) arctan(x/a) + C`);
+						let aSqrtStr;
+						const cNum = parseFloat(cStr);
+						if (Math.abs(cNum - 1/3) < 1e-10) aSqrtStr = `1/sqrt(3)`;
+						else aSqrtStr = `sqrt(${cStr})`;
+						steps.push(`代入 a = √${cStr} = ${aSqrtStr}，得：∫ dx/(x² + ${cStr}) = (1/${aSqrtStr}) arctan(x/${aSqrtStr}) + C`);
+						steps.push(`所以原积分 = ${numeratorStr} × (1/${aSqrtStr}) arctan(x/${aSqrtStr}) + C`);
+						let result;
+						if (cStr === '1/3') {
+							result = `(${numeratorStr})*sqrt(3)*atan(x*sqrt(3))`;
+						} else {
+							result = `(${numeratorStr})*(1/sqrt(${cStr}))*atan(x/sqrt(${cStr}))`;
+						}
+						const nerdFinal = nerdamer.integrate(expr, varName).toString();
+						const finalPretty = nerdFinal.replace(/log/g, 'ln');
+						steps.push(`整理得：I = ${finalPretty} + C`);
+						return { steps, result: finalPretty };
+					}
+				}
+			}
+		}
+	}
+
+	// 1. 形如 (k*x)/(a*x^2+b) 的对数型
+	function matchLogForm(exprStr, varName) {
+		function stripOuterParens(s) {
+			s = s.trim();
+			if (s.startsWith('(') && s.endsWith(')')) return s.slice(1, -1);
+			return s;
+		}
+		let slashIdx = exprStr.indexOf('/');
+		if (slashIdx === -1) return null;
+		let numerator = exprStr.substring(0, slashIdx);
+		let denominator = exprStr.substring(slashIdx + 1);
+		numerator = stripOuterParens(numerator);
+		denominator = stripOuterParens(denominator);
+		let k = null;
+		if (numerator === varName) k = 1;
+		else if (numerator.endsWith('*' + varName)) {
+			let coeffStr = numerator.slice(0, numerator.length - (varName.length + 1));
+			if (/^\d+(?:\.\d+)?$/.test(coeffStr)) k = parseFloat(coeffStr);
+		}
+		if (k === null) return null;
+		let plusIdx = denominator.indexOf('+');
+		if (plusIdx === -1) return null;
+		let left = denominator.substring(0, plusIdx);
+		let right = denominator.substring(plusIdx + 1);
+		let a = null, b = null;
+		if (left.includes(varName + '^2')) {
+			if (left === varName + '^2') a = 1;
+			else if (left.endsWith('*' + varName + '^2')) {
+				let coeffStr = left.slice(0, left.length - (varName.length + 3));
+				if (/^\d+(?:\.\d+)?$/.test(coeffStr)) a = parseFloat(coeffStr);
+			}
+			if (/^\d+(?:\.\d+)?$/.test(right)) b = parseFloat(right);
+		} else if (right.includes(varName + '^2')) {
+			if (/^\d+(?:\.\d+)?$/.test(left)) b = parseFloat(left);
+			if (right === varName + '^2') a = 1;
+			else if (right.endsWith('*' + varName + '^2')) {
+				let coeffStr = right.slice(0, right.length - (varName.length + 3));
+				if (/^\d+(?:\.\d+)?$/.test(coeffStr)) a = parseFloat(coeffStr);
+			}
+		}
+		if (a !== null && b !== null && a > 0) return { k, a, b };
+		return null;
+	}
+	const logMatch = matchLogForm(normalized, varName);
+	if (logMatch) {
+		const { k, a, b } = logMatch;
+		steps.push(`识别为 ∫ (${k}x)/(${a}x² + ${b}) dx 形式，使用代换法。`);
+		steps.push(`令 u = ${a}x² + ${b}，则 du = ${2*a}x dx，即 x dx = du/(${2*a})。`);
+		steps.push(`原积分变为：∫ ${k} * (x dx) / u = ${k} ∫ du/(${2*a} * u) = (${k}/(${2*a})) ∫ du/u。`);
+		steps.push(`∫ du/u = ln|u| + C，所以 I = (${k}/(${2*a})) ln|u| + C。`);
+		steps.push(`回代 u = ${a}x² + ${b}，得：I = (${k}/(${2*a})) ln|${a}x² + ${b}| + C。`);
+		const nerdResult = nerdamer.integrate(expr, varName).toString();
+		const finalResult = nerdResult.replace(/log/g, 'ln');
+		steps.push(`整理得：I = ${finalResult} + C`);
+		return { steps, result: finalResult };
+	}
+	
+	
+	// ========== 新增：幂函数 × 指数函数 x^n * exp(kx) 分部积分 ==========
+	// ========== 幂函数 × 指数函数 x^n * exp(kx) 分部积分 ==========
+	const expPowPattern = new RegExp(`(${escVar}(?:\\^(\\d+))?)\\*exp\\(([^)]+)\\)|exp\\(([^)]+)\\)\\*(${escVar}(?:\\^(\\d+))?)`);
+	const expPowMatch = normalized.match(expPowPattern);
+	if (expPowMatch) {
+		let exponent = expPowMatch[2] || expPowMatch[6];
+		let innerExp = expPowMatch[3] || expPowMatch[4];
+		let n = exponent ? parseInt(exponent) : 1;
+		let kMatch = innerExp.match(/(\d+(?:\.\d+)?)\*/);
+		let k = kMatch ? parseFloat(kMatch[1]) : 1;
+		
+		steps.push(`识别为 ∫ ${varName}^${n}·e^{${k}${varName}} d${varName} 形式，使用分部积分法。`);
+		steps.push(`令 u = ${varName}^${n}，dv = e^{${k}${varName}} d${varName}`);
+		steps.push(`则 du = ${n}·${varName}^${n-1} d${varName}，v = (1/${k}) e^{${k}${varName}}`);
+		steps.push(`由分部积分公式：I = u·v - ∫ v du`);
+		steps.push(`  = (1/${k}) ${varName}^${n} e^{${k}${varName}} - (${n}/${k}) ∫ ${varName}^${n-1} e^{${k}${varName}} d${varName}`);
+		
+		let allSteps = [...steps];
+		
+		// 递归生成子积分的详细步骤（不用于组合结果，只用于展示）
+		if (n-1 > 0) {
+			const subIntegral = generateIntegralSteps(`${varName}^${n-1}*exp(${k}*${varName})`, varName);
+			allSteps.push(...subIntegral.steps.slice(1));
+		} else {
+			allSteps.push(`∫ e^{${k}${varName}} d${varName} = (1/${k}) e^{${k}${varName}} + C`);
+		}
+		
+		// 直接使用 nerdamer 计算最终正确结果（避免手动组合出错）
+		const finalResult = nerdamer.integrate(expr, varName).toString().replace(/log/g, 'ln');
+		allSteps.push(`整理得：I = ${finalResult} + C`);
+		
+		return { steps: allSteps, result: finalResult };
+	}
+		
+	
+	// ========== 代换积分：x^(c-1)/(a + b*x^c) ==========
+	const slashIdx2 = normalized.indexOf('/');
+	if (slashIdx2 !== -1) {
+		let numerator = normalized.slice(0, slashIdx2);
+		let denominator = normalized.slice(slashIdx2 + 1);
+		// 去掉可能的括号
+		if (denominator.startsWith('(') && denominator.endsWith(')')) denominator = denominator.slice(1, -1);
+		if (numerator.startsWith('(') && numerator.endsWith(')')) numerator = numerator.slice(1, -1);
+		
+		// 提取分母中的常数项 a 和 x^c 项系数 b
+		let a = 0, b = 1, c = 0;
+		// 匹配分母中的 x^c 部分
+		const denomXTerm = denominator.match(new RegExp(`([+-]?\\d*\\.?\\d*)\\*?${escVar}\\^(\\d+)`));
+		if (denomXTerm) {
+			b = denomXTerm[1] ? parseFloat(denomXTerm[1]) : 1;
+			c = parseInt(denomXTerm[2]);
+			// 提取常数项（剩余部分）
+			const constPart = denominator.replace(denomXTerm[0], '').replace(/[+-]/g, (m, idx, str) => idx === 0 ? m : ` ${m}`).trim();
+			a = constPart ? parseFloat(constPart) : 0;
+		} else {
+			// 分母不包含 x^c，不匹配
+			// 继续执行后续分支
+		}
+		
+		if (c > 0) {
+			// 检查分子是否为 k * x^(c-1)
+			const numMatch = numerator.match(new RegExp(`^([+-]?\\d*\\.?\\d*)\\*?${escVar}\\^(${c-1})$`));
+			if (numMatch || (c-1 === 1 && numerator === varName) || (c-1 === 0 && /^\d+$/.test(numerator))) {
+				let k = 1;
+				if (numMatch) {
+					k = numMatch[1] ? parseFloat(numMatch[1]) : 1;
+				} else if (c-1 === 1 && numerator === varName) {
+					k = 1;
+				} else if (c-1 === 0) {
+					k = parseFloat(numerator);
+				}
+				
+				steps.push(`识别为 ∫ ${k}·${varName}^${c-1} / (${a} + ${b}·${varName}^${c}) d${varName}，使用代换法。`);
+				steps.push(`令 u = ${a} + ${b}·${varName}^${c}，则 du = ${b*c}·${varName}^${c-1} d${varName}`);
+				steps.push(`原积分 = (${k}/(${b*c})) ∫ du/u = (${k}/(${b*c})) ln|u| + C`);
+				steps.push(`回代得：I = (${k}/(${b*c})) ln|${a} + ${b}·${varName}^${c}| + C`);
+				const finalResult = nerdamer.integrate(expr, varName).toString().replace(/log/g, 'ln');
+				steps.push(`整理得：I = ${finalResult} + C`);
+				return { steps, result: finalResult };
+			}
+		}
+	}
+	
+
+	// 2. 三角恒等变换
+	let trigTransformed = false;
+	let transformedExpr = normalized;
+	let sin2Match = transformedExpr.match(new RegExp(`sin\\^2\\(([^)]+)\\)|sin\\(([^)]+)\\)\\^2`));
+	if (sin2Match) {
+		const angle = sin2Match[1] || sin2Match[2];
+		steps.push(`利用恒等式 sin²θ = (1 - cos2θ)/2 降幂：`);
+		steps.push(`  sin²(${angle}) = (1 - cos(2·${angle}))/2`);
+		transformedExpr = transformedExpr.replace(new RegExp(`sin\\^2\\(${angle}\\)|sin\\(${angle}\\)\\^2`), `(1-cos(2*${angle}))/2`);
+		trigTransformed = true;
+	}
+	let cos2Match = transformedExpr.match(new RegExp(`cos\\^2\\(([^)]+)\\)|cos\\(([^)]+)\\)\\^2`));
+	if (cos2Match) {
+		const angle = cos2Match[1] || cos2Match[2];
+		steps.push(`利用恒等式 cos²θ = (1 + cos2θ)/2 降幂：`);
+		steps.push(`  cos²(${angle}) = (1 + cos(2·${angle}))/2`);
+		transformedExpr = transformedExpr.replace(new RegExp(`cos\\^2\\(${angle}\\)|cos\\(${angle}\\)\\^2`), `(1+cos(2*${angle}))/2`);
+		trigTransformed = true;
+	}
+	let sinCosMatch = normalized.match(new RegExp(`sin\\(([^)]+)\\)\\*cos\\(([^)]+)\\)|cos\\(([^)]+)\\)\\*sin\\(([^)]+)\\)`));
+	if (sinCosMatch) {
+		let aExpr = sinCosMatch[1] || sinCosMatch[4];
+		let bExpr = sinCosMatch[2] || sinCosMatch[3];
+		let a = 1, b = 1;
+		let aMatch = aExpr.match(/(\d+)\*/);
+		if (aMatch) a = parseInt(aMatch[1]);
+		let bMatch = bExpr.match(/(\d+)\*/);
+		if (bMatch) b = parseInt(bMatch[1]);
+		steps.push(`利用积化和差公式：sin(${aExpr})·cos(${bExpr}) = ½[sin((${a}+${b})x) + sin((${a}-${b})x)]`);
+		let term1 = `sin(${a+b}*${varName})`;
+		let term2 = `sin(${a-b}*${varName})`;
+		steps.push(`于是原积分变为：I = ∫ ½[${term1} + ${term2}] d${varName}`);
+		steps.push(`常数因子可提出：I = ½ ∫ ${term1} d${varName} + ½ ∫ ${term2} d${varName}`);
+		function integrateSin(k, varName) {
+			if (k === 0) return `0`;
+			return `-cos(${k}*${varName})/${k}`;
+		}
+		let int1 = integrateSin(a+b, varName);
+		let int2 = integrateSin(a-b, varName);
+		steps.push(`根据公式 ∫ sin(kx) dx = -cos(kx)/k + C：`);
+		steps.push(`  ∫ ${term1} d${varName} = ${int1} + C`);
+		steps.push(`  ∫ ${term2} d${varName} = ${int2} + C`);
+		steps.push(`所以 I = ½ * (${int1}) + ½ * (${int2}) + C`);
+		const finalRaw = nerdamer.integrate(expr, varName).toString();
+		const finalPretty = finalRaw.replace(/log/g, 'ln');
+		steps.push(`整理得：I = ${finalPretty} + C`);
+		return { steps, result: finalPretty };
+	}
+	if (trigTransformed) {
+		steps.push(`原积分变为：I = ∫ ${transformedExpr} d${varName}`);
+		const subRes = generateIntegralSteps(transformedExpr, varName);
+		steps.push(...subRes.steps.slice(1));
+		return { steps, result: subRes.result };
+	}
+
+	// 3. 和差拆分
+	function splitByPlusMinus(str) {
+		const parts = [];
+		let current = "";
+		let depth = 0;
+		let lastOp = '+';
+		for (let i = 0; i < str.length; i++) {
+			const ch = str[i];
+			if (ch === '(') depth++;
+			else if (ch === ')') depth--;
+			if (depth === 0 && (ch === '+' || ch === '-')) 
+			{
+				if (current.trim()) parts.push({ sign: lastOp, expr: current.trim() });
+				current = "";
+				lastOp = ch;
+			} else {
+				current += ch;
+			}
+		}
+		if (current.trim()) parts.push({ sign: lastOp, expr: current.trim() });
+		return parts;
+	}
+	const subExprs = splitByPlusMinus(normalized);
+	if (subExprs.length > 1) {
+		steps.push(`表达式为多项之和/差，可拆分为：`);
+		const subResults = [];
+		for (let i = 0; i < subExprs.length; i++) {
+			const { sign, expr: subExpr } = subExprs[i];
+			const signChar = (i === 0 ? '' : (sign === '+' ? '+' : '-'));
+			steps.push(`${signChar} ${subExpr}`);
+			const subStepsRes = generateIntegralSteps(subExpr, varName);
+			let subResult = subStepsRes.result;
+			if (i === 0) subResults.push(subResult);
+			else subResults.push(`${sign === '+' ? '+' : '-'} ${subResult}`);
+			steps.push(`  ∫ ${subExpr} d${varName} = ${subResult} + C`);
+		}
+		const combinedResult = subResults.join(' ').replace(/\+\s*-/g, '-').replace(/\s+/g, ' ');
+		steps.push(`因此，I = ${combinedResult} + C`);
+		const finalRaw = nerdamer.integrate(expr, varName).toString();
+		const finalPretty = prettyResultString(finalRaw);
+		steps.push(`合并后结果：${finalPretty} + C`);
+		return { steps, result: finalPretty };
+	}
+
+	// 4. 常数/(x^2 - a^2) 和 常数/(a^2 - x^2)
+	//const escVar = varName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	const patternMinus1 = new RegExp(`^(\\d+(?:\\.\\d+)?)/(?:\\(?${escVar}\\^2-(\\d+(?:\\.\\d+)?)\\)?)$`);
+	const matchMinus1 = normalized.match(patternMinus1);
+	if (matchMinus1) {
+		let numerator = parseFloat(matchMinus1[1]);
+		let a2 = parseFloat(matchMinus1[2]);
+		let a = Math.sqrt(a2);
+		steps.push(`识别为 ∫ ${numerator}/(x² - ${a2}) dx 形式，常数因子可提出。`);
+		steps.push(`公式：∫ dx/(x² - a²) = (1/(2a)) ln| (x-a)/(x+a) | + C`);
+		steps.push(`代入 a = √${a2} = ${a}，得：∫ dx/(x² - ${a2}) = (1/(2*${a})) ln| (${varName}-${a})/(${varName}+${a}) | + C`);
+		const coeff = numerator / (2 * a);
+		const result = `(${coeff})*ln(abs((${varName}-${a})/(${varName}+${a})))`;
+		steps.push(`所以原积分 = ${result} + C`);
+		return { steps, result };
+	}
+	const patternMinus2 = new RegExp(`^(\\d+(?:\\.\\d+)?)/(?:\\(?(\\d+(?:\\.\\d+)?)-${escVar}\\^2\\)?)$`);
+	const matchMinus2 = normalized.match(patternMinus2);
+	if (matchMinus2) {
+		let numerator = parseFloat(matchMinus2[1]);
+		let a2 = parseFloat(matchMinus2[2]);
+		let a = Math.sqrt(a2);
+		steps.push(`识别为 ∫ ${numerator}/(${a2} - x²) dx 形式，常数因子可提出。`);
+		steps.push(`公式：∫ dx/(a² - x²) = (1/(2a)) ln| (a+x)/(a-x) | + C`);
+		steps.push(`代入 a = √${a2} = ${a}，得：∫ dx/(${a2} - x²) = (1/(2*${a})) ln| (${a}+${varName})/(${a}-${varName}) | + C`);
+		const coeff = numerator / (2 * a);
+		const result = `(${coeff})*ln(abs((${a}+${varName})/(${a}-${varName})))`;
+		steps.push(`所以原积分 = ${result} + C`);
+		return { steps, result };
+	}
+
+	// 5. 分部积分：x^n * sin(ax) / cos(ax)
+	const xPowSinPattern = new RegExp(`(?:(${escVar}(?:\\^\\d+)?)\\*sin\\(([^)]+)\\))|(?:sin\\(([^)]+)\\)\\*(${escVar}(?:\\^\\d+)?))`);
+	const xSinMatch = normalized.match(xPowSinPattern);
+	if (xSinMatch) {
+		let xPart = xSinMatch[1] || xSinMatch[4];
+		let inner = xSinMatch[2] || xSinMatch[3];
+		let n = 1;
+		if (xPart && xPart.includes('^')) 
+		{
+			const powMatch = xPart.match(/\^(\d+)/);
+			if (powMatch) n = parseInt(powMatch[1]);
+		}
+		let aMatch = inner.match(/(\d+(?:\.\d+)?)\*/);
+		let a = aMatch ? parseFloat(aMatch[1]) : 1;
+		if (n === 1) {
+			steps.push(`识别为 ∫ ${varName}·sin(${a}${varName}) d${varName} 形式，使用分部积分法。`);
+			steps.push(`令 u = ${varName}，dv = sin(${a}${varName}) d${varName}`);
+			steps.push(`则 du = d${varName}，v = ∫ sin(${a}${varName}) d${varName} = -cos(${a}${varName})/${a}`);
+			steps.push(`由分部积分公式 ∫ u dv = u·v - ∫ v du：`);
+			steps.push(`I = ${varName}·(-cos(${a}${varName})/${a}) - ∫ (-cos(${a}${varName})/${a}) d${varName}`);
+			steps.push(`  = -(${varName}/${a}) cos(${a}${varName}) + (1/${a}) ∫ cos(${a}${varName}) d${varName}`);
+			steps.push(`∫ cos(${a}${varName}) d${varName} = sin(${a}${varName})/${a}`);
+			steps.push(`所以 I = -(${varName}/${a}) cos(${a}${varName}) + (1/${a})·(sin(${a}${varName})/${a}) + C`);
+			steps.push(`  = -(${varName}/${a}) cos(${a}${varName}) + (1/${a*a}) sin(${a}${varName}) + C`);
+		} else {
+			steps.push(`识别为 ∫ ${varName}^${n}·sin(${a}${varName}) d${varName} 形式，使用分部积分法，需重复 ${n} 次。`);
+			steps.push(`令 u = ${varName}^${n}，dv = sin(${a}${varName}) d${varName}`);
+			steps.push(`则 du = ${n}·${varName}^${n-1} d${varName}，v = ∫ sin(${a}${varName}) d${varName} = -cos(${a}${varName})/${a}`);
+			steps.push(`由分部积分公式 ∫ u dv = u·v - ∫ v du：`);
+			steps.push(`I = ${varName}^${n}·(-cos(${a}${varName})/${a}) - ∫ (-cos(${a}${varName})/${a})·${n}·${varName}^${n-1} d${varName}`);
+			steps.push(`  = -(${varName}^${n}/${a}) cos(${a}${varName}) + (${n}/${a}) ∫ ${varName}^${n-1}·cos(${a}${varName}) d${varName}`);
+			steps.push(`记 J = ∫ ${varName}^${n-1}·cos(${a}${varName}) d${varName}，则 I = -(${varName}^${n}/${a}) cos(${a}${varName}) + (${n}/${a}) J`);
+			steps.push(`继续对 J 分部积分（类似过程），重复降幂直至幂次为 0。`);
+		}
+		const finalResult = nerdamer.integrate(expr, varName).toString();
+		const prettyFinal = prettyResultString(finalResult);
+		steps.push(`整理得：I = ${prettyFinal} + C`);
+		return { steps, result: prettyFinal };
+	}
+	const xPowCosPattern = new RegExp(`(?:(${escVar}(?:\\^\\d+)?)\\*cos\\(([^)]+)\\))|(?:cos\\(([^)]+)\\)\\*(${escVar}(?:\\^\\d+)?))`);
+	const xCosMatch = normalized.match(xPowCosPattern);
+	if (xCosMatch) {
+		let xPart = xCosMatch[1] || xCosMatch[4];
+		let inner = xCosMatch[2] || xCosMatch[3];
+		let n = 1;
+		if (xPart && xPart.includes('^')) 
+		{
+			const powMatch = xPart.match(/\^(\d+)/);
+			if (powMatch) n = parseInt(powMatch[1]);
+		}
+		let aMatch = inner.match(/(\d+(?:\.\d+)?)\*/);
+		let a = aMatch ? parseFloat(aMatch[1]) : 1;
+		if (n === 1) {
+			steps.push(`识别为 ∫ ${varName}·cos(${a}${varName}) d${varName} 形式，使用分部积分法。`);
+			steps.push(`令 u = ${varName}，dv = cos(${a}${varName}) d${varName}`);
+			steps.push(`则 du = d${varName}，v = ∫ cos(${a}${varName}) d${varName} = sin(${a}${varName})/${a}`);
+			steps.push(`由分部积分公式 ∫ u dv = u·v - ∫ v du：`);
+			steps.push(`I = ${varName}·(sin(${a}${varName})/${a}) - ∫ (sin(${a}${varName})/${a}) d${varName}`);
+			steps.push(`  = (${varName}/${a}) sin(${a}${varName}) - (1/${a}) ∫ sin(${a}${varName}) d${varName}`);
+			steps.push(`∫ sin(${a}${varName}) d${varName} = -cos(${a}${varName})/${a}`);
+			steps.push(`所以 I = (${varName}/${a}) sin(${a}${varName}) - (1/${a})·(-cos(${a}${varName})/${a}) + C`);
+			steps.push(`  = (${varName}/${a}) sin(${a}${varName}) + (1/${a*a}) cos(${a}${varName}) + C`);
+		} else {
+			steps.push(`识别为 ∫ ${varName}^${n}·cos(${a}${varName}) d${varName} 形式，使用分部积分法，需重复 ${n} 次。`);
+			steps.push(`令 u = ${varName}^${n}，dv = cos(${a}${varName}) d${varName}`);
+			steps.push(`则 du = ${n}·${varName}^${n-1} d${varName}，v = ∫ cos(${a}${varName}) d${varName} = sin(${a}${varName})/${a}`);
+			steps.push(`由分部积分公式 ∫ u dv = u·v - ∫ v du：`);
+			steps.push(`I = ${varName}^${n}·(sin(${a}${varName})/${a}) - ∫ (sin(${a}${varName})/${a})·${n}·${varName}^${n-1} d${varName}`);
+			steps.push(`  = (${varName}^${n}/${a}) sin(${a}${varName}) - (${n}/${a}) ∫ ${varName}^${n-1}·sin(${a}${varName}) d${varName}`);
+			steps.push(`继续分部积分，逐步降低幂次，最终得到结果。`);
+		}
+		const finalResult = nerdamer.integrate(expr, varName).toString();
+		const prettyFinal = prettyResultString(finalResult);
+		steps.push(`整理得：I = ${prettyFinal} + C`);
+		return { steps, result: prettyFinal };
+	}
+
+	// 6. 指数×三角函数
+	const expSinPattern = /(?:exp\(([^)]+)\)\*sin\(([^)]+)\))|(?:sin\(([^)]+)\)\*exp\(([^)]+)\))/;
+	const sinMatch = normalized.match(expSinPattern);
+	if (sinMatch) {
+		let aStr, bStr;
+		if (sinMatch[1]) { aStr = sinMatch[1]; bStr = sinMatch[2]; }
+		else { bStr = sinMatch[3]; aStr = sinMatch[4]; }
+		let a = null, b = null;
+		const aMatch = aStr.match(/(\d+(?:\.\d+)?)\*/);
+		if (aMatch) a = parseFloat(aMatch[1]);
+		const bMatch = bStr.match(/(\d+(?:\.\d+)?)\*/);
+		if (bMatch) b = parseFloat(bMatch[1]);
+		if (a !== null && b !== null && a !== 0 && b !== 0) 
+		{
+			steps.push(`识别为 ∫ e^{${a}x}·sin(${b}x) dx 形式，使用分部积分法。`);
+			steps.push(`令 u = sin(${b}x)，dv = e^{${a}x} dx`);
+			steps.push(`则 du = ${b}·cos(${b}x) dx，v = (1/${a}) e^{${a}x}`);
+			steps.push(`由分部积分公式 ∫ u dv = u·v - ∫ v du：`);
+			steps.push(`I = sin(${b}x)·(1/${a}) e^{${a}x} - ∫ (1/${a}) e^{${a}x}·${b}·cos(${b}x) dx`);
+			steps.push(`  = (1/${a}) e^{${a}x} sin(${b}x) - (${b}/${a}) ∫ e^{${a}x} cos(${b}x) dx`);
+			steps.push(`记 J = ∫ e^{${a}x} cos(${b}x) dx，则 I = (1/${a}) e^{${a}x} sin(${b}x) - (${b}/${a}) J   (1)`);
+			steps.push(`对 J 再次分部积分：`);
+			steps.push(`令 u = cos(${b}x)，dv = e^{${a}x} dx`);
+			steps.push(`则 du = -${b}·sin(${b}x) dx，v = (1/${a}) e^{${a}x}`);
+			steps.push(`J = cos(${b}x)·(1/${a}) e^{${a}x} - ∫ (1/${a}) e^{${a}x}·(-${b}·sin(${b}x)) dx`);
+			steps.push(`  = (1/${a}) e^{${a}x} cos(${b}x) + (${b}/${a}) ∫ e^{${a}x} sin(${b}x) dx`);
+			steps.push(`  = (1/${a}) e^{${a}x} cos(${b}x) + (${b}/${a}) I   (2)`);
+			steps.push(`将 (2) 代入 (1)：`);
+			steps.push(`I = (1/${a}) e^{${a}x} sin(${b}x) - (${b}/${a}) [ (1/${a}) e^{${a}x} cos(${b}x) + (${b}/${a}) I ]`);
+			steps.push(`  = (1/${a}) e^{${a}x} sin(${b}x) - (${b}/${a^2}) e^{${a}x} cos(${b}x) - (${b^2}/${a^2}) I`);
+			steps.push(`移项：I + (${b^2}/${a^2}) I = (1/${a}) e^{${a}x} sin(${b}x) - (${b}/${a^2}) e^{${a}x} cos(${b}x)`);
+			const coeff = 1 + (b * b) / (a * a);
+			steps.push(`即 (1 + ${b^2}/${a^2}) I = e^{${a}x} [ (1/${a}) sin(${b}x) - (${b}/${a^2}) cos(${b}x) ]`);
+			steps.push(`所以 I = e^{${a}x} [ (1/${a}) sin(${b}x) - (${b}/${a^2}) cos(${b}x) ] / ${coeff}`);
+			const finalResult = nerdamer.integrate(expr, varName).toString();
+			const prettyFinal = prettyResultString(finalResult);
+			steps.push(`整理得：I = ${prettyFinal} + C`);
+			return { steps, result: prettyFinal };
+		}
+	}
+	const expCosPattern = /(?:exp\(([^)]+)\)\*cos\(([^)]+)\))|(?:cos\(([^)]+)\)\*exp\(([^)]+)\))/;
+	const cosMatch = normalized.match(expCosPattern);
+	if (cosMatch) {
+		let aStr, bStr;
+		if (cosMatch[1]) { aStr = cosMatch[1]; bStr = cosMatch[2]; }
+		else { bStr = cosMatch[3]; aStr = cosMatch[4]; }
+		let a = null, b = null;
+		const aMatch = aStr.match(/(\d+(?:\.\d+)?)\*/);
+		if (aMatch) a = parseFloat(aMatch[1]);
+		const bMatch = bStr.match(/(\d+(?:\.\d+)?)\*/);
+		if (bMatch) b = parseFloat(bMatch[1]);
+		if (a !== null && b !== null && a !== 0 && b !== 0) 
+		{
+			steps.push(`识别为 ∫ e^{${a}x}·cos(${b}x) dx 形式，使用分部积分法（与正弦类似）。`);
+			steps.push(`类似地，两次分部积分可得：`);
+			const finalResult = nerdamer.integrate(expr, varName).toString();
+			const prettyFinal = prettyResultString(finalResult);
+			steps.push(`I = ${prettyFinal} + C`);
+			return { steps, result: prettyFinal };
+		}
+	}
+
+	// 7. 幂函数
+	const powMatch = expr.match(new RegExp(`^${escVar}\\^(\\-?\\d+)$`));
+	if (powMatch) {
+		const n = parseInt(powMatch[1]);
+		steps.push(`识别为幂函数 ∫ ${varName}^${n} d${varName}`);
+		if (n === -1) steps.push(`使用公式：∫ 1/x dx = ln|x| + C`);
+		else steps.push(`使用公式：∫ x^n dx = x^(n+1)/(n+1) + C (n ≠ -1)`);
+		const result = nerdamer.integrate(expr, varName).toString();
+		steps.push(`结果：${result} + C`);
+		return { steps, result };
+	}
+
+	// 8. 正弦/余弦/指数
+	const simpleSin = expr.match(new RegExp(`^sin\\(([^)]+)\\)$`));
+	if (simpleSin) {
+		const inner = simpleSin[1];
+		steps.push(`识别为正弦函数 ∫ sin(${inner}) d${varName}`);
+		steps.push(`使用公式：∫ sin(kx) dx = -cos(kx)/k + C`);
+		const result = nerdamer.integrate(expr, varName).toString();
+		steps.push(`结果：${result} + C`);
+		return { steps, result };
+	}
+	const simpleCos = expr.match(new RegExp(`^cos\\(([^)]+)\\)$`));
+	if (simpleCos) {
+		const inner = simpleCos[1];
+		steps.push(`识别为余弦函数 ∫ cos(${inner}) d${varName}`);
+		steps.push(`使用公式：∫ cos(kx) dx = sin(kx)/k + C`);
+		const result = nerdamer.integrate(expr, varName).toString();
+		steps.push(`结果：${result} + C`);
+		return { steps, result };
+	}
+	const simpleExp = expr.match(new RegExp(`^exp\\(([^)]+)\\)$`));
+	if (simpleExp) {
+		const inner = simpleExp[1];
+		steps.push(`识别为指数函数 ∫ e^(${inner}) d${varName}`);
+		steps.push(`使用公式：∫ e^(kx) dx = e^(kx)/k + C`);
+		const result = nerdamer.integrate(expr, varName).toString();
+		steps.push(`结果：${result} + C`);
+		return { steps, result };
+	}
+
+	// 9. 线性分式 k/(ax+b)（已由前面的有理函数分支覆盖，作为后备）
+	const linearPattern = new RegExp(`^(\\d+(?:\\.\\d+)?)/(?:\\(?([^)]+)\\)?)$`);
+	const linearMatch = normalized.match(linearPattern);
+	if (linearMatch) {
+		const k = parseFloat(linearMatch[1]);
+		let denominator = linearMatch[2];
+		if (!denominator.includes(varName + '^2')) {
+			let a = null, b = null;
+			const termRegex = /([+-]?(?:\d+(?:\.\d+)?\*)?x|\d+(?:\.\d+)?)/g;
+			let matches = denominator.match(termRegex);
+			if (matches) {
+				for (let term of matches) {
+					if (term.includes(varName)) {
+						let coeffStr = term.replace(`*${varName}`, '').replace(varName, '');
+						if (coeffStr === '' || coeffStr === '+') a = 1;
+						else if (coeffStr === '-') a = -1;
+						else a = parseFloat(coeffStr);
+					} else {
+						b = parseFloat(term);
+					}
+				}
+			}
+			if (a === null) a = 1;
+			if (b === null) b = 0;
+			let displayA = a === 1 ? '' : (a === -1 ? '-' : a);
+			let displayB = (b >= 0 ? '+' : '') + b;
+			steps.push(`识别为 ∫ ${k}/(${displayA}${varName}${displayB}) d${varName} 形式，使用代换法。`);
+			steps.push(`令 u = ${displayA}${varName}${displayB}，则 du = ${a} d${varName}，即 d${varName} = du/${a}。`);
+			steps.push(`原积分变为：∫ ${k}/u · (du/${a}) = (${k}/${a}) ∫ du/u。`);
+			steps.push(`∫ du/u = ln|u| + C，所以 I = (${k}/${a}) ln|u| + C。`);
+			steps.push(`回代 u = ${displayA}${varName}${displayB}，得：I = (${k}/${a}) ln|${displayA}${varName}${displayB}| + C。`);
+			const nerdResult = nerdamer.integrate(expr, varName).toString();
+			const finalResult = nerdResult.replace(/log/g, 'ln');
+			steps.push(`整理得：I = ${finalResult} + C`);
+			return { steps, result: finalResult };
+		}
+	}
+
+	// 10. fallback
+	steps.push(`表达式结构较复杂，无法自动生成详细步骤，但积分结果如下：`);
+	let result;
+	try {
+		result = nerdamer.integrate(expr, varName).toString();
+		let prettyResult = prettyResultString(result);
+		steps.push(`∫ ${expr} d${varName} = ${prettyResult} + C`);
+		return { steps, result: prettyResult };
+	} catch (e) {
+		throw new Error(`积分失败: ${e.message}`);
+	}
+}
+	
+	/**
+	 * 生成方程求解的详细步骤
+	 * @param {string} eq 方程，如 "x^2 - 4 = 0" 或 "x^2 - 4"
+	 * @param {string} varName 变量
+	 * @returns {object} { steps: array, result: string }
+	 */
+	function generateSolveSteps(eq, varName) {
+		const steps = [];
+		steps.push(`求解方程：${eq}`);
+	
+		// 标准化方程：如果没有等号则补 =0
+		let normalized = eq;
+		if (!eq.includes('=')) {
+			normalized = eq + '=0';
+			steps.push(`方程未包含等号，自动补充为：${normalized}`);
+		}
+	
+		let [left, right] = normalized.split('=');
+		left = left.trim();
+		right = right.trim();
+		steps.push(`移项：${left} - (${right}) = 0`);
+	
+		let expression = `${left} - (${right})`;
+		let simplified;
+		try {
+			simplified = nerdamer(expression).simplify().toString();
+			steps.push(`化简后：${simplified} = 0`);
+		} catch (e) {
+			simplified = expression;
+			steps.push(`化简失败，使用原始表达式：${simplified} = 0`);
+		}
+	
+		// 判断方程类型
+		if (simplified.includes('^2') && !simplified.includes('^3')) {
+			steps.push(`这是一个二次方程，使用求根公式：x = [-b ± √(b²-4ac)] / (2a)`);
+			// 尝试提取系数 (简单处理，不追求完美)
+			const match = simplified.match(/([+-]?\d*\.?\d*)\*?x\^2\s*([+-]\s*\d*\.?\d*)\*?x\s*([+-]\s*\d+)/);
+			if (match) {
+				const a = parseFloat(match[1]) || 1;
+				const b = parseFloat(match[2].replace(/\s/g, '')) || 0;
+				const c = parseFloat(match[3].replace(/\s/g, '')) || 0;
+				steps.push(`   a = ${a}, b = ${b}, c = ${c}`);
+				const delta = b*b - 4*a*c;
+				steps.push(`   判别式 Δ = b² - 4ac = ${delta}`);
+				if (delta > 0) {
+					steps.push(`   Δ > 0，两个不等实根：x = [${-b} ± √${delta}] / ${2*a}`);
+				} else if (delta === 0) {
+					steps.push(`   Δ = 0，一个重根：x = ${-b} / ${2*a}`);
+				} else {
+					steps.push(`   Δ < 0，两个共轭复根`);
+				}
+			}
+		} else if (simplified.includes('^3')) {
+			steps.push(`这是一个三次方程，尝试因式分解或数值求解`);
+		}
+	
+		// 调用 nerdamer 求解
+		const solutions = nerdamer.solveEquations(normalized, varName);
+		let solStr = Array.isArray(solutions) ? solutions.join(', ') : solutions.toString();
+		steps.push(`解得：${varName} = ${solStr}`);
+		return { steps, result: solStr };
+	}
+
+
+
+	// ---------- 主求值入口：符号指令走 nerdamer，数值/绘图走 math.js，dsolve 走 Pyodide ----------
+// ---------- 主求值入口：符号指令走 nerdamer，数值/绘图走 math.js，dsolve 走 Pyodide ----------
+// ---------- 主求值入口：符号指令走 nerdamer，数值/绘图走 math.js，dsolve 走 Pyodide ----------
+// ---------- 主求值入口：符号指令走 nerdamer，数值/绘图走 math.js，dsolve 走 Pyodide ----------
+	function parseAndEval(input) {
+		// 绘图指令优先拦截
+		if (input.startsWith('plot3d(')) {
+			return handlePlot3D(input);
+		}
+		if (input.startsWith('plot(')) {
+			return handlePlot2D(input);
+		}
+		if (input.startsWith('ode(')) {
+			return handleODE(input);
+		}
+		
+		// 匹配函数调用格式
+		const funcMatch = input.match(/^(\w+)\((.*)\)$/);
+		if (funcMatch) {
+			const funcName = funcMatch[1];
+			const argsStr = funcMatch[2];
+			const args = parseArguments(argsStr);
+			
+			// ----- 符号计算分支 (nerdamer) -----
+			switch(funcName) {
+				case 'diff': {
+					const expr = args[0];
+					const varName = args[1];
+					try {
+						// 1. 生成详细步骤（但不输出）
+						const { steps, result: stepResult } = generateDerivativeSteps(expr, varName);
+						
+						// 2. 用 math.js 计算最终简洁结果
+						const exprNode = math.parse(expr);
+						const derivNode = math.derivative(exprNode, varName);
+						const simplifiedNode = math.simplify(derivNode);
+						let cleanResult = simplifiedNode.toString();
+						cleanResult = cleanResult.replace(/log/g, 'ln').replace(/\^1\b/g, '').replace(/\*1\b/g, '');
+						
+						// 3. 存储步骤
+						const stepId = nextStepId++;
+						stepStorage.set(stepId, {
+							title: `求导过程: d/d${varName} (${expr})`,
+							steps: steps,
+							finalResult: stepResult   // 未化简的中间结果也可保留
+						});
+						
+						return { value: cleanResult, stepId: stepId };
+					} catch(e) {
+						throw new Error(`求导失败: ${e.message}`);
+					}
+				}
+				case 'int': {
+					if (args.length === 2) {
+						const expr = args[0];
+						const varName = args[1];
+						try {
+							const { steps, result } = generateIntegralSteps(expr, varName);
+							// 存储步骤
+							const stepId = nextStepId++;
+							stepStorage.set(stepId, {
+								title: `不定积分: ∫ ${expr} d${varName}`,
+								steps: steps,
+								finalResult: result
+							});
+							// 返回结果对象，value 为积分结果（字符串）
+							return { value: result, stepId: stepId };
+						} catch(e) {
+							throw new Error(`积分失败: ${e.message}`);
+						}
+					} 
+					else if (args.length === 4) {
+						// 定积分
+						const expr = args[0], varName = args[1], a = args[2], b = args[3];
+						try {
+							let steps = [];
+							steps.push(`计算定积分 ∫_{${a}}^{${b}} ${expr} d${varName}`);
+							const indefinite = nerdamer.integrate(expr, varName).toString();
+							steps.push(`先求不定积分：∫${expr} d${varName} = ${indefinite} + C`);
+							steps.push(`代入上下限：F(${b}) - F(${a})`);
+							
+							const defInt = nerdamer(`defint(${expr}, ${varName}, ${a}, ${b})`);
+							const val = defInt.evaluate();
+							let numericResult;
+							
+							if (val && !isNaN(parseFloat(val))) {
+								numericResult = parseFloat(val).toString();
+								steps.push(`计算结果 = ${numericResult}`);
+							} else {
+								numericResult = simpsonIntegrate(expr, varName, parseFloat(a), parseFloat(b), 1000).toString();
+								steps.push(`符号积分失败，使用数值辛普森法近似`);
+								steps.push(`结果 ≈ ${numericResult}`);
+							}
+							
+							const stepId = nextStepId++;
+							stepStorage.set(stepId, {
+								title: `定积分: ∫_{${a}}^{${b}} ${expr} d${varName}`,
+								steps: steps,
+								finalResult: numericResult
+							});
+							return { value: numericResult, stepId: stepId };
+						} catch(e) {
+							// 异常降级：直接数值积分
+							const numeric = simpsonIntegrate(expr, varName, parseFloat(a), parseFloat(b), 1000);
+							const numericResult = numeric.toString();
+							const steps = [`定积分计算出错，使用数值辛普森法近似`, `结果 ≈ ${numericResult}`];
+							const stepId = nextStepId++;
+							stepStorage.set(stepId, {
+								title: `定积分（数值近似）: ∫_{${a}}^{${b}} ${expr} d${varName}`,
+								steps: steps,
+								finalResult: numericResult
+							});
+							return { value: numericResult, stepId: stepId };
+						}
+					} 
+					else {
+						throw new Error("int 语法: int(表达式, 变量) 或 int(表达式, 变量, 下限, 上限)");
+					}
+				}
+				case 'solve': {
+					if (args.length === 2 && !args[0].startsWith('[')) {
+						let eq = args[0];
+						const varName = args[1];
+						try {
+							const { steps, result } = generateSolveSteps(eq, varName);
+							
+							// 存储步骤
+							const stepId = nextStepId++;
+							stepStorage.set(stepId, {
+								title: `方程求解:  ${eq} 求解${varName}`,
+								steps: steps,
+								finalResult: result
+							});
+							// 返回结果对象，value 为积分结果（字符串）
+							return { value: result, stepId: stepId };
+									
+							//logDetailedSteps('方程求解', steps, result);
+							
+							//return result;
+						} catch(e) {
+							throw new Error(`方程求解失败: ${e.message}`);
+						}
+					} else if (args.length === 2 && args[0].startsWith('[') && args[1].startsWith('[')) {
+						// 方程组（保持原有逻辑，可适当增加步骤）
+						let eqsStr = args[0], varsStr = args[1];
+						let eqs = [], vars = [];
+						const eqMatch = eqsStr.match(/\[(.*)\]/);
+						if (eqMatch) eqs = parseArguments(eqMatch[1]);
+						const varMatch = varsStr.match(/\[(.*)\]/);
+						if (varMatch) vars = parseArguments(varMatch[1]);
+						if (eqs.length === 0 || vars.length === 0) throw new Error("无法解析方程组");
+						eqs = eqs.map(eq => normalizeEquation(eq));
+						let steps = [`求解方程组：${eqs.join(', ')}`, `变量：${vars.join(', ')}`];
+						const solutions = nerdamer.solveEquations(eqs, vars);
+						const result = formatNerdamerResult(solutions);
+						steps.push(`消元求解得到：${result}`);
+						// 存储步骤
+						const stepId = nextStepId++;
+						stepStorage.set(stepId, {
+							title: `方程组求解:  ${eqsStr} 求解${varsStr}`,
+							steps: steps,
+							finalResult: result
+						});
+						// 返回结果对象，value 为积分结果（字符串）
+						return { value: result, stepId: stepId };
+						
+						//logDetailedSteps('方程组求解', steps, result);
+						//return result;
+					} else {
+						throw new Error("solve 语法: solve(方程, 变量) 或 solve([方程1,方程2], [变量1,变量2])");
+					}
+				}
+				case 'nsolve': {
+					if (args.length === 3) {
+						const eq = normalizeEquation(args[0]);
+						const varName = args[1];
+						const guess = parseFloat(args[2]);
+						let expr = eq;
+						if (expr.includes('=')) {
+							let sides = expr.split('=');
+							expr = `${sides[0]}-(${sides[1]})`;
+						}
+						let steps = [];
+						steps.push(`方程: ${eq}`);
+						steps.push(`转换为 f(${varName}) = ${expr}`);
+						steps.push(`初始猜测值: ${guess}`);
+						steps.push(`应用牛顿迭代法: x_{n+1} = x_n - f(x_n)/f'(x_n)`);
+						const result = newtonSolve(expr, varName, guess);
+						steps.push(`迭代收敛到: ${result}`);
+						logDetailedSteps('数值求解', steps, result);
+						return result;
+					}
+					throw new Error("nsolve 语法: nsolve(方程, 变量, 初始值)");
+				}
+				case 'simplify': {
+					if (args.length !== 1) throw new Error("simplify 语法: simplify(表达式)");
+					try {
+						const original = nerdamer(args[0]);
+						const simplified = nerdamer(args[0]).toString();
+						let steps = [];
+						steps.push(`原始表达式: ${args[0]}`);
+						steps.push(`应用代数恒等式：合并同类项、约分、化简幂运算`);
+						steps.push(`中间结果: ${original.toString()} → ${simplified}`);
+						steps.push(`最终简化: ${simplified}`);
+						logDetailedSteps('代数化简', steps, simplified);
+						return simplified;
+					} catch(e) {
+						throw new Error(`化简失败: ${e.message}`);
+					}
+				}
+				case 'expand': {
+					if (args.length !== 1) throw new Error("expand 语法: expand(表达式)");
+					try {
+						const expanded = nerdamer.expand(args[0]);
+						let steps = [];
+						steps.push(`原始表达式: ${args[0]}`);
+						steps.push(`展开括号，分配律，合并同类项`);
+						steps.push(`展开结果: ${expanded.toString()}`);
+						logDetailedSteps('多项式展开', steps, expanded.toString());
+						return expanded.toString();
+					} catch(e) {
+						throw new Error(`展开失败: ${e.message}`);
+					}
+				}
+				case 'factor': {
+					if (args.length !== 1) throw new Error("factor 语法: factor(表达式)");
+					try {
+						const factored = nerdamer.factor(args[0]);
+						let steps = [];
+						steps.push(`原始表达式: ${args[0]}`);
+						steps.push(`提取公因子，应用因式分解公式`);
+						steps.push(`因式分解结果: ${factored.toString()}`);
+						logDetailedSteps('因式分解', steps, factored.toString());
+						return factored.toString();
+					} catch(e) {
+						throw new Error(`因式分解失败: ${e.message}`);
+					}
+				}
+				default:
+					return math.evaluate(input);
+			}
+		}
+		
+		// 非函数调用，默认数值计算 (math.js)
+		try {
+			return math.evaluate(input);
+		} catch(e) {
+			try {
+				const res = nerdamer(input);
+				if (res) return res.toString();
+				throw new Error("无法计算");
+			} catch(e2) {
+				throw new Error(`计算失败: ${e.message}`);
+			}
+		}
+	}
+
+	// ---------- 执行入口 (异步支持 dsolve) ----------
+	async function execute() {
+	
+
+		
+		let input = cmdInput.value.trim();
+		if (!input) return;
+		log(`>> ${input}`, 'in');
+		
+			
+		cmdInput.value = '';
+		cmdInput.style.height = '45px';
+		
+		// 处理 syms 命令
+		const trimmed = input.trim();
+		// 支持 syms(...) 和 syms x(t) m F 两种格式
+		if (trimmed.startsWith('syms(')) {
+			// 括号格式: syms(x(t), m, F)
+			const args = parseArguments(trimmed.substring(5, trimmed.length - 1));
+			handleSyms(args);
+			log("符号声明完成", "sys");
+			return;
+		} else if (trimmed.startsWith('syms ')) {
+			// 无括号空格分隔格式: syms x(t) m F
+			const rest = trimmed.slice(5).trim();
+			const args = rest.split(/\s+/);
+			handleSyms(args);
+			log("符号声明完成", "sys");
+			return;
+		}
+		
+		
+		
+		try {
+			// 检查是否为 dsolve 命令（需要异步处理）
+			if (input.trim().startsWith('dsolve(')) {
+				let result = await handleDsolve(input);
+				if (result !== undefined && result !== null) 
+				{
+					log(result);
+				}
+				return;
+			}
+			
+			// 其他命令同步执行
+			let result = parseAndEval(input);
+			
+			// 判断是否带步骤的对象
+			if (result && typeof result === 'object' && 'value' in result && 'stepId' in result) 
+			{
+				let outputStr = result.value;
+				if (typeof outputStr === 'number' && Math.abs(outputStr) < 1e-12) outputStr = "0";
+				else if (typeof outputStr === 'number' && !isFinite(outputStr)) outputStr = "无穷大或未定义";
+				else if (typeof outputStr !== 'string') outputStr = math.format(outputStr, {precision: 14});
+				logWithStep(outputStr, result.stepId);
+			} else {
+				// 普通数值/表达式结果
+				let outputStr = result;
+				if (typeof result === 'number' && Math.abs(result) < 1e-12) outputStr = "0";
+				else if (typeof result === 'number' && !isFinite(result)) outputStr = "无穷大或未定义";
+				else if (typeof result !== 'string') outputStr = math.format(result, {precision: 14});
+				log(outputStr);
+			}
+		} catch (err) {
+			log(`错误: ${err.message}`, 'err');
+		}
+	}
+	
+//=================广告=================	
+
+
+//==============时间限制覆盖层==================
+
+// time-limit-system.js - 会员系统（支持1天/1月/永久，基于日期+私钥的密码验证）
+(function(window, document) {
+	'use strict';
+	
+	const TimeLimitSystem = {
+		// 私钥常量（与密码生成器一致）
+		PRIVATE_KEYS: {
+			DAY: 'ncj科学计算器1天1元',
+			MONTH: 'ncj科学计算器1月5元',
+			PERMANENT: 'ncj科学计算器永久50元'
+		},
+
+		config: {
+			appName: '科学计算器',
+			appVersion: '1.0.0',
+			freeLimits: {
+				maxMinutes: 2,      // 2分钟免费使用
+				maxOperations: 10
+			},
+			// 会员套餐（用于弹窗展示）
+			membershipPlans: {
+				day: { name: '1天会员', price: '¥1', duration: '24小时' },
+				month: { name: '1月会员', price: '¥5', duration: '30天' },
+				permanent: { name: '永久会员', price: '¥50', duration: '永久' }
+			},
+			proVersion: {  // 保留原配置结构以兼容
+				price: '¥29.9',
+				wechatId: 'Ncj13450098946',
+				features: []
+			},
+			passwordConfig: {
+				salt: 'ncjwdbj',    // 原salt保留，但不再使用
+				length: 20,
+				algorithm: 'v1'
+			},
+			uiConfig: {
+				showRemainingTime: true,
+				warningBeforeEnd: 30,
+				autoCheckInterval: 10000,
+				overlayZIndex: 9999
+			}
+		},
+		
+		state: {
+			initialized: false,
+			membership: null,        // { type, expireTime }
+			overlayVisible: false,
+			monitoring: false,
+			usageRecord: null,
+			timers: {
+				checkTimer: null,
+				warningTimer: null,
+				saveTimer: null
+			}
+		},
+		
+		elements: {
+			overlay: null,
+			popup: null,
+			warning: null
+		},
+		
+		// ==================== 密码生成函数（与生成器完全一致） ====================
+		// 生成指定私钥和日期的20位密码
+		generatePassword: function(privateKey, date) {
+			const year = date.getFullYear();
+			const month = String(date.getMonth() + 1).padStart(2, '0');
+			const day = String(date.getDate()).padStart(2, '0');
+			const dateStr = `${year}-${month}-${day}`;
+			
+			const length = this.config.passwordConfig.length;
+			
+			const chars = {
+				upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+				lower: 'abcdefghijklmnopqrstuvwxyz',
+				numbers: '0123456789',
+				symbols: '!@#$%^&*()_+~`|}{[]:;?><,./-='
+			};
+			
+			const stringToHash = function(str) {
+				let hash = 5381;
+				for (let i = 0; i < str.length; i++) {
+					hash = ((hash << 5) + hash) + str.charCodeAt(i);
+				}
+				return hash;
+			};
+			
+			class SeededRandom {
+				constructor(seed) { this.seed = seed; }
+				next() {
+					const x = Math.sin(this.seed++) * 10000;
+					return x - Math.floor(x);
+				}
+				nextInt(max) { return Math.floor(this.next() * max); }
+			}
+			
+			const seedString = dateStr + privateKey;
+			const seedHash = stringToHash(seedString);
+			const rng = new SeededRandom(seedHash);
+			
+			let fullCharset = chars.upper + chars.lower + chars.numbers + chars.symbols;
+			let password = '';
+			
+			let requiredChars = [
+				chars.upper[rng.nextInt(chars.upper.length)],
+				chars.lower[rng.nextInt(chars.lower.length)],
+				chars.numbers[rng.nextInt(chars.numbers.length)],
+				chars.symbols[rng.nextInt(chars.symbols.length)]
+			];
+			
+			for (let i = 0; i < length - requiredChars.length; i++) {
+				password += fullCharset[rng.nextInt(fullCharset.length)];
+			}
+			
+			password += requiredChars.join('');
+			return password.split('').sort(() => rng.next() - 0.5).join('');
+		},
+		
+		// 获取最近N天的日期数组（包括今天）
+		getRecentDates: function(days = 7) {
+			const dates = [];
+			const today = new Date();
+			for (let i = 0; i < days; i++) {
+				const d = new Date(today);
+				d.setDate(today.getDate() - i);
+				dates.push(d);
+			}
+			return dates;
+		},
+		
+		// ==================== 会员验证与激活 ====================
+		// 验证密码并返回会员类型
+		validateMembershipCode: function(inputCode) {
+			const trimmed = inputCode.trim();
+			if (!trimmed) return null;
+			
+			const dates = this.getRecentDates(7); // 检查最近7天
+			for (const date of dates) {
+				for (const [type, key] of Object.entries(this.PRIVATE_KEYS)) {
+					const generated = this.generatePassword(key, date);
+					if (trimmed === generated) {
+						// 转换为小写类型标识
+						const typeMap = { DAY: 'day', MONTH: 'month', PERMANENT: 'permanent' };
+						return typeMap[type];
+					}
+				}
+			}
+			return null;
+		},
+		
+		// 激活会员
+		activateMembership: function(code) {
+			const type = this.validateMembershipCode(code);
+			if (!type) {
+				this.showNotification('密码无效，请检查后重试', true);
+				return false;
+			}
+			
+			let expireTime;
+			switch (type) {
+				case 'day':
+					expireTime = Date.now() + 24 * 3600 * 1000;
+					break;
+				case 'month':
+					expireTime = Date.now() + 30 * 24 * 3600 * 1000;
+					break;
+				case 'permanent':
+					expireTime = new Date('2099-12-31').getTime();
+					break;
+				default:
+					return false;
+			}
+			
+			this.state.membership = { type, expireTime };
+			localStorage.setItem('app_membership', JSON.stringify(this.state.membership));
+			
+			// 清除旧专业版记录
+			localStorage.removeItem('pro_version');
+			// 可选：清除免费使用记录
+			// localStorage.removeItem('app_usage');
+			
+			this.updateTimeDisplay();
+			this.showNotification(`🎉 激活成功！${this.config.membershipPlans[type].name}已开通`);
+			this.hideLimitPopup();
+			this.hideLimitOverlay();
+			
+			// 重新开始监控（如果是免费用户转会员）
+			if (!this.state.monitoring) {
+				this.startMonitoring();
+			}
+			return true;
+		},
+		
+		// 加载会员信息，检查过期
+		loadMembership: function() {
+			const stored = localStorage.getItem('app_membership');
+			if (stored) {
+				try {
+					const membership = JSON.parse(stored);
+					if (membership.expireTime && Date.now() > membership.expireTime) {
+						localStorage.removeItem('app_membership');
+						this.state.membership = null;
+					} else {
+						this.state.membership = membership;
+						return;
+					}
+				} catch (e) {}
+			}
+			
+			// 兼容旧专业版（pro_version = true）
+			const oldPro = localStorage.getItem('pro_version');
+			if (oldPro === 'true') {
+				this.state.membership = {
+					type: 'permanent',
+					expireTime: new Date('2099-12-31').getTime()
+				};
+				localStorage.setItem('app_membership', JSON.stringify(this.state.membership));
+				localStorage.removeItem('pro_version');
+				console.log('已将旧专业版转换为永久会员');
+			} else {
+				this.state.membership = null;
+			}
+		},
+		
+		isMembershipValid: function() {
+			return this.state.membership && this.state.membership.expireTime > Date.now();
+		},
+		
+		// 获取会员剩余时间文案
+		getMembershipDisplayText: function() {
+			if (!this.isMembershipValid()) return '';
+			const membership = this.state.membership;
+			const remaining = membership.expireTime - Date.now();
+			if (remaining <= 0) return '';
+			
+			switch (membership.type) {
+				case 'day':
+					const hours = Math.ceil(remaining / (3600 * 1000));
+					return `会员（1天）剩余 ${hours}小时`;
+				case 'month':
+					const days = Math.ceil(remaining / (24 * 3600 * 1000));
+					return `会员（1月）剩余 ${days}天`;
+				case 'permanent':
+					return '永久会员';
+				default:
+					return '';
+			}
+		},
+		
+		// ==================== 广告奖励与时间限制（保留原逻辑，仅调整会员判断） ====================
+		setupAdVisibilityListener: function() {
+			document.addEventListener('visibilitychange', () => {
+				if (document.hidden) {
+					if (this.state.monitoring && !this.isMembershipValid()) {
+						this.saveUsageRecord();
+					}
+				} else {
+					this.checkAdReturnAndReward();
+				}
+			});
+		},
+		
+		checkAdReturnAndReward: function() {
+			try {
+				const recordStr = localStorage.getItem('ad_click_record');
+				if (!recordStr) return false;
+				const record = JSON.parse(recordStr);
+				if (!record || record.status !== 'clicked') return false;
+				
+				const now = Date.now();
+				const secondsAway = Math.floor((now - record.timestamp) / 1000);
+				if (secondsAway >= 10) {
+					const success = this.addTimeFromAd(5);
+					if (success) {
+						localStorage.removeItem('ad_click_record');
+						return true;
+					}
+				} else if (secondsAway > 30) {
+					localStorage.removeItem('ad_click_record');
+				}
+				return false;
+			} catch (e) {
+				console.error('检查广告返回失败:', e);
+				return false;
+			}
+		},
+		
+		init: function(userConfig) {
+			if (this.state.initialized) return this;
+			if (userConfig) this.mergeConfig(userConfig);
+			this.createDOMElements();
+			this.loadMembership();
+			this.loadUsageRecord();
+			this.applyMembershipFeatures();
+			this.setupAutoSave();
+			this.initAdRewardSystem();
+			this.setupAdVisibilityListener();
+			this.state.initialized = true;
+			console.log('✅ TimeLimitSystem 初始化完成');
+			return this;
+		},
+		
+		initAdRewardSystem: function() {
+			window.addEventListener('load', () => {
+				setTimeout(() => this.checkAdReturnAndReward(), 2000);
+			});
+			setInterval(() => {
+				if (!this.isMembershipValid() && this.state.monitoring) {
+					this.saveUsageRecord();
+				}
+			}, 60000);
+		},
+		
+		addTimeFromAd: function(minutes) {
+			if (this.isMembershipValid()) {
+				console.log('会员用户，无需增加时间');
+				return true;
+			}
+			const record = this.state.usageRecord || this.loadUsageRecord();
+			const today = new Date().toISOString().split('T')[0];
+			if (record.adBonusTodayDate !== today) {
+				record.adBonusToday = 0;
+				record.adBonusTodayDate = today;
+			}
+			if (record.adBonusToday + minutes > 120) {
+				this.showNotification('每天广告奖励时间最多2小时，你已用完，明天可以继续使用，或者升级会员无限制使用。');
+				return false;
+			}
+			//临时解除标志
+			const wasVisible = this.state.overlayVisible;
+			this.state.overlayVisible = false;
+			
+			// 🔑 关键：重置 startTime 为当前时间，防止空转时间被累加
+			record.startTime = Date.now();
+			
+			record.adBonusToday += minutes;
+			record.adBonusMinutes = (record.adBonusMinutes || 0) + minutes;
+			record.adBonusCount = (record.adBonusCount || 0) + 1;
+
+			this.saveUsageRecord();
+			this.state.overlayVisible = wasVisible;
+			this.updateTimeDisplay();
+			this.checkAndCloseOverlay();
+			this.showNotification(`🎁 获得${minutes}分钟！今日还可获取 ${120 - record.adBonusToday} 分钟`);
+			return true;
+		},
+		
+		updateTimeDisplay: function() {
+			const timeDisplay = document.getElementById('time-display');
+			const timeText = document.getElementById('time-text');
+			if (!timeDisplay || !timeText) return;
+		
+			// 会员优先显示
+			if (this.isMembershipValid()) {
+				timeText.textContent = this.getMembershipDisplayText();
+				const gainSpan = document.getElementById('ad-gained');
+				const remainSpan = document.getElementById('ad-remaining');
+				if (gainSpan) gainSpan.style.display = 'none';
+				if (remainSpan) remainSpan.style.display = 'none';
+				timeDisplay.style.cursor = 'default';
+				timeDisplay.onclick = null;
+				return;
+			}
+		
+			// ========== 以下为原版免费用户逻辑（完全不变） ==========
+			// 创建奖励显示元素（如果不存在）
+			let gainSpan = document.getElementById('ad-gained');
+			let remainSpan = document.getElementById('ad-remaining');
+			if (!gainSpan) {
+				gainSpan = document.createElement('span');
+				gainSpan.id = 'ad-gained';
+				gainSpan.style.marginLeft = '8px';
+				gainSpan.style.background = '#FFD700';
+				gainSpan.style.color = '#333';
+				gainSpan.style.padding = '2px 6px';
+				gainSpan.style.borderRadius = '12px';
+				gainSpan.style.fontSize = '0.7em';
+				gainSpan.style.fontWeight = 'bold';
+				timeDisplay.appendChild(gainSpan);
+			}
+			if (!remainSpan) {
+				remainSpan = document.createElement('span');
+				remainSpan.id = 'ad-remaining';
+				remainSpan.style.marginLeft = '5px';
+				remainSpan.style.background = '#4CAF50';
+				remainSpan.style.color = 'white';
+				remainSpan.style.padding = '2px 6px';
+				remainSpan.style.borderRadius = '12px';
+				remainSpan.style.fontSize = '0.7em';
+				timeDisplay.appendChild(remainSpan);
+			}
+		
+			const record = this.state.usageRecord || this.loadUsageRecord();
+			const now = Date.now();
+			const sessionMinutes = (now - record.startTime) / 60000;
+			const totalUsedMinutes = sessionMinutes + (record.totalMinutes || 0);
+			const totalAvailableMinutes = this.config.freeLimits.maxMinutes + (record.adBonusMinutes || 0);
+			const remainingMinutes = totalAvailableMinutes - totalUsedMinutes;
+		
+			if (remainingMinutes <= 0) {
+				timeText.textContent = '⏰ 时间已用完，点击升级';
+				gainSpan.style.display = 'none';
+				remainSpan.style.display = 'none';
+				timeDisplay.style.cursor = 'pointer';
+				timeDisplay.onclick = () => this.showLimitPopup('upgrade');
+				return;
+			}
+		
+			const remainingMins = Math.floor(remainingMinutes);
+			const remainingSecs = Math.floor((remainingMinutes - remainingMins) * 60);
+			if (remainingMins > 0) {
+				timeText.textContent = `⏱️ ${remainingMins}分${remainingSecs}秒`;
+			} else {
+				timeText.textContent = `⏱️ ${remainingSecs}秒`;
+			}
+		
+			const today = new Date().toISOString().split('T')[0];
+			const adToday = (record.adBonusTodayDate === today) ? (record.adBonusToday || 0) : 0;
+			const adRemaining = Math.max(0, 120 - adToday);
+		
+			if (adToday > 0) {
+				gainSpan.textContent = `🎁+${adToday}`;
+				gainSpan.style.display = 'inline';
+			} else {
+				gainSpan.style.display = 'none';
+			}
+			remainSpan.textContent = `⏳${adRemaining}`;
+			remainSpan.style.display = 'inline';
+		
+			timeDisplay.style.cursor = 'default';
+			timeDisplay.onclick = null;
+		},
+		
+		getRemainingMinutes: function() {
+			if (this.isMembershipValid()) return Infinity;
+			const record = this.state.usageRecord || this.loadUsageRecord();
+			const now = Date.now();
+			const sessionMinutes = (now - record.startTime) / 60000;
+			const totalUsedMinutes = sessionMinutes + (record.totalMinutes || 0);
+			const totalAvailableMinutes = this.config.freeLimits.maxMinutes + (record.adBonusMinutes || 0);
+			return totalAvailableMinutes - totalUsedMinutes;
+		},
+		
+		// 以下方法保持原逻辑，仅调整会员判断
+		// 加载使用记录
+		loadUsageRecord: function() {
+			const today = new Date().toISOString().split('T')[0];
+			const defaultRecord = {
+				date: today,
+				startTime: Date.now(),
+				totalMinutes: 0,
+				adBonusMinutes: 0,
+				adBonusCount: 0,
+				adBonusToday: 0,
+				adBonusTodayDate: today,
+				lastWarning: null
+			};
+			try {
+				let stored = localStorage.getItem('app_usage') || sessionStorage.getItem('app_usage');
+				if (!stored) {
+					this.state.usageRecord = defaultRecord;
+					this.saveUsageRecord();
+					return defaultRecord;
+				}
+				const record = JSON.parse(stored);
+				if (record.date !== today) {
+					record.date = today;
+					record.totalMinutes = 0;
+					record.adBonusMinutes = 0;
+					record.adBonusCount = 0;
+					record.startTime = Date.now();
+					record.adBonusToday = 0;
+					record.adBonusTodayDate = today;
+				}
+				if (record.adBonusToday === undefined) record.adBonusToday = 0;
+				if (record.adBonusTodayDate === undefined) record.adBonusTodayDate = today;
+				record.startTime = Date.now();
+				this.state.usageRecord = record;
+				return record;
+			} catch (e) {
+				console.error('加载使用记录失败', e);
+				this.state.usageRecord = defaultRecord;
+				return defaultRecord;
+			}
+		},
+		
+		// 保存使用记录
+		saveUsageRecord: function() {
+			if (this.state.overlayVisible) {
+				console.log('⏸️ 覆盖层已显示，跳过保存');
+				return false;
+			}
+			if (!this.state.usageRecord) return false;
+			if (this.isMembershipValid()) return true; // 会员无需记录
+			const now = Date.now();
+			const sessionMinutes = (now - this.state.usageRecord.startTime) / 60000;
+			this.state.usageRecord.totalMinutes += sessionMinutes;
+			this.state.usageRecord.startTime = now;
+			const dataStr = JSON.stringify(this.state.usageRecord);
+			localStorage.setItem('app_usage', dataStr);
+			sessionStorage.setItem('app_usage', dataStr);
+			const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+			document.cookie = `app_usage=${encodeURIComponent(dataStr)}; expires=${expires}; path=/`;
+			return true;
+		},
+		
+		// 自动保存（可选，但建议保留）
+		setupAutoSave: function() {
+			const self = this;
+			document.addEventListener('visibilitychange', function() {
+				if (document.hidden) {
+					self.saveUsageRecord();
+				}
+			});
+			window.addEventListener('beforeunload', function() {
+				self.saveUsageRecord();
+			});
+			setInterval(function() {
+				if (!self.isMembershipValid() && self.state.monitoring) {
+					self.saveUsageRecord();
+				}
+			}, 10000);
+		},
+		
+		// 合并配置（保持原逻辑）
+		mergeConfig: function(userConfig) {
+			const deepMerge = (target, source) => {
+				for (const key in source) {
+					if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+						if (!target[key] || typeof target[key] !== 'object') target[key] = {};
+						deepMerge(target[key], source[key]);
+					} else {
+						target[key] = source[key];
+					}
+				}
+				return target;
+			};
+			deepMerge(this.config, userConfig);
+		},
+		
+		checkTimeLimit: function() {
+			if (this.isMembershipValid()) {
+				if (this.state.overlayVisible) this.hideLimitOverlay();
+				return true;
+			}
+		    // 🔑 覆盖层已显示时，不再进行任何时间检查
+			if (this.state.overlayVisible) return false;
+			const record = this.state.usageRecord || this.loadUsageRecord();
+		
+			// 先保存当前时间，确保记录是最新的
+			this.saveUsageRecord();
+		
+			const now = Date.now();
+			const sessionMinutes = (now - record.startTime) / 60000;
+			const totalUsedMinutes = (record.totalMinutes || 0) + sessionMinutes;
+			const totalAvailableMinutes = this.config.freeLimits.maxMinutes + (record.adBonusMinutes || 0);
+			const remainingMinutes = totalAvailableMinutes - totalUsedMinutes;
+		
+			console.log(`⏱️ 时间检查: 已用 ${totalUsedMinutes.toFixed(2)} 分钟, 总可用 ${totalAvailableMinutes} 分钟, 剩余 ${remainingMinutes.toFixed(2)} 分钟`);
+		
+			if (remainingMinutes <= 0) {
+				console.log(`⏰ 时间超限: 已用 ${totalUsedMinutes.toFixed(2)} 分钟, 总可用 ${totalAvailableMinutes} 分钟`);
+				this.showLimitOverlay('time');
+				return false;
+			}
+		
+			if (remainingMinutes <= (this.config.uiConfig.warningBeforeEnd / 60)) {
+				this.showTimeWarning(remainingMinutes);
+			}
+			return true;
+		},
+		
+		// 创建DOM元素（覆盖层和弹窗）
+		createDOMElements: function() {
+			const overlay = document.createElement('div');
+			overlay.id = 'time-limit-overlay';
+			overlay.className = 'tls-overlay';
+			overlay.innerHTML = `
+				<div class="tls-overlay-content">
+					<div class="tls-icon">⏰</div>
+					<h2 class="tls-title">免费时间已用完</h2>
+					<p class="tls-message">
+						您今天的免费使用时间已用完<br>
+						升级会员可无限制使用，并去除广告<br>
+						看广告满10秒奖励5分鈡使用时间，每天最多奖励2小时<br>
+						<button class="tls-upgrade-btn">立即升级</button>
+					</p>
+				</div>
+			`;
+			document.body.appendChild(overlay);
+			this.elements.overlay = overlay;
+			
+			const popup = document.createElement('div');
+			popup.id = 'tls-limit-popup';
+			popup.className = 'tls-popup';
+			document.body.appendChild(popup);
+			this.elements.popup = popup;
+			
+			const upgradeBtn = overlay.querySelector('.tls-upgrade-btn');
+			if (upgradeBtn) {
+				upgradeBtn.addEventListener('click', () => this.showLimitPopup('upgrade'));
+			}
+			overlay.addEventListener('click', (e) => {
+				if (e.target === overlay) this.showLimitPopup('upgrade');
+			});
+			
+			// 警告栏
+			const warning = document.createElement('div');
+			warning.id = 'tls-time-warning';
+			warning.className = 'tls-warning';
+			warning.innerHTML = `<span class="tls-warning-text"></span><button id="tls-hide-warning-btn">×</button>`;
+			document.body.appendChild(warning);
+			this.elements.warning = warning;
+			const hideBtn = warning.querySelector('#tls-hide-warning-btn');
+			if (hideBtn) hideBtn.onclick = () => this.hideWarning();
+			
+			// 样式
+			if (!document.getElementById('tls-animations')) 
+			{
+				const style = document.createElement('style');
+				style.id = 'tls-animations';
+				style.textContent = `
+					//.tls-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:9999; }
+					//.tls-overlay-content { background:white; border-radius:12px; padding:30px; text-align:center; max-width:90%; }
+					.tls-upgrade-btn { background:#4a90e2; color:white; border:none; padding:10px 20px; border-radius:6px; margin-top:15px; cursor:pointer; }
+					.tls-popup { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:10000; }
+					.tls-popup-inner { background:white; border-radius:16px; width:600px; max-width:90%; max-height:80vh; overflow:auto; box-shadow:0 20px 40px rgba(0,0,0,0.3); }
+					.tls-popup-header { background:#4a90e2; color:white; padding:16px 20px; border-radius:16px 16px 0 0; }
+					.tls-popup-content { padding:20px; }
+					.tls-popup-footer { border-top:1px solid #eee; padding:15px; text-align:center; }
+					.tls-password-input { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:14px; }
+					.tls-btn { padding:8px 16px; border:none; border-radius:6px; cursor:pointer; font-size:14px; }
+					.tls-btn-primary { background:#4a90e2; color:white; }
+					.tls-btn-secondary { background:#f1f3f4; color:#333; border:1px solid #ccc; }
+					.tls-btn-copy { background:#f0f0f0; border:1px solid #ccc; }
+				
+					@keyframes fadeInRight 
+					{ from { opacity:0; transform:translateX(100%); } to { opacity:1; transform:translateX(0); } }
+				`;
+				document.head.appendChild(style);
+			}
+		},
+		
+		showLimitOverlay: function(type) {
+			if (this.isMembershipValid() || this.state.overlayVisible) return;
+			
+			// 1. 结算当前会话时间（正常累加）
+			this.saveUsageRecord();
+			
+			// 2. 修正 totalMinutes 不超过总可用时间
+			const record = this.state.usageRecord;
+			const totalAvailable = this.config.freeLimits.maxMinutes + (record.adBonusMinutes || 0);
+			if (record.totalMinutes > totalAvailable) {
+			record.totalMinutes = totalAvailable;
+			}
+			
+			// 3. 🔑 重置 startTime 为当前时间，冻结后续时间累加
+			record.startTime = Date.now();
+			
+			// 4. 保存修正后的记录（此时 overlayVisible 还是 false）
+			this.saveUsageRecord();
+			
+			// 5. 显示覆盖层（原有 UI 内容保持不变）
+			const overlay = this.elements.overlay;
+			if (!overlay) return;
+			
+			
+			
+			//const overlay = this.elements.overlay;
+			//if (!overlay) return;
+			overlay.style.display = 'flex';
+			this.state.overlayVisible = true;
+			this.stopMonitoring();
+		},
+		
+		hideLimitOverlay: function() {
+			const overlay = this.elements.overlay;
+			if (overlay) {
+				overlay.style.display = 'none';
+				this.state.overlayVisible = false;
+			}
+			if (!this.state.monitoring && !this.isMembershipValid()) {
+				this.startMonitoring();
+			}
+		},
+		
+		showLimitPopup: function(type) {
+			const popup = this.elements.popup;
+			if (!popup) return;
+			popup.innerHTML = this.generatePopupHTML();
+			popup.style.display = 'block';
+			this.bindPopupEvents();
+			popup.onclick = (e) => { if (e.target === popup) this.hideLimitPopup(); };
+			const escHandler = (e) => {
+				if (e.key === 'Escape') {
+					this.hideLimitPopup();
+					document.removeEventListener('keydown', escHandler);
+				}
+			};
+			document.addEventListener('keydown', escHandler);
+			popup._escHandler = escHandler;
+		},
+		
+		generatePopupHTML: function() {
+			const plans = this.config.membershipPlans;
+			return `
+				<div class="tls-popup-inner">
+					<div class="tls-popup-header">
+						<h3 class="tls-popup-title">📝科学计算器· 会员升级</h3>
+					</div>
+					<div class="tls-popup-content">
+						<div style="margin-bottom: 20px;">
+							<div style="display: flex; gap: 15px; justify-content: space-around; flex-wrap: wrap;">
+								<div style="text-align: center; padding: 10px; background: #f8f9fa; border-radius: 8px; flex:1;">
+									<div><strong>${plans.day.name}</strong></div>
+									<div>${plans.day.price}</div>
+								</div>
+								<div style="text-align: center; padding: 10px; background: #f8f9fa; border-radius: 8px; flex:1;">
+									<div><strong>${plans.month.name}</strong></div>
+									<div>${plans.month.price}</div>
+								</div>
+								<div style="text-align: center; padding: 10px; background: #f8f9fa; border-radius: 8px; flex:1;">
+									<div><strong>${plans.permanent.name}</strong></div>
+									<div>${plans.permanent.price}</div>
+								</div>
+							</div>
+						</div>
+						<div style="font-size: 14px; line-height: 1.6;">
+							1. 添加微信 <strong>${this.config.proVersion.wechatId}</strong>
+							<button id="copy-wechat-btn" style="margin-left: 8px;">复制</button>
+							<button id="open-wechat-btn" style="margin-left: 8px;">打开微信</button><br>
+							2. 发送消息：<strong>科学计算器 + 所选套餐（1天/1月/永久）</strong><br>
+							3. 微信支付对应金额<br>
+							4. 您会收到一个 <strong>20位激活密码</strong><br>
+							5. 在下方输入密码，点击“激活会员”即可解锁
+						</div>
+						<div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+							<input type="text" id="membership-code-input" placeholder="请输入20位激活密码" class="tls-password-input" style="width:100%; padding:12px; margin-bottom:10px;">
+							<button id="activate-membership-btn" class="tls-btn tls-btn-primary" style="width:100%; padding:12px;">激活会员</button>
+							<div id="code-error-msg" style="color:#f44336; font-size:12px; margin-top:8px;"></div>
+						</div>
+						
+						<div style="font-size: 10px; line-height: 1.6; color:green; ">
+							.密码当天有效，请尽快激活。如有问题，请微信联系。<br>
+							.会员权限:解除时间限制，去除广告。<br>
+						</div>
+					</div>
+					<div class="tls-popup-footer">
+						<button id="close-popup-btn" class="tls-btn tls-btn-secondary">关闭</button>
+					</div>
+				</div>
+			`;
+		},
+		
+		bindPopupEvents: function() {
+			const popup = this.elements.popup;
+			if (!popup) return;
+			
+			const codeInput = popup.querySelector('#membership-code-input');
+			const activateBtn = popup.querySelector('#activate-membership-btn');
+			const errorMsg = popup.querySelector('#code-error-msg');
+			const copyWechatBtn = popup.querySelector('#copy-wechat-btn');
+			const closeBtn = popup.querySelector('#close-popup-btn');
+			
+			// 打开微信按钮
+			const openWechatBtn = popup.querySelector('#open-wechat-btn');
+			if (openWechatBtn) {
+				openWechatBtn.onclick = () => {
+					this.openWeChat();
+				};
+			}
+			
+			
+			if (activateBtn && codeInput) {
+				activateBtn.onclick = async () => {
+					const code = codeInput.value.trim();
+					errorMsg.textContent = '';
+					const success = await this.activateMembership(code);
+					if (!success) {
+						errorMsg.textContent = '密码无效或已过期，请核对后重试。';
+					}
+				};
+				codeInput.onkeypress = (e) => { if (e.key === 'Enter') activateBtn.click(); };
+			}
+			
+			if (copyWechatBtn) {
+				copyWechatBtn.onclick = () => {
+					const wechatId = this.config.proVersion.wechatId;
+					if (window.Android && Android.copyToClipboard) {
+						Android.copyToClipboard(wechatId);
+					} else {
+						navigator.clipboard.writeText(wechatId).then(() => {
+							this.showNotification('微信号已复制');
+						}).catch(() => {
+							alert('复制失败，请手动复制');
+						});
+					}
+				};
+			}
+			
+			if (closeBtn) {
+				closeBtn.onclick = () => this.hideLimitPopup();
+			}
+		},
+		
+		hideLimitPopup: function() {
+			const popup = this.elements.popup;
+			if (popup) {
+				popup.style.display = 'none';
+				if (popup._escHandler) {
+					document.removeEventListener('keydown', popup._escHandler);
+					delete popup._escHandler;
+				}
+			}
+		},
+		
+		showTimeWarning: function(remainingMinutes) {
+			if (this.isMembershipValid()) return;
+			const minutes = Math.floor(remainingMinutes);
+			const seconds = Math.floor((remainingMinutes - minutes) * 60);
+			if (!this.elements.warning) return;
+			const warning = this.elements.warning;
+			const textSpan = warning.querySelector('.tls-warning-text');
+			if (textSpan) textSpan.textContent = `⏰ 剩余时间: ${minutes}分${seconds}秒 `;
+			warning.style.display = 'flex';
+			clearTimeout(this.state.timers.warningTimer);
+			this.state.timers.warningTimer = setTimeout(() => {
+				if (this.elements.warning) this.elements.warning.style.display = 'none';
+			}, 10000);
+		},
+		
+		hideWarning: function() {
+			if (this.elements.warning) this.elements.warning.style.display = 'none';
+		},
+		
+		startMonitoring: function() {
+			if (this.isMembershipValid()) {
+				console.log('会员用户，跳过监控');
+				return;
+			}
+			if (this.state.monitoring) return;
+			this.state.monitoring = true;
+			this.checkTimeLimit();
+			this.state.timers.checkTimer = setInterval(() => {
+				if (!this.isMembershipValid()) this.checkTimeLimit();
+			}, this.config.uiConfig.autoCheckInterval);
+			this.state.timers.saveTimer = setInterval(() => {
+				if (!this.isMembershipValid()) this.saveUsageRecord();
+			}, 60000);
+		},
+		
+		stopMonitoring: function() {
+			this.state.monitoring = false;
+			if (this.state.timers.checkTimer) clearInterval(this.state.timers.checkTimer);
+			if (this.state.timers.saveTimer) clearInterval(this.state.timers.saveTimer);
+			if (this.state.timers.warningTimer) clearTimeout(this.state.timers.warningTimer);
+		},
+		
+		applyMembershipFeatures: function() {
+			if (this.isMembershipValid()) {
+				this.hideLimitOverlay();
+				this.hideWarning();
+				if (!this.state.monitoring) this.startMonitoring();
+			} else {
+				this.startMonitoring();
+			}
+		},
+		
+		// 公共API
+		checkSave: function() { return this.checkTimeLimit(); },
+		checkExport: function() { return this.checkTimeLimit(); },
+		checkTime: function() { return this.checkTimeLimit(); },
+		resetUsage: function() {
+			localStorage.removeItem('app_usage');
+			this.state.usageRecord = null;
+			this.loadUsageRecord();
+			return true;
+		},
+		showProPopup: function() { this.showLimitPopup('upgrade'); },
+		getStatus: function() { return this.getRemainingInfo(); },
+		
+		// 辅助方法
+		getRemainingInfo: function() {
+			if (this.isMembershipValid()) return { minutes: Infinity, totalMinutes: 0 };
+			const record = this.state.usageRecord || this.loadUsageRecord();
+			const now = Date.now();
+			const sessionMinutes = (now - record.startTime) / 60000;
+			const totalUsedMinutes = sessionMinutes + (record.totalMinutes || 0);
+			const totalAvailableMinutes = this.config.freeLimits.maxMinutes + (record.adBonusMinutes || 0);
+			const remainingMinutes = totalAvailableMinutes - totalUsedMinutes;
+			return { minutes: Math.max(0, remainingMinutes), totalMinutes: totalUsedMinutes };
+		},
+		
+		showNotification: function(message, isError = false) {
+			const notif = document.createElement('div');
+			notif.style.cssText = `
+				position: fixed;
+				top: 100px;
+				right: 20px;
+				background: ${isError ? '#f44336' : '#4CAF50'};
+				color: white;
+				padding: 12px 20px;
+				border-radius: 6px;
+				z-index: 10001;
+				box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+				animation: fadeInRight 0.3s ease;
+			`;
+			notif.textContent = message;
+			document.body.appendChild(notif);
+			setTimeout(() => notif.remove(), 3000);
+		},
+		
+		checkAndCloseOverlay: function() {
+			if (!this.state.overlayVisible) return false;
+			const remainingMinutes = this.getRemainingMinutes();
+			if (remainingMinutes > 0) {
+				this.hideLimitOverlay();
+				if (!this.state.monitoring && !this.isMembershipValid()) this.startMonitoring();
+				this.showStatusMessage('时间已恢复，继续使用');
+				return true;
+			}
+			return false;
+		},
+		
+		showStatusMessage: function(message) {
+			const statusMsg = document.getElementById('status-msg');
+			if (statusMsg) {
+				statusMsg.textContent = message;
+				statusMsg.style.opacity = '1';
+				setTimeout(() => statusMsg.style.opacity = '0', 3000);
+			}
+		},
+		
+		// 复制微信号（优先 Android 接口）
+		copyWeChatId: function() {
+			const wechatId = this.config.proVersion.wechatId;
+			if (window.Android && Android.copyToClipboard) {
+				Android.copyToClipboard(wechatId);
+			} else if (navigator.clipboard) {
+				navigator.clipboard.writeText(wechatId).then(() => {
+					this.showNotification('微信号已复制');
+				}).catch(() => {
+					this.fallbackCopy(wechatId);
+				});
+			} else {
+				this.fallbackCopy(wechatId);
+			}
+		},
+		
+		fallbackCopy: function(text) {
+			const textarea = document.createElement('textarea');
+			textarea.value = text;
+			document.body.appendChild(textarea);
+			textarea.select();
+			document.execCommand('copy');
+			document.body.removeChild(textarea);
+			this.showNotification('微信号已复制: ' + text);
+		},
+		
+		// 打开微信（先复制微信号，再尝试打开微信）
+		openWeChat: function() {
+			const wechatId = this.config.proVersion.wechatId;
+			this.copyWeChatId();  // 先复制
+			if (window.Android && Android.openWeChat) {
+				Android.openWeChat(wechatId);
+			} else {
+				window.location.href = 'weixin://';
+				setTimeout(() => {
+					this.showNotification('请手动在微信中搜索添加好友: ' + wechatId);
+				}, 800);
+			}
+		},		
+		
+		
+		// 保留原方法但不再使用
+		getDailyPassword: function() { return ''; },
+		validatePassword: function() { return { valid: false, message: '此方法已废弃' }; },
+		activateProVersion: function() { return false; },
+		checkProVersion: function() { return false; },
+		saveProVersion: function() { return false; },
+		removeProVersion: function() { return false; },
+		addProBadge: function() {}
+	};
+	
+	window.TimeLimitSystem = TimeLimitSystem;
+	
+	if (typeof window.TLS_AUTO_INIT !== 'undefined' && window.TLS_AUTO_INIT) {
+		document.addEventListener('DOMContentLoaded', function() {
+			TimeLimitSystem.init(window.TLS_CONFIG);
+		});
+	}
+})(window, document);
+	
+	
+	
+</script>
+
+<!-- ==================== 全屏绘图模态框 ==================== -->
+<div id="fullscreen-graph-modal" class="graph-modal" style="display: none;">
+	<div class="graph-modal-content">
+		<div class="graph-modal-header">
+			<span>📐 函数图像绘制</span>
+			<button class="graph-close-btn" id="graph-close-modal">&times;</button>
+		</div>
+		<div class="graph-controls">
+			<div class="graph-examples">
+				<button class="graph-example-btn" data-expr="y = x^2 - 4">2D 抛物线</button>
+				<button class="graph-example-btn" data-expr="y = sin(x) * exp(-x/5)">2D 衰减波</button>
+				<button class="graph-example-btn" data-expr="z = sin(sqrt(x^2 + y^2))">3D 波浪</button>
+				<button class="graph-example-btn" data-expr="z = x^2 - y^2">3D 马鞍面</button>
+			</div>
+			<div class="graph-input-group">
+				<input type="text" id="graph-equation-input" placeholder="输入公式，如 y = sin(x) 或 z = x^2+y^2" value="z = sin(sqrt(x^2 + y^2))">
+				<button id="graph-plot-btn" class="graph-plot-btn">生成</button>
+			</div>
+		</div>
+		<div id="graph-chart-container">
+			<div id="graph-chart"></div>
+			<div id="graph-error-msg" class="graph-error-msg"></div>
+			<div class="graph-hint">单指旋转 · 双指缩放/平移 · 双击重置</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	/* 全屏模态框样式 */
+	.graph-modal {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0,0,0,0.9);
+		
+		z-index: 8000;	
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		backdrop-filter: blur(5px);
+	}
+	.graph-modal-content {
+		width: 95%;
+		height: 95%;
+		background: var(--card);
+		border-radius: 20px;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+		border: 1px solid var(--border);
+	}
+	.graph-modal-header {
+		padding: 15px 20px;
+		background: var(--accent);
+		color: white;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 18px;
+		font-weight: bold;
+	}
+	.graph-close-btn {
+		background: transparent;
+		border: none;
+		color: white;
+		font-size: 28px;
+		cursor: pointer;
+		line-height: 1;
+		padding: 0 8px;
+	}
+	.graph-controls {
+		padding: 15px;
+		background: var(--bg);
+		border-bottom: 1px solid var(--border);
+	}
+	.graph-examples {
+		display: flex;
+		gap: 8px;
+		margin-bottom: 12px;
+		overflow-x: auto;
+		white-space: nowrap;
+	}
+	.graph-examples::-webkit-scrollbar { display: none; }
+	.graph-example-btn {
+		flex-shrink: 0;
+		padding: 6px 12px;
+		background: #334155;
+		color: var(--text);
+		border: none;
+		border-radius: 20px;
+		font-size: 13px;
+		cursor: pointer;
+	}
+	.graph-example-btn:active { background: var(--accent); }
+	.graph-input-group {
+		display: flex;
+		gap: 10px;
+	}
+	.graph-input-group input {
+		flex: 1;
+		padding: 12px;
+		background: var(--bg);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		color: var(--text);
+		font-size: 16px;
+		outline: none;
+	}
+	.graph-input-group input:focus { border-color: var(--accent); }
+	.graph-plot-btn {
+		padding: 0 20px;
+		background: var(--accent);
+		color: white;
+		border: none;
+		border-radius: 8px;
+		font-weight: bold;
+		cursor: pointer;
+	}
+	#graph-chart-container {
+		flex: 1;
+		position: relative;
+		min-height: 0;
+	}
+	#graph-chart {
+		width: 100%;
+		height: 100%;
+	}
+	.graph-error-msg {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: rgba(239,68,68,0.9);
+		color: white;
+		padding: 15px 25px;
+		border-radius: 8px;
+		display: none;
+		z-index: 10;
+		text-align: center;
+	}
+	.graph-hint {
+		position: absolute;
+		bottom: 15px;
+		left: 0;
+		right: 0;
+		text-align: center;
+		color: var(--text-muted);
+		font-size: 12px;
+		pointer-events: none;
+	}
+</style>
+
+<script>
+	// ========== 绘图模块（独立于主终端） ==========
+	(function() {
+		let chartElem = null;
+		let errorDiv = null;
+
+		function showGraphError(msg) {
+			if (errorDiv) {
+				errorDiv.innerText = msg;
+				errorDiv.style.display = 'block';
+				setTimeout(() => { if (errorDiv) errorDiv.style.display = 'none'; }, 3000);
+			} else {
+				alert(msg);
+			}
+		}
+
+		function hideGraphError() {
+			if (errorDiv) errorDiv.style.display = 'none';
+		}
+
+		function plot2D(exprStr, xVar = 'x') {
+			try {
+				const compiled = math.compile(exprStr);
+				const xVals = [], yVals = [];
+				for (let x = -10; x <= 10; x += 0.04) {
+					try {
+						let y = compiled.evaluate({ [xVar]: x });
+						if (typeof y === 'number' && isFinite(y)) {
+							xVals.push(x);
+							yVals.push(y);
+						}
+					} catch(e) {}
+				}
+				const trace = {
+					x: xVals, y: yVals,
+					type: 'scatter', mode: 'lines',
+					line: { color: '#3b82f6', width: 3 }
+				};
+				const layout = {
+					paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+					margin: { l: 30, r: 20, t: 20, b: 30 },
+					font: { color: '#94a3b8' },
+					xaxis: { gridcolor: '#334155', zerolinecolor: '#475569', title: xVar },
+					yaxis: { gridcolor: '#334155', zerolinecolor: '#475569', title: 'y' }
+				};
+				Plotly.newPlot('graph-chart', [trace], layout, { responsive: true, displayModeBar: false });
+			} catch(e) {
+				showGraphError('绘图错误: ' + e.message);
+			}
+		}
+
+		function plot3D(exprStr) {
+			try {
+				const compiled = math.compile(exprStr);
+				const xArr = [], yArr = [], zArr = [];
+				const step = 0.2;
+				for (let x = -5; x <= 5; x += step) {
+					const rowX = [], rowY = [], rowZ = [];
+					for (let y = -5; y <= 5; y += step) {
+						try {
+							let z = compiled.evaluate({ x, y });
+							if (typeof z !== 'number' || !isFinite(z)) z = null;
+							rowX.push(x);
+							rowY.push(y);
+							rowZ.push(z);
+						} catch(e) {
+							rowX.push(x); rowY.push(y); rowZ.push(null);
+						}
+					}
+					xArr.push(rowX);
+					yArr.push(rowY);
+					zArr.push(rowZ);
+				}
+				const trace = {
+					z: zArr, x: xArr, y: yArr,
+					type: 'surface',
+					colorscale: 'Viridis',
+					opacity: 0.95,
+					contours: { z: { show: true, usecolormap: true, highlightcolor: "#fff" } }
+				};
+				const layout = {
+					paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+					margin: { l: 0, r: 0, t: 0, b: 0 },
+					scene: {
+						xaxis: { title: 'X', color: '#94a3b8', gridcolor: '#334155' },
+						yaxis: { title: 'Y', color: '#94a3b8', gridcolor: '#334155' },
+						zaxis: { title: 'Z', color: '#94a3b8', gridcolor: '#334155' },
+						bgcolor: 'rgba(0,0,0,0)',
+						camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } }
+					}
+				};
+				Plotly.newPlot('graph-chart', [trace], layout, { responsive: true, displayModeBar: false });
+			} catch(e) {
+				showGraphError('3D绘图错误: ' + e.message);
+			}
+		}
+
+		function processGraphInput() {
+			hideGraphError();
+			const raw = document.getElementById('graph-equation-input').value.trim();
+			if (!raw) return;
+			let targetVar = 'y';
+			let expr = raw;
+			if (raw.includes('=')) {
+				const parts = raw.split('=');
+				targetVar = parts[0].trim();
+				expr = parts[1].trim();
+			}
+			try {
+				const node = math.parse(expr);
+				const symbols = new Set();
+				node.traverse(n => { if (n.isSymbolNode) symbols.add(n.name); });
+				const builtIns = ['pi', 'e', 'i', 'PI', 'E'];
+				const vars = [...symbols].filter(s => !builtIns.includes(s));
+				const is3D = vars.includes('x') && vars.includes('y') && targetVar.toLowerCase() === 'z';
+				if (is3D) plot3D(expr);
+				else plot2D(expr, vars[0] || 'x');
+			} catch(e) {
+				showGraphError('公式语法错误: ' + e.message);
+			}
+		}
+
+		// 初始化绘图模态框事件
+		function initGraphModal() {
+			chartElem = document.getElementById('graph-chart');
+			errorDiv = document.getElementById('graph-error-msg');
+			const modal = document.getElementById('fullscreen-graph-modal');
+			const openBtn = document.getElementById('graph-modal-btn');
+			const closeBtn = document.getElementById('graph-close-modal');
+			const plotBtn = document.getElementById('graph-plot-btn');
+			const inputElem = document.getElementById('graph-equation-input');
+
+			if (!openBtn || !modal) return;
+
+			openBtn.onclick = () => {
+				modal.style.display = 'flex';
+				// 显示后重新绘制当前表达式（确保图表尺寸正确）
+				setTimeout(() => processGraphInput(), 100);
+			};
+			closeBtn.onclick = () => { modal.style.display = 'none'; };
+			modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+			plotBtn.onclick = processGraphInput;
+			inputElem.onkeyup = (e) => { if (e.key === 'Enter') processGraphInput(); };
+
+			// 示例按钮
+			document.querySelectorAll('.graph-example-btn').forEach(btn => {
+				btn.onclick = () => {
+					const expr = btn.getAttribute('data-expr');
+					if (expr) {
+						inputElem.value = expr;
+						processGraphInput();
+					}
+				};
+			});
+
+			// 默认绘制一次
+			processGraphInput();
+		}
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initGraphModal);
+		} else {
+			initGraphModal();
+		}
+	})();
+</script>
+
+
+</body>
+</html>
