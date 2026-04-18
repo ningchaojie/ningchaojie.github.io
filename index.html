@@ -2,1964 +2,994 @@
 <html lang="zh-CN">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>宁朝杰 - 应用开发中心</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+	<title>3D漫游 - 自适应广告牌 | 自由探索</title>
 	<style>
-		:root {
-			--primary: #667eea;
-			--primary-dark: #5a67d8;
-			--secondary: #764ba2;
-			--success: #4CAF50;
-			--success-dark: #45a049;
-			--light: #f8f9fa;
-			--dark: #343a40;
-			--gray: #6c757d;
-			--light-gray: #e9ecef;
-			--border-radius: 12px;
-			--shadow: 0 8px 30px rgba(0,0,0,0.08);
-			--transition: all 0.3s ease;
-		}
-		
-		* {
-			margin: 0;
-			padding: 0;
-			box-sizing: border-box;
-		}
-		
 		body {
-			font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
-			background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-			color: var(--dark);
-			line-height: 1.6;
-			min-height: 100vh;
-			padding: 20px;
-		}
-		
-		.container {
-			max-width: 1400px;
-			margin: 0 auto;
-		}
-		
-		/* 头部样式 */
-		header {
-			text-align: center;
-			padding: 30px 20px;
-			background: linear-gradient(135deg, var(--primary), var(--secondary));
-			color: white;
-			border-radius: var(--border-radius);
-			margin-bottom: 30px;
-			box-shadow: var(--shadow);
-		}
-		
-		.logo {
-			font-size: 2.8rem;
-			margin-bottom: 15px;
-			display: inline-block;
-			background: rgba(255,255,255,0.1);
-			width: 80px;
-			height: 80px;
-			line-height: 80px;
-			border-radius: 50%;
-		}
-		
-		h1 {
-			font-size: 2.2rem;
-			margin-bottom: 10px;
-			font-weight: 700;
-		}
-		
-		.subtitle {
-			font-size: 1.1rem;
-			opacity: 0.9;
-			max-width: 600px;
-			margin: 0 auto 20px;
-		}
-		
-		/* 控制栏样式 */
-		.controls {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 15px;
-			background: white;
-			padding: 20px;
-			border-radius: var(--border-radius);
-			margin-bottom: 25px;
-			box-shadow: var(--shadow);
-			align-items: center;
-		}
-		
-		.search-box {
-			flex: 1;
-			min-width: 250px;
-			position: relative;
-		}
-		
-		.search-box input {
-			width: 100%;
-			padding: 12px 20px 12px 45px;
-			border: 2px solid var(--light-gray);
-			border-radius: 30px;
-			font-size: 1rem;
-			transition: var(--transition);
-		}
-		
-		.search-box input:focus {
-			outline: none;
-			border-color: var(--primary);
-			box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-		}
-		
-		.search-icon {
-			position: absolute;
-			left: 15px;
-			top: 50%;
-			transform: translateY(-50%);
-			color: var(--gray);
-			font-size: 1.2rem;
-		}
-		
-		.filter-buttons {
-			display: flex;
-			gap: 10px;
-			flex-wrap: wrap;
-		}
-		
-		.filter-btn {
-			padding: 10px 18px;
-			border: 2px solid var(--light-gray);
-			background: white;
-			border-radius: 30px;
-			cursor: pointer;
-			font-weight: 500;
-			transition: var(--transition);
-		}
-		
-		.filter-btn:hover {
-			border-color: var(--primary);
-			color: var(--primary);
-		}
-		
-		.filter-btn.active {
-			background: var(--primary);
-			color: white;
-			border-color: var(--primary);
-		}
-		
-		.stats {
-			display: flex;
-			gap: 15px;
-			margin-left: auto;
-			flex-wrap: wrap;
-		}
-		
-		.stat-item {
-			background: var(--light);
-			padding: 8px 15px;
-			border-radius: 20px;
-			font-size: 0.9rem;
-			color: var(--dark);
-			display: flex;
-			align-items: center;
-			gap: 5px;
-		}
-		
-		/* 加载动画 */
-		.loading {
-			text-align: center;
-			padding: 60px 20px;
-		}
-		
-		.spinner {
-			width: 60px;
-			height: 60px;
-			border: 5px solid rgba(102, 126, 234, 0.2);
-			border-top-color: var(--primary);
-			border-radius: 50%;
-			animation: spin 1s linear infinite;
-			margin: 0 auto 20px;
-		}
-		
-		@keyframes spin {
-			to { transform: rotate(360deg); }
-		}
-		
-		/* 文件卡片网格 */
-		.files-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-			gap: 25px;
-			margin-bottom: 40px;
-		}
-		
-		@media (max-width: 768px) {
-			.files-grid {
-				grid-template-columns: 1fr;
-			}
-		}
-		
-		/* 文件卡片样式 */
-		.file-card {
-			background: white;
-			border-radius: var(--border-radius);
+			margin: 0;
 			overflow: hidden;
-			box-shadow: var(--shadow);
-			transition: var(--transition);
-			height: 100%;
-			display: flex;
-			flex-direction: column;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			touch-action: none;
 		}
-		
-		.file-card:hover {
-			transform: translateY(-8px);
-			box-shadow: 0 15px 40px rgba(0,0,0,0.12);
-		}
-		
-		.card-header {
-			background: linear-gradient(135deg, var(--primary), var(--secondary));
-			color: white;
-			padding: 20px;
-			position: relative;
-		}
-		
-		.file-type {
+		#info {
 			position: absolute;
-			top: 15px;
-			right: 15px;
-			background: rgba(255,255,255,0.2);
-			padding: 5px 12px;
-			border-radius: 20px;
-			font-size: 0.85rem;
-			font-weight: 500;
-		}
-		
-		.file-name {
-			font-size: 1.4rem;
-			font-weight: 700;
-			margin-bottom: 8px;
-			word-break: break-word;
-		}
-		
-		.file-filename {
-			font-size: 0.9rem;
-			opacity: 0.9;
-		}
-		
-		.card-body {
-			padding: 20px;
-			flex-grow: 1;
-			display: flex;
-			flex-direction: column;
-		}
-		
-		.file-meta {
-			background: var(--light);
-			padding: 15px;
-			border-radius: 10px;
-			margin-bottom: 20px;
-		}
-		
-		.meta-row {
-			display: flex;
-			justify-content: space-between;
-			margin-bottom: 8px;
-			font-size: 0.95rem;
-		}
-		
-		.meta-label {
-			color: var(--gray);
-			font-weight: 500;
-		}
-		
-		.meta-value {
-			font-weight: 600;
-		}
-		
-		/* 图片展示区 */
-		.images-section {
-			margin-top: 15px;
-		}
-		
-		.section-title {
-			font-size: 1.1rem;
-			font-weight: 600;
-			margin-bottom: 12px;
-			color: var(--primary);
-			display: flex;
-			align-items: center;
-			gap: 8px;
-		}
-		
-		/* 横向滚动容器 */
-		.scroll-container {
-			position: relative;
-			margin-bottom: 20px;
-		}
-		
-		.scroll-wrapper {
-			display: flex;
-			overflow-x: auto;
-			scroll-behavior: smooth;
-			padding: 10px 5px;
-			gap: 10px;
-			scrollbar-width: none; /* Firefox */
-			-ms-overflow-style: none; /* IE/Edge */
-		}
-		
-		.scroll-wrapper::-webkit-scrollbar {
-			display: none; /* Chrome/Safari */
-		}
-		
-		.scroll-content {
-			display: flex;
-			gap: 10px;
-		}
-		
-		.scroll-image {
-			flex: 0 0 auto;
-			width: 180px;
-			height: 135px;
-			object-fit: cover;
-			border-radius: 8px;
-			cursor: pointer;
-			transition: var(--transition);
-			border: 2px solid transparent;
-		}
-		
-		.scroll-image:hover {
-			transform: scale(1.03);
-			border-color: var(--primary);
-			box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-		}
-		
-		.scroll-btn {
-			position: absolute;
-			top: 50%;
-			transform: translateY(-50%);
-			background: rgba(255,255,255,0.9);
-			border: none;
-			width: 36px;
-			height: 36px;
-			border-radius: 50%;
-			cursor: pointer;
-			font-size: 1.2rem;
-			color: var(--primary);
-			box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-			z-index: 10;
-			transition: var(--transition);
-		}
-		
-		.scroll-btn:hover {
-			background: white;
-			box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-			transform: translateY(-50%) scale(1.1);
-		}
-		
-		.scroll-left {
-			left: 10px;
-		}
-		
-		.scroll-right {
-			right: 10px;
-		}
-		
-		.scroll-btn.hidden {
-			display: none;
-		}
-		
-		/* 下载按钮 */
-		.download-btn {
-			display: block;
-			width: 100%;
-			background: linear-gradient(135deg, var(--success), var(--success-dark));
-			color: white;
-			text-align: center;
-			padding: 15px;
-			border-radius: 10px;
-			text-decoration: none;
-			font-weight: 700;
-			font-size: 1.1rem;
-			margin-top: 20px;
-			transition: var(--transition);
-			border: none;
-			cursor: pointer;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 10px;
-		}
-		
-		.download-btn:hover {
-			background: linear-gradient(135deg, var(--success-dark), #3d8b40);
-			transform: translateY(-2px);
-			box-shadow: 0 7px 20px rgba(76, 175, 80, 0.3);
-		}
-		
-		.download-count {
-			margin-left: auto;
-			background: rgba(255,255,255,0.2);
-			padding: 3px 10px;
-			border-radius: 15px;
-			font-size: 0.9rem;
-		}
-		
-		/* 空状态 */
-		.empty-state {
-			text-align: center;
-			padding: 80px 20px;
-			background: white;
-			border-radius: var(--border-radius);
-			margin-bottom: 40px;
-			box-shadow: var(--shadow);
-		}
-		
-		.empty-icon {
-			font-size: 4rem;
-			color: var(--light-gray);
-			margin-bottom: 20px;
-		}
-		
-		.empty-state h3 {
-			color: var(--dark);
-			margin-bottom: 15px;
-			font-size: 1.5rem;
-		}
-		
-		.empty-state p {
-			color: var(--gray);
-			max-width: 500px;
-			margin: 0 auto 25px;
-			line-height: 1.7;
-		}
-		
-		/* 页脚 */
-		footer {
-			text-align: center;
-			padding: 30px 0;
-			color: var(--dark);
-			opacity: 0.8;
-			font-size: 0.95rem;
-		}
-		
-		footer a {
-			color: var(--primary);
-			text-decoration: none;
-		}
-		
-		footer a:hover {
-			text-decoration: underline;
-		}
-		
-		/* 错误提示 */
-		.error-message {
-			background: #ffebee;
-			color: #c62828;
-			padding: 20px;
-			border-radius: var(--border-radius);
-			margin-bottom: 25px;
-			border-left: 5px solid #c62828;
-			display: none;
-		}
-		
-		.error-icon {
-			margin-right: 10px;
-			font-size: 1.2rem;
-		}
-		
-		/* 懒加载图片样式 */
-		.lazy-image {
-			background: var(--light-gray);
-			border-radius: 8px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			color: var(--gray);
-			font-size: 0.9rem;
-		}
-		
-		/* 更新信息 */
-		.update-info {
-			text-align: center;
-			color: var(--gray);
-			font-size: 0.9rem;
-			margin-top: 15px;
-		}
-		
-		/* 文件图标 */
-		.file-icon {
-			margin-right: 8px;
-			font-size: 1.1rem;
-		}
-		
-		/* 文档卡片特殊样式 */
-		.document-card .card-header {
-			background: linear-gradient(135deg, #3498db, #2980b9);
-		}
-		
-		.document-card .file-type {
-			background: rgba(255,255,255,0.25);
-		}
-		
-		/* 工具提示 */
-		.tooltip {
-			position: relative;
-			display: inline-block;
-		}
-		
-		.tooltip .tooltiptext {
-			visibility: hidden;
-			width: 200px;
-			background-color: var(--dark);
-			color: white;
-			text-align: center;
-			border-radius: 6px;
-			padding: 8px;
-			position: absolute;
-			z-index: 1;
-			bottom: 125%;
-			left: 50%;
-			transform: translateX(-50%);
-			opacity: 0;
-			transition: opacity 0.3s;
-			font-size: 0.85rem;
-			font-weight: normal;
-		}
-		
-		.tooltip .tooltiptext::after {
-			content: "";
-			position: absolute;
-			top: 100%;
-			left: 50%;
-			margin-left: -5px;
-			border-width: 5px;
-			border-style: solid;
-			border-color: var(--dark) transparent transparent transparent;
-		}
-		
-		.tooltip:hover .tooltiptext {
-			visibility: visible;
-			opacity: 1;
-		}
-		
-		/* ====== 图片浏览器模态框样式 ====== */
-		.image-browser-modal {
-			display: none;
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background: rgba(0, 0, 0, 0.95);
-			z-index: 2000;
-			flex-direction: column;
-			backdrop-filter: blur(5px);
-		}
-		
-		.modal-header {
-			padding: 15px 20px;
-			background: rgba(0, 0, 0, 0.8);
-			color: white;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-		}
-		
-		.modal-title {
-			font-size: 1.2rem;
-			font-weight: 600;
-			display: flex;
-			align-items: center;
-			gap: 10px;
-		}
-		
-		.modal-body {
-			flex: 1;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			position: relative;
-			padding: 20px;
-			overflow: hidden;
-		}
-		
-		.image-container {
-			max-width: 95%;
-			max-height: 85%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			position: relative;
-		}
-		
-		.browser-image {
-			max-width: 100%;
-			max-height: 100%;
-			object-fit: contain;
-			border-radius: 4px;
-			box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-			opacity: 0;
-			transition: opacity 0.3s ease;
-		}
-		
-		.browser-image.loaded {
-			opacity: 1;
-		}
-		
-		.nav-btn {
-			position: absolute;
-			top: 50%;
-			transform: translateY(-50%);
-			background: rgba(255, 255, 255, 0.15);
-			color: white;
-			border: none;
-			width: 56px;
-			height: 56px;
-			border-radius: 50%;
-			font-size: 28px;
-			cursor: pointer;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			transition: all 0.3s;
-			z-index: 10;
-			backdrop-filter: blur(10px);
-			border: 1px solid rgba(255, 255, 255, 0.2);
-		}
-		
-		.nav-btn:hover {
-			background: rgba(255, 255, 255, 0.25);
-			transform: translateY(-50%) scale(1.1);
-			border-color: rgba(255, 255, 255, 0.3);
-		}
-		
-		.nav-btn:active {
-			transform: translateY(-50%) scale(0.95);
-		}
-		
-		.prev-btn {
+			top: 20px;
 			left: 20px;
-		}
-		
-		.next-btn {
-			right: 20px;
-		}
-		
-		.nav-btn.hidden {
-			display: none;
-		}
-		
-		.modal-footer {
-			padding: 15px 20px;
-			background: rgba(0, 0, 0, 0.8);
+			background: rgba(0,0,0,0.65);
+			backdrop-filter: blur(6px);
 			color: white;
-			border-top: 1px solid rgba(255, 255, 255, 0.1);
+			padding: 8px 16px;
+			border-radius: 24px;
+			font-size: 14px;
+			font-weight: bold;
+			pointer-events: none;
+			z-index: 20;
+			border-left: 3px solid #ffaa44;
+			box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+		}
+		#controls-panel {
+			position: absolute;
+			bottom: 20px;
+			left: 0;
+			right: 0;
 			display: flex;
 			justify-content: space-between;
-			align-items: center;
-		}
-		
-		.image-counter {
-			font-size: 1rem;
-			font-weight: 600;
-			background: rgba(255, 255, 255, 0.1);
-			padding: 5px 15px;
-			border-radius: 20px;
-		}
-		
-		.image-info {
-			flex: 1;
-			text-align: center;
-			font-size: 0.95rem;
 			padding: 0 20px;
-			opacity: 0.9;
-		}
-		
-		.image-actions {
-			display: flex;
-			gap: 10px;
-		}
-		
-		.action-btn {
-			background: rgba(102, 126, 234, 0.8);
-			color: white;
-			border: none;
-			padding: 8px 16px;
-			border-radius: 6px;
-			cursor: pointer;
-			font-size: 0.95rem;
-			transition: all 0.3s;
-			display: flex;
-			align-items: center;
-			gap: 8px;
-		}
-		
-		.action-btn:hover {
-			background: rgba(102, 126, 234, 1);
-			transform: translateY(-2px);
-		}
-		
-		.close-modal {
-			background: none;
-			border: none;
-			color: white;
-			font-size: 32px;
-			cursor: pointer;
-			padding: 0;
-			width: 40px;
-			height: 40px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			transition: color 0.3s;
-		}
-		
-		.close-modal:hover {
-			color: #ff6b6b;
-		}
-		
-		/* 加载指示器 */
-		.loader {
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			width: 50px;
-			height: 50px;
-			border: 3px solid rgba(255, 255, 255, 0.3);
-			border-top-color: white;
-			border-radius: 50%;
-			animation: spin 1s linear infinite;
-		}
-		
-		/* 响应式调整 */
-		@media (max-width: 768px) {
-			.nav-btn {
-				width: 46px;
-				height: 46px;
-				font-size: 24px;
-			}
-			
-			.prev-btn {
-				left: 10px;
-			}
-			
-			.next-btn {
-				right: 10px;
-			}
-			
-			.modal-footer {
-				flex-direction: column;
-				gap: 15px;
-				text-align: center;
-			}
-			
-			.image-info {
-				order: -1;
-				width: 100%;
-				padding: 0;
-			}
-			
-			.image-actions {
-				width: 100%;
-				justify-content: center;
-			}
-			
-			.modal-title {
-				font-size: 1rem;
-			}
-		}
-		
-		/* 触摸提示 */
-		.touch-hint {
-			position: absolute;
-			bottom: 30px;
-			left: 50%;
-			transform: translateX(-50%);
-			background: rgba(0, 0, 0, 0.6);
-			color: white;
-			padding: 8px 15px;
-			border-radius: 20px;
-			font-size: 0.85rem;
-			opacity: 0;
-			transition: opacity 0.3s;
 			pointer-events: none;
+			z-index: 20;
 		}
-		
-		.touch-hint.show {
-			opacity: 1;
+		.ctrl-tip {
+			background: rgba(0,0,0,0.55);
+			backdrop-filter: blur(8px);
+			border-radius: 40px;
+			padding: 8px 18px;
+			color: #ffdd99;
+			font-size: 12px;
+			font-weight: bold;
+			text-align: center;
+			letter-spacing: 1px;
+			border: 1px solid rgba(255,255,255,0.2);
+		}
+		.ctrl-tip.left {
+			border-left: 3px solid #ffaa44;
+		}
+		.ctrl-tip.right {
+			border-right: 3px solid #44aaff;
+		}
+		#instruction {
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			background: rgba(0,0,0,0.55);
+			backdrop-filter: blur(5px);
+			padding: 6px 14px;
+			border-radius: 20px;
+			font-size: 11px;
+			color: #ccc;
+			pointer-events: none;
+			z-index: 20;
+			font-family: monospace;
+		}
+		@media (max-width: 700px) {
+			.ctrl-tip { font-size: 10px; padding: 5px 12px; }
+			#info { font-size: 12px; top: 12px; left: 12px; }
+			#instruction { font-size: 9px; top: 12px; right: 12px; }
+		}
+		#video-note {
+			position: absolute;
+			bottom: 80px;
+			left: 0;
+			right: 0;
+			text-align: center;
+			background: rgba(0,0,0,0.5);
+			color: #ffaa88;
+			font-size: 11px;
+			padding: 4px;
+			pointer-events: none;
+			z-index: 20;
 		}
 	</style>
 </head>
 <body>
-	<div class="container">
-		<!-- 头部 -->
-		<header>
-			<div class="logo">📱</div>
-			<h1>应用开发中心</h1>
-			<p class="subtitle">自动检测GitHub仓库中的APK应用与文档，提供交流建议、一键下载与图片预览</p>
-			<div class="update-info">
-				<span id="current-time">正在连接...</span> | 
-				<span id="github-status">GitHub API正常</span>
-			</div>
-		</header>
-		
-		<!-- 控制栏 -->
-		<div class="controls">
-			<div class="search-box">
-				<i class="fas fa-search search-icon"></i>
-				<input type="text" id="search-input" placeholder="搜索文件名称或描述...">
-			</div>
-			
-			<div class="filter-buttons">
-				<button class="filter-btn active" data-filter="all">全部文件</button>
-				<button class="filter-btn" data-filter="apk">APK应用</button>
-				<button class="filter-btn" data-filter="document">文档</button>
-			</div>
-			
-			<div class="stats">
-				<div class="stat-item">
-					<i class="fas fa-file-alt"></i>
-					<span id="total-files">0个文件</span>
-				</div>
-				<div class="stat-item">
-					<i class="fas fa-download"></i>
-					<span id="total-downloads">0次下载</span>
-				</div>
-				<div class="stat-item">
-					<i class="fas fa-sync-alt"></i>
-					<span id="last-update">更新中...</span>
-				</div>
-			</div>
-		</div>
-		
-		<!-- 错误提示 -->
-		<div id="error-container" class="error-message">
-			<i class="fas fa-exclamation-triangle error-icon"></i>
-			<span id="error-text">发生错误，请稍后重试</span>
-		</div>
-		
-		<!-- 加载动画 -->
-		<div id="loading" class="loading">
-			<div class="spinner"></div>
-			<p>正在从GitHub仓库加载文件列表...</p>
-			<p style="margin-top: 10px; font-size: 0.9rem; color: #666;">
-				仓库: <strong>ningchaojie/ningchaojie.github.io</strong>
-			</p>
-		</div>
-		
-		<!-- 文件展示区 -->
-		<div id="files-container" class="files-grid" style="display: none;"></div>
-		
-		<!-- 空状态 -->
-		<div id="empty-state" class="empty-state" style="display: none;">
-			<div class="empty-icon">📁</div>
-			<h3>未找到任何文件</h3>
-			<p>你的GitHub仓库中还没有APK或文档文件，或者当前筛选条件没有匹配的文件。</p>
-			<p>请上传文件到仓库根目录，文件名格式参考：</p>
-			<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; max-width: 400px; margin: 20px auto; text-align: left;">
-				<div><strong>APK文件:</strong> 应用名.apk</div>
-				<div><strong>描述图片:</strong> 应用名_描述_1.jpg</div>
-				<div><strong>界面截图:</strong> 应用名_界面_1.jpg</div>
-				<div><strong>文档文件:</strong> 文档名.pdf</div>
-				<div><strong>文档文件:</strong> 文档名.txt</div>	
-				<div><strong>引言图片:</strong> 文档名_引言_1.jpg</div>
-				<div><strong>目录图片:</strong> 文档名_目录_1.jpg</div>
-			</div>
-			<a href="https://github.com/ningchaojie/ningchaojie.github.io/upload" 
-			   class="download-btn" style="max-width: 300px; margin: 0 auto;">
-				<i class="fas fa-upload"></i> 前往GitHub上传文件
-			</a>
-		</div>
-		
-		<!-- 图片浏览器模态框 -->
-		<div id="image-browser-modal" class="image-browser-modal">
-			<div class="modal-header">
-				<div class="modal-title">
-					<i class="fas fa-images"></i>
-					<span id="modal-title-text">图片浏览器</span>
-				</div>
-				<button class="close-modal" id="close-browser-modal">&times;</button>
-			</div>
-			
-			<div class="modal-body">
-				<!-- 加载指示器 -->
-				<div class="loader" id="image-loader"></div>
-				
-				<!-- 图片显示区域 -->
-				<div class="image-container">
-					<img id="browser-image" class="browser-image" src="" alt="">
-				</div>
-				
-				<!-- 导航按钮 -->
-				<button class="nav-btn prev-btn" id="prev-image-btn">
-					<i class="fas fa-chevron-left"></i>
-				</button>
-				
-				<button class="nav-btn next-btn" id="next-image-btn">
-					<i class="fas fa-chevron-right"></i>
-				</button>
-				
-				<!-- 触摸提示 -->
-				<div class="touch-hint" id="touch-hint">左右滑动切换图片</div>
-			</div>
-			
-			<div class="modal-footer">
-				<div class="image-counter">
-					<span id="current-image-index">1</span> / <span id="total-images-count">1</span>
-				</div>
-				
-				<div class="image-info" id="image-info-text">
-					图片信息
-				</div>
-				
-				<div class="image-actions">
-					<button class="action-btn" id="download-image-btn">
-						<i class="fas fa-download"></i> 下载
-					</button>
-				</div>
-			</div>
-		</div>
-		
-		<!-- 页脚 -->
-		<footer>
-			
-			<p style="margin-top: 10px; font-size: 0.85rem;">
-				文件命名规则: 名称_类型_序号.扩展名 | 支持类型: 描述, 界面, 引言, 目录
-			</p>
-			<p style="margin-top: 5px; font-size: 0.85rem;">
-				页面版本: 3.0 | 专业图片浏览器 | 最后更新: 2024-12-25
-
-			</p>
-			
-			<p style="margin-top: 5px; font-size: 0.85rem;">
-
-						邮箱:13128146370@163.com  微信号:Ncj13450098946
-							
-			</p>
-		</footer>
+	<div id="info">
+		🏞️ 自由漫游 | 自适应广告牌 (图片/视频不变形)
+	</div>
+	<div id="controls-panel">
+		<div class="ctrl-tip left">⬅️ 左半屏 ➡️<br>滑动移动</div>
+		<div class="ctrl-tip right">🔄 右半屏 🔄<br>滑动环顾</div>
+	</div>
+	<div id="instruction">
+		👆 直接触摸滑动 | 广告牌始终面向你 | 视频首次触摸后播放
+	</div>
+	<div id="video-note">
+		🎬 视频广告静音循环播放 | 图片/视频比例自动适应不拉伸
 	</div>
 
-	<script>
-		// 全局变量
-		let allFilesData = [];
-		let filteredFilesData = [];
-		let currentFilter = 'all';
-		let downloadStats = {};
-		
-		// 图片浏览器状态管理
-		const imageBrowser = {
-			isOpen: false,
-			scrollPosition: 0,
-			currentGroupIndex: -1,
-			currentImageType: '',
-			currentImageIndex: 0,
-			images: [],
-			touchStartX: 0,
-			touchStartY: 0
-		};
-		
-		// 页面加载完成后初始化
-		document.addEventListener('DOMContentLoaded', function() {
-			// 设置当前时间
-			document.getElementById('current-time').textContent = new Date().toLocaleString('zh-CN');
-			
-			// 加载下载统计
-			loadDownloadStats();
-			
-			// 从GitHub加载文件
-			loadFilesFromGitHub();
-			
-			// 绑定事件监听器
-			bindEventListeners();
-			
-			// 每30分钟自动刷新一次
-			setInterval(loadFilesFromGitHub, 30 * 60 * 1000);
-		});
-		
-		// 绑定事件监听器
-		function bindEventListeners() {
-			// 搜索框输入事件
-			document.getElementById('search-input').addEventListener('input', searchFiles);
-			
-			// 筛选按钮点击事件
-			document.querySelectorAll('.filter-btn').forEach(btn => {
-				btn.addEventListener('click', function() {
-					// 移除所有按钮的active类
-					document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-					// 给当前按钮添加active类
-					this.classList.add('active');
-					// 更新当前筛选器
-					currentFilter = this.getAttribute('data-filter');
-					// 应用筛选
-					applyFilter();
-				});
-			});
-			
-			// 图片浏览器按钮事件
-			document.getElementById('close-browser-modal').addEventListener('click', closeImageBrowser);
-			document.getElementById('prev-image-btn').addEventListener('click', showPrevImage);
-			document.getElementById('next-image-btn').addEventListener('click', showNextImage);
-			document.getElementById('download-image-btn').addEventListener('click', downloadCurrentImage);
-			
-			// 图片浏览器触摸事件
-			const modalBody = document.querySelector('.modal-body');
-			modalBody.addEventListener('touchstart', handleTouchStart);
-			modalBody.addEventListener('touchmove', handleTouchMove);
-			modalBody.addEventListener('touchend', handleTouchEnd);
-			
-			// 键盘事件
-			document.addEventListener('keydown', handleKeyDown);
-			
-			// 点击模态框背景关闭
-			document.getElementById('image-browser-modal').addEventListener('click', function(e) {
-				if (e.target === this) {
-					closeImageBrowser();
-				}
-			});
-			
-			// 防止右键菜单和开发者工具（基本保护）
-			document.addEventListener('contextmenu', function(e) {
-				if (e.target.tagName === 'IMG') {
-					e.preventDefault();
-				}
-			});
-			
-			document.addEventListener('keydown', function(e) {
-				// 禁用F12、Ctrl+Shift+I、Ctrl+U
-				if (e.key === 'F12' || 
-					(e.ctrlKey && e.shiftKey && e.key === 'I') ||
-					(e.ctrlKey && e.key === 'u')) {
-					e.preventDefault();
-				}
-			});
-		}
-		
-		// 从GitHub仓库加载文件
-		async function loadFilesFromGitHub() {
-			try {
-				// 显示加载动画
-				document.getElementById('loading').style.display = 'block';
-				document.getElementById('files-container').style.display = 'none';
-				document.getElementById('empty-state').style.display = 'none';
-				document.getElementById('error-container').style.display = 'none';
-				
-				// GitHub API URL
-				const username = 'ningchaojie';
-				const repo = 'ningchaojie.github.io';
-				const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/`;
-				
-				console.log('正在请求GitHub API:', apiUrl);
-				
-				// 获取仓库文件列表
-				const response = await fetch(apiUrl);
-				
-				if (!response.ok) {
-					throw new Error(`GitHub API错误: ${response.status} ${response.statusText}`);
-				}
-				
-				const files = await response.json();
-				
-				if (!Array.isArray(files)) {
-					throw new Error('GitHub API返回的数据格式不正确');
-				}
-				
-				console.log(`成功获取到${files.length}个文件`);
-				
-				// 处理文件数据
-				processFiles(files);
-				
-				// 更新状态
-				document.getElementById('github-status').textContent = 'GitHub API正常';
-				document.getElementById('github-status').style.color = '';
-				
-			} catch (error) {
-				console.error('从GitHub加载文件时出错:', error);
-				showError(`无法加载文件列表: ${error.message}`);
-				document.getElementById('github-status').textContent = 'GitHub API错误';
-				document.getElementById('github-status').style.color = '#c62828';
-			}
-		}
-		
-		// 处理文件数据
-// 处理文件数据
-function processFiles(files) {
-	// 清空数据
-	allFilesData = [];
-	
-	// 按文件名分组
-	const fileGroups = {};
-	
-	// 首先按基础名称分组
-	files.forEach(file => {
-		if (file.type !== 'file') return;
-		
-		const parsed = parseFileName(file.name);
-		const baseName = parsed.baseName;
-		
-		// 新增：如果是主文件且扩展名为 html/htm，则忽略该文件
-		if (parsed.type === 'main') {
-			const ext = parsed.ext.toLowerCase();
-			if (ext === 'html' || ext === 'htm') {
-				return; // 跳过 HTML 文件
-			}
-		}
-		
-		if (!fileGroups[baseName]) {
-			fileGroups[baseName] = {
-				mainFile: null,
-				images: {
-					'描述': [],
-					'界面': [],
-					'引言': [],
-					'目录': []
-				},
-				parsedName: parsed
-			};
-		}
-		
-		if (parsed.type === 'main') {
-			fileGroups[baseName].mainFile = file;
-		} else if (['描述', '界面', '引言', '目录'].includes(parsed.type)) {
-			// 添加到对应类型的数组中，并记录序号
-			fileGroups[baseName].images[parsed.type].push({
-				...file,
-				index: parsed.index,
-				type: parsed.type
-			});
-		}
-	});
-	
-	// 对每种类型的图片按序号排序（允许跳序）
-	Object.values(fileGroups).forEach(group => {
-		Object.keys(group.images).forEach(type => {
-			group.images[type].sort((a, b) => a.index - b.index);
-		});
-	});
-	
-	// 转换为数组并过滤掉没有主文件的组
-	allFilesData = Object.values(fileGroups).filter(group => group.mainFile);
-	
-	// 如果没有文件，显示空状态
-	if (allFilesData.length === 0) {
-		document.getElementById('loading').style.display = 'none';
-		document.getElementById('empty-state').style.display = 'block';
-		updateStats();
-		return;
-	}
-	
-	// 应用当前筛选
-	applyFilter();
-	
-	// 隐藏加载动画
-	document.getElementById('loading').style.display = 'none';
-}
-		
-		// 解析文件名
-		function parseFileName(filename) {
-			const parts = filename.split('.');
-			const ext = parts.pop().toLowerCase();
-			const nameWithoutExt = parts.join('.');
-			
-			// 匹配：名称_类型_序号
-			const pattern = /^(.+?)_(.+?)_(\d+)$/;
-			const match = nameWithoutExt.match(pattern);
-			
-			if (match) {
-				return {
-					baseName: match[1],
-					type: match[2],
-					index: parseInt(match[3]),
-					ext: ext,
-					isImage: ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)
-				};
-			}
-			
-			// 不是图片，是主文件
-			return {
-				baseName: nameWithoutExt,
-				type: 'main',
-				index: null,
-				ext: ext,
-				isImage: false
-			};
-		}
-		
-		// 获取文件类型
-		function getFileType(file) {
-			const ext = file.name.split('.').pop().toLowerCase();
-			
-			if (ext === 'apk') return 'apk';
-			if (['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'xls', 'xlsx'].includes(ext)) return 'document';
-			if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return 'image';
-			return 'other';
-		}
-		
-		// 应用筛选
-		function applyFilter() {
-			const searchTerm = document.getElementById('search-input').value.toLowerCase();
-			
-			// 先根据类型筛选
-			if (currentFilter === 'all') {
-				filteredFilesData = [...allFilesData];
-			} else {
-				filteredFilesData = allFilesData.filter(group => {
-					const fileType = getFileType(group.mainFile);
-					return fileType === currentFilter;
-				});
-			}
-			
-			// 再根据搜索词筛选
-			if (searchTerm) {
-				filteredFilesData = filteredFilesData.filter(group => {
-					const fileName = group.mainFile.name.toLowerCase();
-					const baseName = group.parsedName.baseName.toLowerCase();
-					return fileName.includes(searchTerm) || baseName.includes(searchTerm);
-				});
-			}
-			
-			// 显示文件
-			displayFiles();
-		}
-		
-		// 搜索文件
-		function searchFiles() {
-			applyFilter();
-		}
-		
-		// 显示文件
-		function displayFiles() {
-			const container = document.getElementById('files-container');
-			const emptyState = document.getElementById('empty-state');
-			
-			// 如果没有文件，显示空状态
-			if (filteredFilesData.length === 0) {
-				container.style.display = 'none';
-				emptyState.style.display = 'block';
-				updateStats();
-				return;
-			}
-			
-			// 清空容器
-			container.innerHTML = '';
-			
-			// 生成文件卡片
-			filteredFilesData.forEach((group, index) => {
-				const fileType = getFileType(group.mainFile);
-				const card = createFileCard(group, fileType, index);
-				container.appendChild(card);
-			});
-			
-			// 显示容器
-			container.style.display = 'grid';
-			emptyState.style.display = 'none';
-			
-			// 初始化横向滚动
-			initHorizontalScrolls();
-			
-			// 初始化图片懒加载
-			initLazyLoading();
-			
-			// 初始化图片点击事件
-			initImageClickEvents();
-			
-			// 更新统计信息
-			updateStats();
-		}
-		
-		// 创建文件卡片
-		function createFileCard(group, fileType, cardIndex) {
-			const mainFile = group.mainFile;
-			const baseName = group.parsedName.baseName;
-			const fileExt = mainFile.name.split('.').pop().toUpperCase();
-			
-			// 创建卡片元素
-			const card = document.createElement('div');
-			card.className = `file-card ${fileType === 'document' ? 'document-card' : ''}`;
-			card.dataset.index = cardIndex;
-			
-			// 文件类型显示文本
-			let typeText = '';
-			let typeIcon = '';
-			if (fileType === 'apk') {
-				typeText = 'Android应用';
-				typeIcon = '<i class="fas fa-mobile-alt"></i>';
-			} else if (fileType === 'document') {
-				typeText = '文档文件';
-				typeIcon = '<i class="fas fa-file-alt"></i>';
-			} else {
-				typeText = '其他文件';
-				typeIcon = '<i class="fas fa-file"></i>';
-			}
-			
-			// 下载次数
-			const downloadCount = downloadStats[mainFile.name] || 0;
-			
-			// 文件大小格式化
-			const fileSize = formatFileSize(mainFile.size);
-			
-			// 更新时间格式化
-			const updateTime = formatTime(mainFile.updated_at || mainFile.created_at);
-			
-			// 构建图片HTML
-			let imagesHtml = '';
-			const imageTypes = ['描述', '界面', '引言', '目录'];
-			
-			imageTypes.forEach(type => {
-				const images = group.images[type];
-				if (images.length > 0) {
-					imagesHtml += createImageScrollHtml(type, images, cardIndex, baseName);
-				}
-			});
-			
-			// 构建卡片HTML
-			card.innerHTML = `
-				<div class="card-header">
-					<div class="file-type">${typeIcon} ${typeText}</div>
-					<div class="file-name">${baseName}</div>
-					<div class="file-filename">${mainFile.name}</div>
-				</div>
-				
-				<div class="card-body">
-					<div class="file-meta">
-						<div class="meta-row">
-							<span class="meta-label"><i class="fas fa-hdd file-icon"></i>文件大小:</span>
-							<span class="meta-value">${fileSize}</span>
-						</div>
-						<div class="meta-row">
-							<span class="meta-label"><i class="fas fa-calendar-alt file-icon"></i>更新时间:</span>
-							<span class="meta-value">${updateTime}</span>
-						</div>
-						<div class="meta-row">
-							<span class="meta-label"><i class="fas fa-download file-icon"></i>下载次数:</span>
-							<span class="meta-value">${downloadCount}</span>
-						</div>
-						<div class="meta-row">
-							<span class="meta-label"><i class="fas fa-code file-icon"></i>文件格式:</span>
-							<span class="meta-value">${fileExt}</span>
-						</div>
-					</div>
-					
-					${imagesHtml}
-					
-					<a href="${mainFile.download_url}" 
-					   class="download-btn" 
-					   onclick="trackDownload('${mainFile.name}')"
-					   download="${mainFile.name}">
-						<i class="fas fa-download"></i> 下载文件
-						<span class="download-count">${downloadCount}次</span>
-					</a>
-				</div>
-			`;
-			
-			return card;
-		}
-		
-		// 创建图片横向滚动HTML
-		function createImageScrollHtml(type, images, cardIndex, baseName) {
-			const typeIcons = {
-				'描述': '<i class="fas fa-info-circle"></i>',
-				'界面': '<i class="fas fa-mobile-alt"></i>',
-				'引言': '<i class="fas fa-book-open"></i>',
-				'目录': '<i class="fas fa-list-ul"></i>'
-			};
-			
-			const typeNames = {
-				'描述': '描述图片',
-				'界面': '界面截图',
-				'引言': '引言图片',
-				'目录': '目录图片'
-			};
-			
-			const icon = typeIcons[type] || '<i class="fas fa-image"></i>';
-			const typeName = typeNames[type] || type;
-			
-			// 构建图片HTML
-			let imagesHtml = '';
-			images.forEach((img, imgIndex) => {
-				imagesHtml += `
-					<img src="" 
-						 data-src="${img.download_url}"
-						 data-group-index="${cardIndex}"
-						 data-image-type="${img.type}"
-						 data-image-index="${imgIndex}"
-						 alt="${baseName} ${typeName} ${imgIndex + 1}"
-						 class="scroll-image lazy-image"
-						 loading="lazy">
-				`;
-			});
-			
-			return `
-				<div class="images-section">
-					<div class="section-title">
-						${icon} ${typeName} (${images.length}张)
-					</div>
-					<div class="scroll-container">
-						<button class="scroll-btn scroll-left" 
-								onclick="scrollImages('left', '${type}-${cardIndex}')">
-							<i class="fas fa-chevron-left"></i>
-						</button>
-						
-						<div class="scroll-wrapper" id="scroll-${type}-${cardIndex}">
-							<div class="scroll-content">
-								${imagesHtml}
-							</div>
-						</div>
-						
-						<button class="scroll-btn scroll-right"
-								onclick="scrollImages('right', '${type}-${cardIndex}')">
-							<i class="fas fa-chevron-right"></i>
-						</button>
-					</div>
-				</div>
-			`;
-		}
-		
-		// 初始化横向滚动
-		function initHorizontalScrolls() {
-			// 为每个滚动容器设置初始状态
-			document.querySelectorAll('.scroll-container').forEach(container => {
-				const wrapper = container.querySelector('.scroll-wrapper');
-				const leftBtn = container.querySelector('.scroll-left');
-				const rightBtn = container.querySelector('.scroll-right');
-				
-				// 初始检查按钮状态
-				updateScrollButtons(wrapper, leftBtn, rightBtn);
-				
-				// 监听滚动事件
-				wrapper.addEventListener('scroll', function() {
-					updateScrollButtons(wrapper, leftBtn, rightBtn);
-				});
-			});
-		}
-		
-		// 更新滚动按钮状态
-		function updateScrollButtons(wrapper, leftBtn, rightBtn) {
-			const scrollLeft = wrapper.scrollLeft;
-			const maxScrollLeft = wrapper.scrollWidth - wrapper.clientWidth;
-			
-			// 左按钮
-			if (scrollLeft <= 10) {
-				leftBtn.classList.add('hidden');
-			} else {
-				leftBtn.classList.remove('hidden');
-			}
-			
-			// 右按钮
-			if (scrollLeft >= maxScrollLeft - 10) {
-				rightBtn.classList.add('hidden');
-			} else {
-				rightBtn.classList.remove('hidden');
-			}
-		}
-		
-		// 滚动图片
-		function scrollImages(direction, scrollId) {
-			const wrapper = document.getElementById(`scroll-${scrollId}`);
-			if (!wrapper) return;
-			
-			const scrollAmount = 300; // 每次滚动300px
-			
-			if (direction === 'left') {
-				wrapper.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-			} else {
-				wrapper.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-			}
-		}
-		
-		// 初始化图片懒加载
-		function initLazyLoading() {
-			// 使用Intersection Observer实现懒加载
-			const lazyImages = document.querySelectorAll('.lazy-image');
-			
-			const imageObserver = new IntersectionObserver((entries, observer) => {
-				entries.forEach(entry => {
-					if (entry.isIntersecting) {
-						const img = entry.target;
-						img.src = img.dataset.src;
-						img.classList.remove('lazy-image');
-						
-						// 图片加载完成后移除背景色
-						img.onload = function() {
-							img.style.background = 'none';
-						};
-						
-						// 图片加载失败处理
-						img.onerror = function() {
-							img.style.background = '#ffebee';
-							img.style.display = 'flex';
-							img.style.alignItems = 'center';
-							img.style.justifyContent = 'center';
-							img.innerHTML = '<div style="color: #c62828; font-size: 0.8rem;">图片加载失败</div>';
-						};
-						
-						observer.unobserve(img);
-					}
-				});
-			});
-			
-			lazyImages.forEach(img => imageObserver.observe(img));
-		}
-		
-		// 初始化图片点击事件
-		function initImageClickEvents() {
-			document.querySelectorAll('.scroll-image').forEach(img => {
-				img.addEventListener('click', function() {
-					const groupIndex = parseInt(this.dataset.groupIndex);
-					const imageType = this.dataset.imageType;
-					const imageIndex = parseInt(this.dataset.imageIndex);
-					
-					// 打开图片浏览器
-					openImageBrowser(groupIndex, imageType, imageIndex);
-				});
-			});
-		}
-		
-		// 打开图片浏览器
-		function openImageBrowser(groupIndex, imageType, imageIndex) {
-			if (imageBrowser.isOpen) return;
-			
-			// 保存当前滚动位置
-			imageBrowser.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-			
-			// 锁定背景滚动
-			document.body.style.overflow = 'hidden';
-			document.body.style.position = 'fixed';
-			document.body.style.width = '100%';
-			document.body.style.top = `-${imageBrowser.scrollPosition}px`;
-			
-			// 设置图片浏览器数据
-			const group = filteredFilesData[groupIndex];
-			imageBrowser.currentGroupIndex = groupIndex;
-			imageBrowser.currentImageType = imageType;
-			imageBrowser.currentImageIndex = imageIndex;
-			imageBrowser.images = group.images[imageType];
-			imageBrowser.isOpen = true;
-			
-			// 更新模态框标题
-			const typeNames = {
-				'描述': '描述图片',
-				'界面': '界面截图',
-				'引言': '引言图片',
-				'目录': '目录图片'
-			};
-			
-			document.getElementById('modal-title-text').textContent = 
-				`${group.parsedName.baseName} - ${typeNames[imageType] || imageType}`;
-			
-			// 显示模态框
-			document.getElementById('image-browser-modal').style.display = 'flex';
-			
-			// 显示触摸提示（仅移动端）
-			if (isMobileDevice()) {
-				setTimeout(() => {
-					const touchHint = document.getElementById('touch-hint');
-					touchHint.classList.add('show');
-					setTimeout(() => touchHint.classList.remove('show'), 3000);
-				}, 500);
-			}
-			
-			// 加载当前图片
-			loadCurrentImage();
-			
-			// 更新导航按钮状态
-			updateImageNavButtons();
-		}
-		
-		// 加载当前图片
-		function loadCurrentImage() {
-			const currentImage = imageBrowser.images[imageBrowser.currentImageIndex];
-			
-			if (!currentImage) return;
-			
-			// 显示加载指示器
-			document.getElementById('image-loader').style.display = 'block';
-			
-			// 重置图片状态
-			const browserImage = document.getElementById('browser-image');
-			browserImage.classList.remove('loaded');
-			browserImage.style.opacity = '0';
-			
-			// 设置图片源
-			browserImage.src = currentImage.download_url;
-			browserImage.alt = currentImage.name;
-			
-			// 图片加载完成
-			browserImage.onload = function() {
-				document.getElementById('image-loader').style.display = 'none';
-				browserImage.classList.add('loaded');
-				browserImage.style.opacity = '1';
-				
-				// 更新图片信息
-				document.getElementById('image-info-text').textContent = 
-					`${currentImage.name} (${formatFileSize(currentImage.size)})`;
-				
-				// 更新计数器
-				document.getElementById('current-image-index').textContent = imageBrowser.currentImageIndex + 1;
-				document.getElementById('total-images-count').textContent = imageBrowser.images.length;
-				
-				// 更新下载按钮
-				document.getElementById('download-image-btn').dataset.imageUrl = currentImage.download_url;
-				document.getElementById('download-image-btn').dataset.imageName = currentImage.name;
-			};
-			
-			// 图片加载失败
-			browserImage.onerror = function() {
-				document.getElementById('image-loader').style.display = 'none';
-				browserImage.alt = '图片加载失败';
-				document.getElementById('image-info-text').textContent = '图片加载失败，请重试';
-			};
-		}
-		
-		// 显示上一张图片
-		function showPrevImage() {
-			if (imageBrowser.currentImageIndex > 0) {
-				imageBrowser.currentImageIndex--;
-				loadCurrentImage();
-				updateImageNavButtons();
-			}
-		}
-		
-		// 显示下一张图片
-		function showNextImage() {
-			if (imageBrowser.currentImageIndex < imageBrowser.images.length - 1) {
-				imageBrowser.currentImageIndex++;
-				loadCurrentImage();
-				updateImageNavButtons();
-			}
-		}
-		
-		// 更新图片导航按钮状态
-		function updateImageNavButtons() {
-			const prevBtn = document.getElementById('prev-image-btn');
-			const nextBtn = document.getElementById('next-image-btn');
-			
-			// 上一张按钮
-			if (imageBrowser.currentImageIndex > 0) {
-				prevBtn.classList.remove('hidden');
-			} else {
-				prevBtn.classList.add('hidden');
-			}
-			
-			// 下一张按钮
-			if (imageBrowser.currentImageIndex < imageBrowser.images.length - 1) {
-				nextBtn.classList.remove('hidden');
-			} else {
-				nextBtn.classList.add('hidden');
-			}
-		}
-		
-		// 关闭图片浏览器
-		function closeImageBrowser() {
-			if (!imageBrowser.isOpen) return;
-			
-			// 关闭模态框
-			document.getElementById('image-browser-modal').style.display = 'none';
-			
-			// 恢复背景滚动
-			document.body.style.overflow = '';
-			document.body.style.position = '';
-			document.body.style.width = '';
-			document.body.style.top = '';
-			
-			// 恢复滚动位置
-			window.scrollTo(0, imageBrowser.scrollPosition);
-			
-			// 重置状态
-			imageBrowser.isOpen = false;
-		}
-		
-		// 下载当前图片
-		function downloadCurrentImage() {
-			const btn = document.getElementById('download-image-btn');
-			const imageUrl = btn.dataset.imageUrl;
-			const imageName = btn.dataset.imageName;
-			
-			if (!imageUrl) return;
-			
-			const link = document.createElement('a');
-			link.href = imageUrl;
-			link.download = imageName;
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			
-			// 记录下载
-			console.log(`图片下载: ${imageName}`);
-		}
-		
-		// 触摸事件处理
-		function handleTouchStart(e) {
-			if (!imageBrowser.isOpen) return;
-			
-			imageBrowser.touchStartX = e.touches[0].clientX;
-			imageBrowser.touchStartY = e.touches[0].clientY;
-		}
-		
-		function handleTouchMove(e) {
-			if (!imageBrowser.isOpen) return;
-			e.preventDefault(); // 防止页面滚动
-		}
-		
-		function handleTouchEnd(e) {
-			if (!imageBrowser.isOpen) return;
-			
-			const touchEndX = e.changedTouches[0].clientX;
-			const touchEndY = e.changedTouches[0].clientY;
-			
-			const diffX = imageBrowser.touchStartX - touchEndX;
-			const diffY = imageBrowser.touchStartY - touchEndY;
-			
-			// 水平滑动距离大于垂直滑动距离，且大于50px
-			if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
-				if (diffX > 0) {
-					showNextImage(); // 向左滑动，下一张
-				} else {
-					showPrevImage(); // 向右滑动，上一张
-				}
-			}
-		}
-		
-		// 键盘事件处理
-		function handleKeyDown(e) {
-			if (!imageBrowser.isOpen) return;
-			
-			switch(e.key) {
-				case 'Escape':
-					closeImageBrowser();
-					break;
-				case 'ArrowLeft':
-					showPrevImage();
-					break;
-				case 'ArrowRight':
-					showNextImage();
-					break;
-				case ' ':
-				case 'Spacebar':
-					e.preventDefault(); // 防止空格键滚动页面
-					break;
-			}
-		}
-		
-		// 检测是否为移动设备
-		function isMobileDevice() {
-			return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-		}
-		
-		// 加载下载统计
-		function loadDownloadStats() {
-			try {
-				const stats = localStorage.getItem('downloadStats');
-				if (stats) {
-					downloadStats = JSON.parse(stats);
-				} else {
-					downloadStats = {};
-				}
-			} catch (e) {
-				console.error('加载下载统计失败:', e);
-				downloadStats = {};
-			}
-		}
-		
-		// 保存下载统计
-		function saveDownloadStats() {
-			try {
-				localStorage.setItem('downloadStats', JSON.stringify(downloadStats));
-			} catch (e) {
-				console.error('保存下载统计失败:', e);
-			}
-		}
-		
-		// 跟踪下载
-		function trackDownload(filename) {
-			// 增加下载计数
-			downloadStats[filename] = (downloadStats[filename] || 0) + 1;
-			
-			// 保存到localStorage
-			saveDownloadStats();
-			
-			// 更新当前卡片的下载次数显示
-			const downloadCountElement = document.querySelector(`.file-card[data-index] .download-count`);
-			if (downloadCountElement) {
-				downloadCountElement.textContent = `${downloadStats[filename]}次`;
-			}
-			
-			// 更新总下载次数显示
-			updateStats();
-			
-			// 记录下载日志
-			console.log(`文件下载: ${filename}, 总下载次数: ${downloadStats[filename]}`);
-		}
-		
-		// 更新统计信息
-		function updateStats() {
-			// 文件数量
-			document.getElementById('total-files').textContent = `${filteredFilesData.length}个文件`;
-			
-			// 总下载次数
-			const totalDownloads = Object.values(downloadStats).reduce((sum, count) => sum + count, 0);
-			document.getElementById('total-downloads').textContent = `${totalDownloads}次下载`;
-			
-			// 最后更新时间
-			if (filteredFilesData.length > 0) {
-				// 找到最新的更新时间
-				let latestTime = new Date(0);
-				filteredFilesData.forEach(group => {
-					const fileTime = new Date(group.mainFile.updated_at || group.mainFile.created_at);
-					if (fileTime > latestTime) {
-						latestTime = fileTime;
-					}
-				});
-				
-				document.getElementById('last-update').textContent = `更新于: ${formatTime(latestTime.toISOString(), true)}`;
-			} else {
-				document.getElementById('last-update').textContent = `暂无文件`;
-			}
-		}
-		
-		// 显示错误信息
-		function showError(message) {
-			document.getElementById('error-text').textContent = message;
-			document.getElementById('error-container').style.display = 'block';
-			document.getElementById('loading').style.display = 'none';
-			document.getElementById('files-container').style.display = 'none';
-		}
-		
-		// 格式化文件大小
-		function formatFileSize(bytes) {
-			if (bytes === 0 || bytes === undefined) return '未知大小';
-			
-			const units = ['B', 'KB', 'MB', 'GB'];
-			let size = bytes;
-			let unitIndex = 0;
-			
-			while (size >= 1024 && unitIndex < units.length - 1) {
-				size /= 1024;
-				unitIndex++;
-			}
-			
-			return size.toFixed(2) + ' ' + units[unitIndex];
-		}
-		
-		// 格式化时间
-		function formatTime(dateString, short = false) {
-			if (!dateString) return '未知时间';
-			
-			try {
-				const date = new Date(dateString);
-				if (isNaN(date.getTime())) {
-					return '未知时间';
-				}
-				
-				if (short) {
-					// 简短格式：月-日 时:分
-					return date.toLocaleDateString('zh-CN', { 
-						month: '2-digit', 
-						day: '2-digit' 
-					}) + ' ' + date.toLocaleTimeString('zh-CN', { 
-						hour: '2-digit', 
-						minute: '2-digit' 
-					});
-				} else {
-					// 完整格式：年-月-日 时:分:秒
-					return date.toLocaleDateString('zh-CN') + ' ' + date.toLocaleTimeString('zh-CN');
-				}
-			} catch (e) {
-				return '未知时间';
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+				"three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
 			}
 		}
 	</script>
-	<!-- 新网站链接区域 - 从此处开始复制 -->
-	<div style="margin: 30px 0; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 10px; border-left: 5px solid #4CAF50;">
-		<h3 style="margin-top: 0; color: #333;">🚀 探索我的新项目</h3>
-		<p>我已经成功创建了第二个独立的网站，专注于分享不同的内容。</p>
-		<a href="https://ningchaojie.github.io/new-website" 
-		   style="display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">
-		   点击访问「我的第二个网站」 →
-		</a>
-	</div>
-	<!-- 新网站链接区域 - 到此结束 -->
-	<!-- 数学符号编辑器链接区域 - 从此处开始复制 -->
-<div style="margin: 30px 0; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 10px; border-left: 5px solid #4CAF50;">
-	<h3 style="margin-top: 0; color: #333;">∑ 数学符号编辑器</h3>
-	<p>这是一个在线工具，提供便捷的数学符号输入、编辑与实时预览功能。</p>
+
+	<script type="module">
+		import * as THREE from 'three';
+		import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+		// --- 触摸控制专用变量 ---
+		let touchMoveLeft = { active: false, startX: 0, startY: 0 };
+		let touchMoveRight = { active: false, startX: 0, startY: 0 };
+		let moveDirection = { forward: 0, right: 0 };
+		let cameraEuler = { yaw: -0.8, pitch: 0.15 };
+		let playerPosition = null;
+		
+		// --- 广告牌相关全局引用 (用于自适应调整) ---
+		let imgPlane = null;          // 图片广告牌平面
+		let imgBorder = null;         // 图片边框线框
+		let ringParticlesAdImg = null; // 图片装饰粒子环
+		let videoPlane = null;        // 视频广告牌平面
+		let videoBorder = null;       // 视频边框线框
+		let ringParticlesAdVideo = null; // 视频装饰粒子环
+		let videoTexture = null;
+		let videoElement = null;
+		
+		// --- 初始化场景、相机、渲染器 ---
+		const scene = new THREE.Scene();
+		scene.background = new THREE.Color(0x0a1030);
+		scene.fog = new THREE.FogExp2(0x0a1030, 0.008);
+
+		const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+		camera.position.set(5, 1.6, 8);
+		camera.rotation.order = 'YXZ';
+		
+		const renderer = new THREE.WebGLRenderer({ antialias: true });
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+		document.body.appendChild(renderer.domElement);
+		
+		const labelRenderer = new CSS2DRenderer();
+		labelRenderer.setSize(window.innerWidth, window.innerHeight);
+		labelRenderer.domElement.style.position = 'absolute';
+		labelRenderer.domElement.style.top = '0px';
+		labelRenderer.domElement.style.left = '0px';
+		labelRenderer.domElement.style.pointerEvents = 'none'; //可点击
+		
+		document.body.appendChild(labelRenderer.domElement);
+		
+		// --- 光照系统 ---
+		const ambientLight = new THREE.AmbientLight(0x404060, 0.6);
+		scene.add(ambientLight);
+		
+		const dirLight = new THREE.DirectionalLight(0xfff5e6, 1.2);
+		dirLight.position.set(10, 20, 5);
+		dirLight.castShadow = true;
+		dirLight.receiveShadow = true;
+		dirLight.shadow.mapSize.width = 1024;
+		dirLight.shadow.mapSize.height = 1024;
+		dirLight.shadow.camera.near = 0.5;
+		dirLight.shadow.camera.far = 30;
+		dirLight.shadow.camera.left = -10;
+		dirLight.shadow.camera.right = 10;
+		dirLight.shadow.camera.top = 10;
+		dirLight.shadow.camera.bottom = -10;
+		scene.add(dirLight);
+		
+		const backLight = new THREE.PointLight(0xcc9966, 0.4);
+		backLight.position.set(-3, 2, -4);
+		scene.add(backLight);
+		
+		const fillLight = new THREE.PointLight(0x6688aa, 0.3);
+		fillLight.position.set(2, 1, 3);
+		scene.add(fillLight);
+		
+		const groundGlow = new THREE.PointLight(0x88aaff, 0.2);
+		groundGlow.position.set(0, 1, 0);
+		scene.add(groundGlow);
+		
+		// --- 地面与装饰 ---
+		const gridHelper = new THREE.GridHelper(30, 20, 0x88aaff, 0x335588);
+		gridHelper.position.y = -0.01;
+		gridHelper.material.transparent = true;
+		gridHelper.material.opacity = 0.4;
+		scene.add(gridHelper);
+		
+		const groundPlane = new THREE.Mesh(
+			new THREE.PlaneGeometry(25, 25),
+			new THREE.MeshStandardMaterial({ color: 0x3c8c40, roughness: 0.8, metalness: 0.1 })
+		);
+		groundPlane.rotation.x = -Math.PI / 2;
+		groundPlane.position.y = -0.05;
+		groundPlane.receiveShadow = true;
+		scene.add(groundPlane);
+		
+		// 草地装饰
+		const grassMat = new THREE.MeshStandardMaterial({ color: 0x5cac5c });
+		for (let i = 0; i < 280; i++) {
+			const grass = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 0.2, 3), grassMat);
+			const angle = Math.random() * Math.PI * 2;
+			const rad = 5 + Math.random() * 13;
+			const x = Math.cos(angle) * rad;
+			const z = Math.sin(angle) * rad;
+			grass.position.set(x, -0.05 + 0.1, z);
+			grass.castShadow = true;
+			if (Math.abs(x) < 3.5 && Math.abs(z) < 3.5) continue;
+			scene.add(grass);
+		}
+		
+		// --- 场景物体 (增加探索趣味) ---
+		const redBox = new THREE.Mesh(
+			new THREE.BoxGeometry(1.2, 1.2, 1.2),
+			new THREE.MeshStandardMaterial({ color: 0xd64531, roughness: 0.3 })
+		);
+		redBox.position.set(-2.5, 0.55, -3);
+		redBox.castShadow = true;
+		scene.add(redBox);
+		
+		const bluePillar = new THREE.Mesh(
+			new THREE.BoxGeometry(0.8, 2.0, 0.8),
+			new THREE.MeshStandardMaterial({ color: 0x3a86ff, metalness: 0.4 })
+		);
+		bluePillar.position.set(3.2, 0.9, -2);
+		bluePillar.castShadow = true;
+		scene.add(bluePillar);
+		
+		const goldRing = new THREE.Mesh(
+			new THREE.TorusGeometry(0.7, 0.1, 32, 64),
+			new THREE.MeshStandardMaterial({ color: 0xffaa44, metalness: 0.8 })
+		);
+		goldRing.position.set(-1, 1.2, 4);
+		goldRing.rotation.x = Math.PI / 2;
+		goldRing.castShadow = true;
+		scene.add(goldRing);
+		
+		const greenPlatform = new THREE.Mesh(
+			new THREE.BoxGeometry(2.5, 0.3, 2.5),
+			new THREE.MeshStandardMaterial({ color: 0x66bb66 })
+		);
+		greenPlatform.position.set(4, 0.1, 3.5);
+		greenPlatform.castShadow = true;
+		greenPlatform.receiveShadow = true;
+		scene.add(greenPlatform);
+		
+		const sphere = new THREE.Mesh(
+			new THREE.SphereGeometry(0.4, 32, 32),
+			new THREE.MeshStandardMaterial({ color: 0xff8844 })
+		);
+		sphere.position.set(4, 0.5, 3.5);
+		sphere.castShadow = true;
+		scene.add(sphere);
+		
+		const pillarPositions = [
+			[-1.5, 0, -4.5], [0.5, 0, -5], [3.8, 0, -1], [-3, 0, 2], [-4, 0, -1], [1.5, 0, 3.2]
+		];
+		pillarPositions.forEach(pos => {
+			const pillar = new THREE.Mesh(
+				new THREE.BoxGeometry(0.6, 0.8, 0.6),
+				new THREE.MeshStandardMaterial({ color: 0xaa8866 })
+			);
+			pillar.position.set(pos[0], 0.35, pos[2]);
+			pillar.castShadow = true;
+			scene.add(pillar);
+		});
+		
+		function addTree(x, z) {
+			const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 1.2, 6), new THREE.MeshStandardMaterial({ color: 0x8B5A2B }));
+			trunk.position.set(x, 0.5, z);
+			trunk.castShadow = true;
+			const foliage = new THREE.Mesh(new THREE.ConeGeometry(0.7, 1.0, 6), new THREE.MeshStandardMaterial({ color: 0x5cad45 }));
+			foliage.position.set(x, 1.1, z);
+			foliage.castShadow = true;
+			scene.add(trunk);
+			scene.add(foliage);
+		}
+		addTree(-3.5, -3.2);
+		addTree(3, -4);
+		addTree(-2, 4.5);
+		addTree(0, -5.2);
+		addTree(5, 0.5);
+		addTree(-4.8, 1);
+		
+		// 粒子效果
+		const particleCount = 450;
+		const particlesGeometry = new THREE.BufferGeometry();
+		const particlePositions = new Float32Array(particleCount * 3);
+		for (let i = 0; i < particleCount; i++) {
+			particlePositions[i*3] = (Math.random() - 0.5) * 42;
+			particlePositions[i*3+1] = Math.random() * 6;
+			particlePositions[i*3+2] = (Math.random() - 0.5) * 32;
+		}
+		particlesGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+		const particleMat = new THREE.PointsMaterial({ color: 0x88aaff, size: 0.06, transparent: true, opacity: 0.5 });
+		const particles = new THREE.Points(particlesGeometry, particleMat);
+		scene.add(particles);
+		
+		const ringParticles = new THREE.BufferGeometry();
+		const ringCount = 200;
+		const ringPos = [];
+		for (let i = 0; i < ringCount; i++) {
+			const angle = (i / ringCount) * Math.PI * 2;
+			const rad = 2.2;
+			ringPos.push(Math.cos(angle) * rad, Math.sin(angle) * rad + 1.2, Math.sin(angle) * rad);
+		}
+		ringParticles.setAttribute('position', new THREE.BufferAttribute(new Float32Array(ringPos), 3));
+		const ringPointsMat = new THREE.PointsMaterial({ color: 0xffaa66, size: 0.08 });
+		const ringPoints = new THREE.Points(ringParticles, ringPointsMat);
+		ringPoints.position.set(-1, 0.5, 4);
+		scene.add(ringPoints);
+		
+		// --- 文字标签 (CSS2D) ---
+		function makeLabel(text, color, position) {
+			const div = document.createElement('div');
+			div.textContent = text;
+			div.style.color = color;
+			div.style.fontSize = '13px';
+			div.style.fontWeight = 'bold';
+			div.style.textShadow = '1px 1px 0px black';
+			div.style.background = 'rgba(0,0,0,0.6)';
+			div.style.padding = '2px 8px';
+			div.style.borderRadius = '20px';
+			div.style.borderLeft = `3px solid ${color}`;
+			div.style.pointerEvents = 'none';
+			div.style.backdropFilter = 'blur(4px)';
+			const label = new CSS2DObject(div);
+			label.position.copy(position);
+			scene.add(label);
+		}
+		makeLabel('红色巨石', '#ff8888', new THREE.Vector3(-2.5, 1.2, -3));
+		makeLabel('蓝晶柱', '#88aaff', new THREE.Vector3(3.2, 2.2, -2));
+		makeLabel('黄金圆环', '#ffcc88', new THREE.Vector3(-1, 1.6, 4));
+		makeLabel('悬浮平台', '#88ff88', new THREE.Vector3(4, 0.6, 3.5));
+		
+
+		const billboards = []; // 存储所有需要面向相机的物体 (平面、边框、装饰粒子环)
+		
+		// ----- 辅助函数：生成广告牌边框 (基于宽高和厚度) -----
+		function createBillboardBorder(width, height, depth, colorHex) {
+			const boxGeo = new THREE.BoxGeometry(width, height, depth);
+			const edgesGeo = new THREE.EdgesGeometry(boxGeo);
+			const borderMat = new THREE.LineBasicMaterial({ color: colorHex });
+			const border = new THREE.LineSegments(edgesGeo, borderMat);
+			return border;
+		}
+		
+		// ----- 辅助函数：更新粒子环缩放以适应新尺寸 (原始基准宽2.4，高1.6) -----
+		function updateParticleRingScale(ring, newWidth, newHeight) {
+			if (!ring) return;
+			const baseWidth = 2.4;
+			const baseHeight = 1.6;
+			ring.scale.set(newWidth / baseWidth, newHeight / baseHeight, 1);
+		}
+
+
+		
+// 网页展示板
+// 网页展示板 - 使用普通平面，可点击跳转
+//const webPlaneMat = new THREE.MeshStandardMaterial({ color: 0x2266aa, side: THREE.DoubleSide });
+//const webPlaneMat = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load('https://ningchaojie.github.io/手写演示.jpg'), side: THREE.DoubleSide });
+//const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 256; const ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0,0,512,256); ctx.fillStyle = '#333'; ctx.font = 'bold 24px "Segoe UI"'; ctx.fillText('文档编辑器', 20, 60); ctx.font = '16px "Segoe UI"'; ctx.fillText('手写模块 | 实时预览', 20, 110); const webPlaneMat = new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(canvas), side: THREE.DoubleSide });	
+//const video = document.createElement('video'); video.src = 'https://ningchaojie.github.io/手写演示.mp4'; video.loop = true; video.muted = true; video.playsInline = true; video.autoplay = true; video.play(); const videoTexture = new THREE.VideoTexture(video); const webPlaneMat = new THREE.MeshStandardMaterial({ map: videoTexture, side: THREE.DoubleSide });	
+
+// 网页展示板 - 视频自适应（高度固定1.8，宽度按比例）
+const webPlaneHeight = 1.8;
+let webPlaneWidth = 3.2; // 临时宽度，元数据加载后会更新
+
+const webVideo = document.createElement('video');
+webVideo.src = 'https://ningchaojie.github.io/手写演示.mp4';
+webVideo.loop = true;
+webVideo.muted = true;
+webVideo.playsInline = true;
+webVideo.crossOrigin = 'anonymous';
+webVideo.load();
+
+const webVideoTexture = new THREE.VideoTexture(webVideo);
+const webPlaneMat = new THREE.MeshStandardMaterial({ map: webVideoTexture, side: THREE.DoubleSide });
+const webPlane = new THREE.Mesh(new THREE.PlaneGeometry(webPlaneWidth, webPlaneHeight), webPlaneMat);
+webPlane.position.set(0, 2.5, -5);
+webPlane.castShadow = true;
+scene.add(webPlane);
+billboards.push(webPlane);
+
+// 添加边框（临时尺寸，后续会根据视频比例更新）
+let webBorder = createBillboardBorder(webPlaneWidth + 0.1, webPlaneHeight + 0.1, 0.05, 0x44aaff);
+webBorder.position.copy(webPlane.position);
+scene.add(webBorder);
+billboards.push(webBorder);
+
+// 等待视频元数据加载后，调整宽度以适应比例
+webVideo.addEventListener('loadedmetadata', () => {
+	const vw = webVideo.videoWidth;
+	const vh = webVideo.videoHeight;
+	if (vw && vh) {
+		const ratio = vw / vh;
+		const newWidth = webPlaneHeight * ratio;  // 高度固定，宽度按比例
+		// 更新平面几何体
+		webPlane.geometry.dispose();
+		webPlane.geometry = new THREE.PlaneGeometry(newWidth, webPlaneHeight);
+		// 更新边框
+		scene.remove(webBorder);
+		const idx = billboards.indexOf(webBorder);
+		if (idx !== -1) billboards.splice(idx, 1);
+		webBorder = createBillboardBorder(newWidth + 0.1, webPlaneHeight + 0.1, 0.05, 0x44aaff);
+		webBorder.position.copy(webPlane.position);
+		scene.add(webBorder);
+		billboards.push(webBorder);
+		console.log(`网页板视频自适应完成: 宽=${newWidth.toFixed(2)} 高=${webPlaneHeight}, 比例=${ratio.toFixed(2)}`);
+	}
+});
+
+// CSS2D文字标签（位置不变，仍在平面下方）
+const webLabelDiv = document.createElement('div');
+webLabelDiv.textContent = '📄 文档编辑器v2.3手写模块功能展示.html';
+webLabelDiv.style.color = 'white';
+webLabelDiv.style.background = 'rgba(0,0,0,0.6)';
+webLabelDiv.style.padding = '4px 12px';
+webLabelDiv.style.borderRadius = '20px';
+webLabelDiv.style.fontSize = '14px';
+webLabelDiv.style.pointerEvents = 'none';
+const webLabel = new CSS2DObject(webLabelDiv);
+webLabel.position.copy(webPlane.position);
+webLabel.position.y -= 1.0;
+scene.add(webLabel);
+
+
+
+
+// 网页展示板 - 图片按高度填满且保持宽高比（不拉伸）
+// ========== 第二个网页展示板（图片，位置不同，变量独立） ==========
+const webPlane2Width = 3.2;
+const webPlane2Height = 1.8;
+const webPlane2Geometry = new THREE.PlaneGeometry(webPlane2Width, webPlane2Height);
+const webPlane2Mat = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+const webPlane2 = new THREE.Mesh(webPlane2Geometry, webPlane2Mat);
+webPlane2.position.set(-5, 2.5, -10);  // 新位置
+webPlane2.castShadow = true;
+scene.add(webPlane2);
+billboards.push(webPlane2);
+
+// 边框
+const webBorder2 = createBillboardBorder(webPlane2Width + 0.1, webPlane2Height + 0.1, 0.05, 0x44aaff);
+webBorder2.position.copy(webPlane2.position);
+scene.add(webBorder2);
+billboards.push(webBorder2);
+
+// 加载图片（可用相同图片或新图片，这里复用同一张）
+const webImageUrl2 = 'https://ningchaojie.github.io/手写演示.jpg';
+const webCanvas2 = document.createElement('canvas');
+const webCtx2 = webCanvas2.getContext('2d');
+const canvasWidth2 = 800;
+const canvasHeight2 = 450;
+webCanvas2.width = canvasWidth2;
+webCanvas2.height = canvasHeight2;
+
+const webImg2 = new Image();
+webImg2.crossOrigin = "Anonymous";
+webImg2.onload = () => {
+	const imgW = webImg2.width;
+	const imgH = webImg2.height;
+	const scale = canvasHeight2 / imgH;
+	const scaledWidth = imgW * scale;
+	const offsetX = (canvasWidth2 - scaledWidth) / 2;
 	
-	<!-- 注意：这里的链接已经改成了 GitHub 上的在线地址 -->
-	<a href="https://ningchaojie.github.io/math-editor.html" 
-	   target="_blank" 
-	   rel="noopener noreferrer"
-	   style="display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">
-	   启动编辑器 →
-	</a>
-</div>
-<!-- 数学符号编辑器链接区域 - 到此结束 -->
+	webCtx2.clearRect(0, 0, canvasWidth2, canvasHeight2);
+	webCtx2.drawImage(webImg2, offsetX, 0, scaledWidth, canvasHeight2);
 	
-	<!-- 数学符号编辑器链接区域 - 从此处开始复制 -->
-<div style="margin: 30px 0; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 10px; border-left: 5px solid #4CAF50;">
-	<h3 style="margin-top: 0; color: #333;">Latex公式编辑器2.8</h3>
-	<p>这是一个介绍和apk下载网页。</p>
+	const texture = new THREE.CanvasTexture(webCanvas2);
+	texture.colorSpace = THREE.SRGBColorSpace;
+	webPlane2.material.map = texture;
+	webPlane2.material.needsUpdate = true;
+};
+webImg2.src = webImageUrl2;
+
+// CSS2D 文字标签
+const webLabelDiv2 = document.createElement('div');
+webLabelDiv2.textContent = '📄应用开发中心(点击进入了解更多) ';
+webLabelDiv2.style.color = 'white';
+webLabelDiv2.style.background = 'rgba(0,0,0,0.6)';
+webLabelDiv2.style.padding = '4px 12px';
+webLabelDiv2.style.borderRadius = '20px';
+webLabelDiv2.style.fontSize = '14px';
+webLabelDiv2.style.pointerEvents = 'none';
+const webLabel2 = new CSS2DObject(webLabelDiv2);
+webLabel2.position.copy(webPlane2.position);
+webLabel2.position.y -= 1.0;
+scene.add(webLabel2);
+
+
+
+// 下载图标（CSS2D 方式，直接支持点击）
+// 下载图标 - 使用纹理加载真实图标
+const iconTexture = new THREE.TextureLoader().load('https://ningchaojie.github.io/文档编辑器APP图标.jpg');
+const iconMat = new THREE.MeshStandardMaterial({ map: iconTexture, side: THREE.DoubleSide });
+const iconPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.8), iconMat);
+iconPlane.position.set(-2, 1.2, -4);
+iconPlane.castShadow = true;
+scene.add(iconPlane);
+billboards.push(iconPlane);
+
+// 添加边框
+const iconBorder = createBillboardBorder(0.85, 0.85, 0.05, 0xffaa66);
+iconBorder.position.copy(iconPlane.position);
+scene.add(iconBorder);
+billboards.push(iconBorder);
+
+// 添加文字提示
+const iconLabelDiv = document.createElement('div');
+iconLabelDiv.textContent = '⬇️ 文档编辑器v2.3.apk';
+iconLabelDiv.style.color = '#ffaa88';
+iconLabelDiv.style.background = 'rgba(0,0,0,0.5)';
+iconLabelDiv.style.padding = '2px 8px';
+iconLabelDiv.style.borderRadius = '16px';
+iconLabelDiv.style.fontSize = '12px';
+iconLabelDiv.style.pointerEvents = 'none';
+const iconLabel = new CSS2DObject(iconLabelDiv);
+iconLabel.position.copy(iconPlane.position);
+iconLabel.position.y -= 0.6;
+scene.add(iconLabel);
+		
+
+
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+function onCanvasClick(event) {
+	// 计算鼠标位置归一化坐标
+	mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+	mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
 	
-	<!-- 注意：这里的链接已经改成了 GitHub 上的在线地址 -->
-	<a href="https://ningchaojie.github.io/latex公式编辑器新版本.html" 
-	   target="_blank" 
-	   rel="noopener noreferrer"
-	   style="display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">
-	   打开网页了解编辑器 →
-	</a>
-</div>
-
-
-<div style="margin: 30px 0; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 10px; border-left: 5px solid #4CAF50;">
-	<h3 style="margin-top: 0; color: #333;">Latex公式编辑器2.9</h3>
-	<p>这是一个介绍和apk下载网页。</p>
+	raycaster.setFromCamera(mouse, camera);
+	// 检测网页板和图标
+	const clickableObjects = [webPlane,webPlane2,iconPlane];
+	const intersects = raycaster.intersectObjects(clickableObjects);
 	
-	<!-- 注意：这里的链接已经改成了 GitHub 上的在线地址 -->
-	<a href="https://ningchaojie.github.io/latex公式编辑器新版本2.9.html" 
-	   target="_blank" 
-	   rel="noopener noreferrer"
-	   style="display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">
-	   打开网页了解编辑器 →
-	</a>
-</div>
+	if (intersects.length > 0) {
+		const hit = intersects[0].object;
+		if (hit === webPlane) {
+			window.open('https://ningchaojie.github.io/文档编辑器v2.3手写模块功能展示.html', '_blank');
+		} else if (hit === iconPlane) {
+			const link = document.createElement('a');
+			link.href = 'https://ningchaojie.github.io/文档编辑器v2.3.apk';
+			link.download = '文档编辑器v2.3.apk';
+			link.click();
+		} else if (hit === webPlane2) {
+			window.open('https://ningchaojie.github.io/应用开发中心.html','_blank');
+		}
+	}
+}
 
+// 添加点击监听
+renderer.domElement.addEventListener('click', onCanvasClick);
+// 移动端触摸也需要
+renderer.domElement.addEventListener('touchstart', (e) => {
+	// 取第一个触摸点位置
+	const touch = e.touches[0];
+	const fakeEvent = { clientX: touch.clientX, clientY: touch.clientY };
+	onCanvasClick(fakeEvent);
+});	
+		
+		// ======================= 广告牌系统 (自适应比例，防止变形) =======================
 
-
-
-<div style="margin: 30px 0; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 10px; border-left: 5px solid #4CAF50; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-	<!-- 图片放在最左边 -->
-	<img src="https://ningchaojie.github.io/文档编辑器APP图标.jpg" alt="文档编辑器图标" style="width: 70px; height: 70px; object-fit: cover; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;">
-	<div style="flex: 1;">
-		<h3 style="margin-top: 0; color: #333;">文档编辑器介绍</h3>
-		<p>这是一个介绍和apk下载网页。</p>
-		<!-- 注意：这里的链接已经改成了 GitHub 上的在线地址 -->
-		<a href="https://ningchaojie.github.io/文档编辑介绍.html" 
-		   target="_blank" 
-		   rel="noopener noreferrer"
-		   style="display: inline-block; background-color: #4CAF50; color: white; padding: 8px 18px; text-decoration: none; border-radius: 40px; font-weight: bold; margin-top: 8px; font-size: 0.9rem;">
-		   打开网页了解编辑器 →
-		</a>
-	</div>
-</div>
-
-
-
-
-
-<div style="margin: 30px 0; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 10px; border-left: 5px solid #4CAF50; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-	<!-- 图片放在最左边 -->
-	<img src="https://ningchaojie.github.io/文档编辑器APP图标.jpg" alt="文档编辑器图标" style="width: 70px; height: 70px; object-fit: cover; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;">
-	<div style="flex: 1;">
-		<h3 style="margin-top: 0; color: #333;">文档编辑器v1.1介绍</h3>
-		<p>这是一个介绍和apk下载网页。</p>
-		<!-- 注意：这里的链接已经改成了 GitHub 上的在线地址 -->
-		<a href="https://ningchaojie.github.io/文档编辑器v1.1介绍.html" 
-		   target="_blank" 
-		   rel="noopener noreferrer"
-		   style="display: inline-block; background-color: #4CAF50; color: white; padding: 8px 18px; text-decoration: none; border-radius: 40px; font-weight: bold; margin-top: 8px; font-size: 0.9rem;">
-		   打开网页了解编辑器 →
-		</a>
-	</div>
-</div>	
-	
+		
+		// ----- 1. 图片广告牌 (自适应纹理宽高比，保持宽度固定，高度按比例) -----
+		// ----- 1. 图片广告牌 (使用原生Image确保获取真实尺寸) -----
+		const imgUrl = 'https://ningchaojie.github.io/%E9%BA%A6%E5%85%8B%E6%96%AF%E9%9F%A6%E6%96%87%E6%A1%A3%E7%BC%96%E8%BE%91.jpg';
+		const defaultWidth = 2.4;
+		
+		// 先创建一个临时平面，稍后替换
+		const tempMat = new THREE.MeshStandardMaterial({ color: 0xcccccc });
+		imgPlane = new THREE.Mesh(new THREE.PlaneGeometry(defaultWidth, defaultWidth), tempMat);
+		//imgPlane.position.set(2.2, 1.8, 2.5);
+		imgPlane.position.set(2.2, 4, 4);
+		imgPlane.castShadow = true;
+		scene.add(imgPlane);
+		billboards.push(imgPlane);
+		
+		// 初始边框（占位）
+		imgBorder = createBillboardBorder(defaultWidth + 0.05, defaultWidth + 0.05, 0.05, 0xffaa66);
+		imgBorder.position.copy(imgPlane.position);
+		scene.add(imgBorder);
+		billboards.push(imgBorder);
+		
+		// 粒子环（暂用默认尺寸，后面会根据实际宽高缩放）
+		const particleRingGeoImg = new THREE.BufferGeometry();
+		const particleCountAdImg = 60;
+		const particlePosAdImg = [];
+		for (let i = 0; i < particleCountAdImg; i++) {
+			const angle = (i / particleCountAdImg) * Math.PI * 2;
+			const radiusX = 1.2;
+			const radiusY = 0.8;
+			particlePosAdImg.push(Math.cos(angle) * radiusX, Math.sin(angle) * radiusY + 0.1, Math.sin(angle) * 0.6);
+		}
+		particleRingGeoImg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(particlePosAdImg), 3));
+		ringParticlesAdImg = new THREE.Points(particleRingGeoImg, new THREE.PointsMaterial({ color: 0xffaa88, size: 0.06 }));
+		ringParticlesAdImg.position.copy(imgPlane.position);
+		scene.add(ringParticlesAdImg);
+		billboards.push(ringParticlesAdImg);
+		
+		// 使用原生 Image 加载，确保能获取宽高
+		const img = new Image();
+		img.crossOrigin = "Anonymous";
+		img.onload = () => {
+			const imgRatio = img.width / img.height;
+			const newWidth = defaultWidth;
+			const newHeight = defaultWidth / imgRatio;
+			
+			// 更新纹理
+			const texture = new THREE.Texture(img);
+			texture.colorSpace = THREE.SRGBColorSpace;
+			texture.needsUpdate = true;
+			
+			// 更新平面材质
+			imgPlane.material.dispose();
+			imgPlane.material = new THREE.MeshStandardMaterial({ map: texture, side: THREE.DoubleSide });
+			// 更新几何体尺寸
+			imgPlane.geometry.dispose();
+			imgPlane.geometry = new THREE.PlaneGeometry(newWidth, newHeight);
+			
+			// 更新边框
+			scene.remove(imgBorder);
+			const idx = billboards.indexOf(imgBorder);
+			if (idx !== -1) billboards.splice(idx, 1);
+			imgBorder = createBillboardBorder(newWidth + 0.05, newHeight + 0.05, 0.05, 0xffaa66);
+			imgBorder.position.copy(imgPlane.position);
+			scene.add(imgBorder);
+			billboards.push(imgBorder);
+			
+			// 更新粒子环缩放
+			updateParticleRingScale(ringParticlesAdImg, newWidth, newHeight);
+			console.log(`图片自适应完成: ${newWidth.toFixed(2)} x ${newHeight.toFixed(2)}, 比例 ${imgRatio.toFixed(2)}`);
+		};
+		img.onerror = () => console.error('图片加载失败');
+		img.src = imgUrl;
+		//resizeImageBillboard();
+		
+		// ----- 2. 视频广告牌 (自适应视频宽高比，保持宽度固定，高度按比例，并在元数据加载后调整) -----
+		const videoUrl = 'https://ningchaojie.github.io/%E6%8E%92%E7%89%88%E5%8F%8APDF%E6%93%8D%E4%BD%9C.mp4';
+		videoElement = document.createElement('video');
+		videoElement.src = videoUrl;
+		videoElement.crossOrigin = "Anonymous";
+		videoElement.loop = true;
+		videoElement.muted = true;
+		videoElement.playsInline = true;
+		videoElement.setAttribute('webkit-playsinline', 'true');
+		
+		videoTexture = new THREE.VideoTexture(videoElement);
+		videoTexture.colorSpace = THREE.SRGBColorSpace;
+		const videoDefaultWidth = 2.8;
+		const videoDefaultHeight = 1.6;
+		videoPlane = new THREE.Mesh(new THREE.PlaneGeometry(videoDefaultWidth, videoDefaultHeight), new THREE.MeshStandardMaterial({ map: videoTexture, side: THREE.DoubleSide }));
+		//videoPlane.position.set(-2.5, 1.9, 3.2);
+		videoPlane.position.set(-2.5, 3, -8);
+		videoPlane.castShadow = true;
+		scene.add(videoPlane);
+		billboards.push(videoPlane);
+		
+		// 初始边框
+		videoBorder = createBillboardBorder(videoDefaultWidth + 0.05, videoDefaultHeight + 0.05, 0.05, 0x44aaff);
+		videoBorder.position.copy(videoPlane.position);
+		scene.add(videoBorder);
+		billboards.push(videoBorder);
+		
+		// 视频装饰粒子环
+		const particleRingGeoVideo = new THREE.BufferGeometry();
+		const particleCountAdVideo = 60;
+		const particlePosAdVideo = [];
+		for (let i = 0; i < particleCountAdVideo; i++) {
+			const angle = (i / particleCountAdVideo) * Math.PI * 2;
+			const radiusX = 1.4;
+			const radiusY = 0.8;
+			particlePosAdVideo.push(Math.cos(angle) * radiusX, Math.sin(angle) * radiusY + 0.1, Math.sin(angle) * 0.6);
+		}
+		particleRingGeoVideo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(particlePosAdVideo), 3));
+		ringParticlesAdVideo = new THREE.Points(particleRingGeoVideo, new THREE.PointsMaterial({ color: 0x88aaff, size: 0.06 }));
+		ringParticlesAdVideo.position.copy(videoPlane.position);
+		scene.add(ringParticlesAdVideo);
+		billboards.push(ringParticlesAdVideo);
+		
+		// 视频元数据加载后获取真实宽高比并调整平面
+		videoElement.addEventListener('loadedmetadata', () => {
+			const vw = videoElement.videoWidth;
+			const vh = videoElement.videoHeight;
+			if (vw && vh) {
+				const videoRatio = vw / vh;
+				const newWidth = videoDefaultWidth;
+				const newHeight = videoDefaultWidth / videoRatio;
+				// 更新视频平面几何体
+				videoPlane.geometry.dispose();
+				videoPlane.geometry = new THREE.PlaneGeometry(newWidth, newHeight);
+				// 更新边框
+				scene.remove(videoBorder);
+				const oldBorderIndex = billboards.indexOf(videoBorder);
+				if (oldBorderIndex !== -1) billboards.splice(oldBorderIndex, 1);
+				videoBorder = createBillboardBorder(newWidth + 0.05, newHeight + 0.05, 0.05, 0x44aaff);
+				videoBorder.position.copy(videoPlane.position);
+				scene.add(videoBorder);
+				billboards.push(videoBorder);
+				// 更新粒子环缩放 (原始基准宽2.8,高1.6? 但粒子环基于初始几何半径设计，使用基准宽2.8高1.6)
+				const baseVidW = 2.8;
+				const baseVidH = 1.6;
+				if (ringParticlesAdVideo) {
+					ringParticlesAdVideo.scale.set(newWidth / baseVidW, newHeight / baseVidH, 1);
+				}
+				console.log(`视频广告牌自适应完成: 新尺寸 ${newWidth.toFixed(2)} x ${newHeight.toFixed(2)}, 比例 ${videoRatio.toFixed(2)}`);
+			} else {
+				// fallback: 如果获取不到尺寸，使用默认16:9近似
+				console.warn('视频元数据宽高无效，使用默认比例');
+			}
+		});
+		
+		// 视频播放控制: 首次用户触摸时启动 (移动端自动播放策略)
+		let videoStarted = false;
+		function startVideoPlayback() {
+			if (!videoStarted && videoElement) 
+			{
+				videoElement.play().then(() => {
+					console.log('视频广告开始播放 (静音循环)');
+					videoStarted = true;
+					const note = document.getElementById('video-note');
+					if (note) note.style.opacity = '0.5';
+				}).catch(e => {
+					console.warn('视频自动播放失败，需要用户再次交互', e);
+				});
+			}
+			if (webVideo) webVideo.play();   // 新增：播放网页板视频
+			
+		}
+		
+		// --- 碰撞系统 (AABB) ---
+		const obstacles = [];
+		function addCollider(pos, sizeX, sizeY, sizeZ) {
+			obstacles.push({
+				pos: new THREE.Vector3(pos.x, pos.y, pos.z),
+				halfSize: new THREE.Vector3(sizeX/2, sizeY/2, sizeZ/2)
+			});
+		}
+		addCollider(new THREE.Vector3(-2.5, 0.6, -3), 1.2, 1.2, 1.2);
+		addCollider(new THREE.Vector3(3.2, 1.0, -2), 0.8, 2.0, 0.8);
+		addCollider(new THREE.Vector3(-1, 0.7, 4), 1.4, 0.2, 1.4);
+		addCollider(new THREE.Vector3(4, 0.25, 3.5), 2.5, 0.3, 2.5);
+		addCollider(new THREE.Vector3(4, 0.6, 3.5), 0.8, 0.8, 0.8);
+		const smallPillarPos = [[-1.5,0.4,-4.5], [0.5,0.4,-5], [3.8,0.4,-1], [-3,0.4,2], [-4,0.4,-1], [1.5,0.4,3.2]];
+		smallPillarPos.forEach(p => addCollider(new THREE.Vector3(p[0], p[1], p[2]), 0.6, 0.8, 0.6));
+		const treesPos = [[-3.5,0.8,-3.2], [3,0.8,-4], [-2,0.8,4.5], [0,0.8,-5.2], [5,0.8,0.5], [-4.8,0.8,1]];
+		treesPos.forEach(p => addCollider(new THREE.Vector3(p[0], p[1], p[2]), 0.9, 1.5, 0.9));
+		addCollider(new THREE.Vector3(2.2, 1.2, 2.5), 2.5, 1.8, 1.8);
+		addCollider(new THREE.Vector3(-2.5, 1.3, 3.2), 3.0, 1.8, 1.8);
+		
+		const boundaryMinX = -7.5;
+		const boundaryMaxX = 7.5;
+		const boundaryMinZ = -7.8;
+		const boundaryMaxZ = 7.8;
+		
+		function tryMove(newPos) {
+			let finalPos = newPos.clone();
+			finalPos.x = Math.min(boundaryMaxX, Math.max(boundaryMinX, finalPos.x));
+			finalPos.z = Math.min(boundaryMaxZ, Math.max(boundaryMinZ, finalPos.z));
+			if (finalPos.y < 0.2) finalPos.y = 0.2;
+			
+			const playerHalfSize = new THREE.Vector3(0.35, 0.7, 0.35);
+			for (let obs of obstacles) {
+				const dx = finalPos.x - obs.pos.x;
+				const dy = finalPos.y - obs.pos.y;
+				const dz = finalPos.z - obs.pos.z;
+				const px = (Math.abs(dx) < (playerHalfSize.x + obs.halfSize.x));
+				const py = (Math.abs(dy) < (playerHalfSize.y + obs.halfSize.y));
+				const pz = (Math.abs(dz) < (playerHalfSize.z + obs.halfSize.z));
+				if (px && py && pz) {
+					const overlapX = (playerHalfSize.x + obs.halfSize.x) - Math.abs(dx);
+					const overlapY = (playerHalfSize.y + obs.halfSize.y) - Math.abs(dy);
+					const overlapZ = (playerHalfSize.z + obs.halfSize.z) - Math.abs(dz);
+					if (overlapX < overlapY && overlapX < overlapZ) {
+						finalPos.x += (dx > 0 ? overlapX : -overlapX);
+					} else if (overlapY < overlapX && overlapY < overlapZ) {
+						finalPos.y += (dy > 0 ? overlapY : -overlapY);
+					} else {
+						finalPos.z += (dz > 0 ? overlapZ : -overlapZ);
+					}
+				}
+			}
+			finalPos.x = Math.min(boundaryMaxX, Math.max(boundaryMinX, finalPos.x));
+			finalPos.z = Math.min(boundaryMaxZ, Math.max(boundaryMinZ, finalPos.z));
+			if (finalPos.y < 0.2) finalPos.y = 0.2;
+			return finalPos;
+		}
+		
+		playerPosition = camera.position.clone();
+		
+		// --- 触摸事件监听 (左右半屏区分，视频首次触摸启动)---
+		const canvas = renderer.domElement;
+		let leftTouchIds = new Set();
+		let rightTouchIds = new Set();
+		let hasStartedVideo = false;
+		
+		function onFirstTouch() {
+			if (!hasStartedVideo) {
+				startVideoPlayback();
+				hasStartedVideo = true;
+				canvas.removeEventListener('touchstart', onFirstTouch);
+				canvas.removeEventListener('mousedown', onFirstTouch);
+			}
+		}
+		canvas.addEventListener('touchstart', onFirstTouch);
+		canvas.addEventListener('mousedown', onFirstTouch);
+		
+		canvas.addEventListener('touchstart', (e) => {
+			e.preventDefault();
+			for (let i = 0; i < e.changedTouches.length; i++) {
+				const touch = e.changedTouches[i];
+				const isLeft = touch.clientX < window.innerWidth / 2;
+				if (isLeft) {
+					leftTouchIds.add(touch.identifier);
+					if (!touchMoveLeft.active) {
+						touchMoveLeft.active = true;
+						touchMoveLeft.startX = touch.clientX;
+						touchMoveLeft.startY = touch.clientY;
+						moveDirection.forward = 0;
+						moveDirection.right = 0;
+					}
+				} else {
+					rightTouchIds.add(touch.identifier);
+					if (!touchMoveRight.active) {
+						touchMoveRight.active = true;
+						touchMoveRight.startX = touch.clientX;
+						touchMoveRight.startY = touch.clientY;
+					}
+				}
+			}
+		});
+		
+		canvas.addEventListener('touchmove', (e) => {
+			e.preventDefault();
+			for (let i = 0; i < e.changedTouches.length; i++) {
+				const touch = e.changedTouches[i];
+				const isLeft = touch.clientX < window.innerWidth / 2;
+				if (isLeft && leftTouchIds.has(touch.identifier)) {
+					let deltaX = touch.clientX - touchMoveLeft.startX;
+					let deltaY = touch.clientY - touchMoveLeft.startY;
+					moveDirection.forward = Math.min(0.8, Math.max(-0.8, deltaY * 0.012));
+					moveDirection.right  = Math.min(0.8, Math.max(-0.8, deltaX * 0.012));
+				} else if (!isLeft && rightTouchIds.has(touch.identifier)) {
+					let deltaX = touch.clientX - touchMoveRight.startX;
+					let deltaY = touch.clientY - touchMoveRight.startY;
+					cameraEuler.yaw   -= deltaX * 0.007;
+					cameraEuler.pitch -= deltaY * 0.007;
+					cameraEuler.pitch = Math.min(Math.max(cameraEuler.pitch, -Math.PI/2.2), Math.PI/2.2);
+					touchMoveRight.startX = touch.clientX;
+					touchMoveRight.startY = touch.clientY;
+				}
+			}
+		});
+		
+		canvas.addEventListener('touchend', (e) => {
+			e.preventDefault();
+			for (let i = 0; i < e.changedTouches.length; i++) {
+				const touch = e.changedTouches[i];
+				const wasLeft = touch.clientX < window.innerWidth / 2;
+				if (wasLeft) {
+					leftTouchIds.delete(touch.identifier);
+					if (leftTouchIds.size === 0) {
+						touchMoveLeft.active = false;
+						moveDirection.forward = 0;
+						moveDirection.right = 0;
+					}
+				} else {
+					rightTouchIds.delete(touch.identifier);
+					if (rightTouchIds.size === 0) touchMoveRight.active = false;
+				}
+			}
+			if (e.touches.length === 0) {
+				touchMoveLeft.active = false;
+				touchMoveRight.active = false;
+				moveDirection.forward = 0;
+				moveDirection.right = 0;
+				leftTouchIds.clear();
+				rightTouchIds.clear();
+			}
+		});
+		
+		canvas.addEventListener('touchcancel', (e) => {
+			touchMoveLeft.active = false;
+			touchMoveRight.active = false;
+			moveDirection.forward = 0;
+			moveDirection.right = 0;
+			leftTouchIds.clear();
+			rightTouchIds.clear();
+		});
+		
+		function updateMovementByTouch(deltaTime) {
+			if (!playerPosition) return;
+			const speed = 5.5;
+			const forwardDir = new THREE.Vector3(Math.sin(cameraEuler.yaw), 0, Math.cos(cameraEuler.yaw)).normalize();
+			const rightDir = new THREE.Vector3(Math.cos(cameraEuler.yaw), 0, -Math.sin(cameraEuler.yaw)).normalize();
+			let moveVec = new THREE.Vector3();
+			moveVec.addScaledVector(forwardDir, moveDirection.forward);
+			moveVec.addScaledVector(rightDir, moveDirection.right);
+			moveVec.multiplyScalar(speed * deltaTime);
+			let newPos = playerPosition.clone().add(moveVec);
+			newPos = tryMove(newPos);
+			playerPosition.copy(newPos);
+			camera.position.copy(playerPosition);
+			camera.rotation.order = 'YXZ';
+			camera.rotation.y = cameraEuler.yaw;
+			camera.rotation.x = cameraEuler.pitch;
+		}
+		
+		// --- 动画与物体特效 ---
+		let lastTime = performance.now();
+		
+		function animateObjects(deltaTime) {
+			goldRing.rotation.z += 1.5 * deltaTime;
+			ringPoints.rotation.y += 1.2 * deltaTime;
+			ringPoints.rotation.x += 0.6 * deltaTime;
+			const time = Date.now() * 0.003;
+			sphere.position.y = 0.5 + Math.sin(time) * 0.12;
+			particles.rotation.y += 0.1 * deltaTime;
+			if (playerPosition) {
+				groundGlow.position.x = playerPosition.x;
+				groundGlow.position.z = playerPosition.z;
+			}
+			
+			// 广告牌朝向：只绕 Y 轴旋转，保持竖直
+			const camPos = camera.position;
+			
+			// 图片广告牌
+			const imgDir = new THREE.Vector3().subVectors(camPos, imgPlane.position).normalize();
+			const imgYaw = Math.atan2(imgDir.x, imgDir.z);
+			imgPlane.rotation.set(0, imgYaw, 0);
+			imgBorder.rotation.copy(imgPlane.rotation);
+			ringParticlesAdImg.rotation.copy(imgPlane.rotation);
+			
+			// 视频广告牌
+			const videoDir = new THREE.Vector3().subVectors(camPos, videoPlane.position).normalize();
+			const videoYaw = Math.atan2(videoDir.x, videoDir.z);
+			videoPlane.rotation.set(0, videoYaw, 0);
+			videoBorder.rotation.copy(videoPlane.rotation);
+			ringParticlesAdVideo.rotation.copy(videoPlane.rotation);
+			
+			// 粒子环自转（不影响主朝向）
+			ringParticlesAdImg.rotation.y += 1.0 * deltaTime;
+			ringParticlesAdVideo.rotation.y -= 0.8 * deltaTime;
+		}
+		
+		function animate() {
+			const now = performance.now();
+			let delta = Math.min(0.033, (now - lastTime) / 1000);
+			if (delta <= 0) delta = 0.016;
+			lastTime = now;
+			
+			updateMovementByTouch(delta);
+			animateObjects(delta);
+			
+			if (videoTexture && videoElement.readyState >= videoElement.HAVE_CURRENT_DATA) {
+				videoTexture.needsUpdate = true;
+			}
+			
+			renderer.render(scene, camera);
+			labelRenderer.render(scene, camera);
+			requestAnimationFrame(animate);
+		}
+		
+		playerPosition.copy(camera.position);
+		cameraEuler.yaw = -0.8;
+		cameraEuler.pitch = 0.15;
+		camera.rotation.order = 'YXZ';
+		camera.rotation.y = cameraEuler.yaw;
+		camera.rotation.x = cameraEuler.pitch;
+		
+		animate();
+		
+		window.addEventListener('resize', onWindowResize, false);
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			labelRenderer.setSize(window.innerWidth, window.innerHeight);
+		}
+		
+		console.log('3D漫游已启动 | 图片/视频广告牌均自适应比例，防止变形 | 首次触摸后视频播放');
+	</script>
 </body>
 </html>
