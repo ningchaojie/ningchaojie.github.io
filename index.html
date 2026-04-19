@@ -362,6 +362,43 @@
 			const baseHeight = 1.6;
 			ring.scale.set(newWidth / baseWidth, newHeight / baseHeight, 1);
 		}
+		
+		//==================制作文字标签==================		
+		function makeTextBillboard(text, color, bgColor, fontSize, position, offsetY = 0) {
+			const canvas = document.createElement('canvas');
+			const ctx = canvas.getContext('2d');
+			ctx.font = `${fontSize}px "Segoe UI", "Microsoft YaHei"`;
+			const textWidth = ctx.measureText(text).width;
+			const padding = 20;
+			const width = textWidth + padding * 2;
+			const height = fontSize + padding;
+			canvas.width = width;
+			canvas.height = height;
+			
+			ctx.font = `${fontSize}px "Segoe UI", "Microsoft YaHei"`;
+			ctx.fillStyle = bgColor;
+			ctx.fillRect(0, 0, width, height);
+			ctx.fillStyle = color;
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			ctx.fillText(text, width/2, height/2);
+			
+			const texture = new THREE.CanvasTexture(canvas);
+			const baseWidth = 1.5;
+			const aspect = width / height;
+			const planeWidth = baseWidth;
+			const planeHeight = baseWidth / aspect;
+			
+			const material = new THREE.MeshStandardMaterial({ map: texture, side: THREE.DoubleSide, transparent: true });
+			const plane = new THREE.Mesh(new THREE.PlaneGeometry(planeWidth, planeHeight), material);
+			plane.position.copy(position);
+			plane.position.y += offsetY;
+			plane.castShadow = false;
+			scene.add(plane);
+			billboards.push(plane);
+			return plane;
+		}		
+		
 
 
 		
@@ -420,19 +457,8 @@ webVideo.addEventListener('loadedmetadata', () => {
 	}
 });
 
-// CSS2D文字标签（位置不变，仍在平面下方）
-const webLabelDiv = document.createElement('div');
-webLabelDiv.textContent = '📄 文档编辑器v2.3手写模块功能展示.html';
-webLabelDiv.style.color = 'white';
-webLabelDiv.style.background = 'rgba(0,0,0,0.6)';
-webLabelDiv.style.padding = '4px 12px';
-webLabelDiv.style.borderRadius = '20px';
-webLabelDiv.style.fontSize = '14px';
-webLabelDiv.style.pointerEvents = 'none';
-const webLabel = new CSS2DObject(webLabelDiv);
-webLabel.position.copy(webPlane.position);
-webLabel.position.y -= 1.0;
-scene.add(webLabel);
+// 📄 文档编辑器v2.3手写模块功能展示.html
+makeTextBillboard('📄 文档编辑器v2.3手写模块功能展示.html', '#ffffff', 'rgba(0,0,0,0.7)', 14, webPlane.position, -1.0);
 
 
 
@@ -483,19 +509,8 @@ webImg2.onload = () => {
 };
 webImg2.src = webImageUrl2;
 
-// CSS2D 文字标签
-const webLabelDiv2 = document.createElement('div');
-webLabelDiv2.textContent = '📄应用开发中心(点击进入了解更多) ';
-webLabelDiv2.style.color = 'white';
-webLabelDiv2.style.background = 'rgba(0,0,0,0.6)';
-webLabelDiv2.style.padding = '4px 12px';
-webLabelDiv2.style.borderRadius = '20px';
-webLabelDiv2.style.fontSize = '14px';
-webLabelDiv2.style.pointerEvents = 'none';
-const webLabel2 = new CSS2DObject(webLabelDiv2);
-webLabel2.position.copy(webPlane2.position);
-webLabel2.position.y -= 1.0;
-scene.add(webLabel2);
+// 应用开发中心 文字标签
+makeTextBillboard('📄 应用开发中心(点击进入了解更多)', '#ffffff', 'rgba(0,0,0,0.7)', 14, webPlane2.position, -1.0);
 
 
 
@@ -515,19 +530,8 @@ iconBorder.position.copy(iconPlane.position);
 scene.add(iconBorder);
 billboards.push(iconBorder);
 
-// 添加文字提示
-const iconLabelDiv = document.createElement('div');
-iconLabelDiv.textContent = '⬇️ 文档编辑器v2.3.apk';
-iconLabelDiv.style.color = '#ffaa88';
-iconLabelDiv.style.background = 'rgba(0,0,0,0.5)';
-iconLabelDiv.style.padding = '2px 8px';
-iconLabelDiv.style.borderRadius = '16px';
-iconLabelDiv.style.fontSize = '12px';
-iconLabelDiv.style.pointerEvents = 'none';
-const iconLabel = new CSS2DObject(iconLabelDiv);
-iconLabel.position.copy(iconPlane.position);
-iconLabel.position.y -= 0.6;
-scene.add(iconLabel);
+// 文档编辑器v2.3.apk文字提示
+makeTextBillboard('⬇️ 文档编辑器v2.3.apk', '#ffaa88', 'rgba(0,0,0,0.6)', 12, iconPlane.position, -0.6);
 		
 
 
@@ -542,7 +546,8 @@ function onCanvasClick(event) {
 	
 	raycaster.setFromCamera(mouse, camera);
 	// 检测网页板和图标
-	const clickableObjects = [webPlane,webPlane2,iconPlane];
+	//const clickableObjects = [webPlane,webPlane2,iconPlane];
+	const clickableObjects = [webPlane, webPlane2, iconPlane, fetchBtn, prevPageBtn, nextPageBtn];
 	const intersects = raycaster.intersectObjects(clickableObjects);
 	
 	if (intersects.length > 0) {
@@ -556,7 +561,20 @@ function onCanvasClick(event) {
 			link.click();
 		} else if (hit === webPlane2) {
 			window.open('https://ningchaojie.github.io/应用开发中心.html','_blank');
+		}else if (hit === fetchBtn) {
+			fetchGitHubContents();
+		}else if (hit === prevPageBtn) {
+			if (currentFileList.length > 0 && currentPage > 0) {
+				currentPage--;
+				updateScreenDisplay(currentFileList, false);
+			}
+		} else if (hit === nextPageBtn) {
+			if (currentFileList.length > 0 && (currentPage + 1) * ITEMS_PER_PAGE < currentFileList.length) {
+				currentPage++;
+				updateScreenDisplay(currentFileList, false);
+			}
 		}
+		
 	}
 }
 
@@ -739,6 +757,174 @@ renderer.domElement.addEventListener('touchstart', (e) => {
 			
 		}
 		
+		
+		
+		
+		
+let currentFileList = [];       // 存储完整文件列表
+let currentPage = 0;            // 当前页码
+const ITEMS_PER_PAGE = 8;       // 每页显示数量
+
+let prevPageBtn, nextPageBtn;   // 上下翻页按钮
+let prevPageLabel, nextPageLabel;
+let x=5;
+		
+// 操作台基座
+const baseGeo = new THREE.BoxGeometry(3, 0.2, 2.5);
+const baseMat = new THREE.MeshStandardMaterial({ color: 0x2c3e66, metalness: 0.6, roughness: 0.4 });
+const podium = new THREE.Mesh(baseGeo, baseMat);
+podium.position.set(x, 0, -3);
+podium.castShadow = true;
+podium.receiveShadow = true;
+scene.add(podium);
+
+
+
+// 屏幕显示区域（动态CanvasTexture）
+const screenCanvas = document.createElement('canvas');
+screenCanvas.width = 1024;
+screenCanvas.height = 512;
+const screenCtx = screenCanvas.getContext('2d');
+const screenTexture = new THREE.CanvasTexture(screenCanvas);
+const screenMat = new THREE.MeshStandardMaterial({ map: screenTexture, side: THREE.DoubleSide, emissive: 0x224466 });
+const screenPlane = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 1.2), screenMat);
+//screenPlane.position.set(0, 0.9, -2.83);
+screenPlane.position.set(x, 1.5, -2.83); // 放到更近、更高的位置
+screenPlane.rotation.y = Math.PI; // 旋转180度
+scene.add(screenPlane);
+
+// 3D 按钮（圆形或方形）
+const btnGeo = new THREE.BoxGeometry(0.6, 0.2, 0.6);
+const btnMat = new THREE.MeshStandardMaterial({ color: 0xff6600, emissive: 0x442200 });
+const fetchBtn = new THREE.Mesh(btnGeo, btnMat);
+fetchBtn.position.set(x, 0.3, -2.2);
+fetchBtn.userData = { type: 'fetch' };
+scene.add(fetchBtn);
+
+// 按钮上的文字标签（CSS2D）
+const btnLabelDiv = document.createElement('div');
+btnLabelDiv.textContent = '📥 获取仓库内容';
+btnLabelDiv.style.color = 'white';
+btnLabelDiv.style.background = 'rgba(0,0,0,0.7)';
+btnLabelDiv.style.padding = '4px 12px';
+btnLabelDiv.style.borderRadius = '20px';
+btnLabelDiv.style.fontSize = '14px';
+const btnLabel = new CSS2DObject(btnLabelDiv);
+btnLabel.position.set(x, 0.45, -2.2);
+scene.add(btnLabel);
+
+
+// 上一页按钮
+const prevBtnGeo = new THREE.BoxGeometry(0.5, 0.2, 0.5);
+const prevBtnMat = new THREE.MeshStandardMaterial({ color: 0x44aaff, emissive: 0x004466 });
+prevPageBtn = new THREE.Mesh(prevBtnGeo, prevBtnMat);
+prevPageBtn.position.set(-0.8+x, 0.15, -2.2);
+prevPageBtn.userData = { type: 'prevPage' };
+scene.add(prevPageBtn);
+
+const prevLabelDiv = document.createElement('div');
+prevLabelDiv.textContent = '▲ 上一页';
+prevLabelDiv.style.cssText = 'color:white; background:rgba(0,0,0,0.6); padding:2px 8px; border-radius:16px; font-size:12px;';
+prevPageLabel = new CSS2DObject(prevLabelDiv);
+prevPageLabel.position.copy(prevPageBtn.position);
+prevPageLabel.position.y -= 0.2;
+scene.add(prevPageLabel);
+
+// 下一页按钮
+nextPageBtn = new THREE.Mesh(prevBtnGeo.clone(), prevBtnMat.clone());
+nextPageBtn.position.set(0.8+x, 0.15, -2.2);
+nextPageBtn.userData = { type: 'nextPage' };
+scene.add(nextPageBtn);
+
+const nextLabelDiv = document.createElement('div');
+nextLabelDiv.textContent = '▼ 下一页';
+nextLabelDiv.style.cssText = 'color:white; background:rgba(0,0,0,0.6); padding:2px 8px; border-radius:16px; font-size:12px;';
+nextPageLabel = new CSS2DObject(nextLabelDiv);
+nextPageLabel.position.copy(nextPageBtn.position);
+nextPageLabel.position.y -= 0.2;
+scene.add(nextPageLabel);
+	
+
+
+
+
+function updateScreenDisplay(files, resetPage = true) {
+	if (resetPage) {
+		currentFileList = files || [];
+		currentPage = 0;
+	}
+	
+	// 清空画布
+	screenCtx.fillStyle = '#0a1030';
+	screenCtx.fillRect(0, 0, screenCanvas.width, screenCanvas.height);
+	
+	// 标题
+	screenCtx.fillStyle = '#ffaa66';
+	screenCtx.font = 'bold 24px "Segoe UI"';
+	screenCtx.fillText('仓库文件列表', 30, 50);
+	
+	if (!currentFileList || currentFileList.length === 0) {
+		screenCtx.fillStyle = '#ff8888';
+		screenCtx.font = '20px monospace';
+		screenCtx.fillText('暂无文件', 30, 120);
+		screenTexture.needsUpdate = true;
+		return;
+	}
+	
+	// 计算当前页显示范围
+	const start = currentPage * ITEMS_PER_PAGE;
+	const end = Math.min(start + ITEMS_PER_PAGE, currentFileList.length);
+	const pageFiles = currentFileList.slice(start, end);
+	
+	// 显示文件列表
+	screenCtx.fillStyle = '#aaffdd';
+	screenCtx.font = '18px monospace';
+	for (let i = 0; i < pageFiles.length; i++) {
+		const y = 120 + i * 35;
+		// 截断过长文件名
+		let name = pageFiles[i].name;
+		if (name.length > 28) name = name.slice(0, 25) + '...';
+		screenCtx.fillText(`📄 ${name}`, 30, y);
+	}
+	
+	// 显示页码信息
+	screenCtx.fillStyle = '#88aaff';
+	screenCtx.font = '16px monospace';
+	const totalPages = Math.ceil(currentFileList.length / ITEMS_PER_PAGE);
+	screenCtx.fillText(`第 ${currentPage+1} / ${totalPages} 页`, screenCanvas.width - 150, screenCanvas.height - 30);
+	
+	// 如果当前页没有文件，回到第一页
+	if (pageFiles.length === 0 && currentPage > 0) {
+		currentPage--;
+		updateScreenDisplay(currentFileList, false);
+		return;
+	}
+	
+	screenTexture.needsUpdate = true;
+}
+
+async function fetchGitHubContents() {
+	updateScreenDisplay([{ name: '加载中...' }], true);
+	try {
+		const username = 'ningchaojie';
+		const repo = 'ningchaojie.github.io';
+		const url = `https://api.github.com/repos/${username}/${repo}/contents/`;
+		const response = await fetch(url);
+		if (!response.ok) throw new Error(`HTTP ${response.status}`);
+		const data = await response.json();
+		const files = data.filter(item => item.type === 'file' && (item.name.endsWith('.html') || item.name.endsWith('.apk')));
+		updateScreenDisplay(files, true);
+		// 可选：网页提示
+		// alert(`成功获取 ${files.length} 个文件`);
+	} catch (err) {
+		console.error(err);
+		updateScreenDisplay([{ name: `错误: ${err.message}` }], true);
+		alert(`获取失败: ${err.message}`);
+	}
+}
+
+		
+		
 		// --- 碰撞系统 (AABB) ---
 		const obstacles = [];
 		function addCollider(pos, sizeX, sizeY, sizeZ) {
@@ -915,7 +1101,22 @@ renderer.domElement.addEventListener('touchstart', (e) => {
 			camera.rotation.order = 'YXZ';
 			camera.rotation.y = cameraEuler.yaw;
 			camera.rotation.x = cameraEuler.pitch;
+			
 		}
+		
+		
+function animateButton() {
+	const time = Date.now() * 0.003;
+	fetchBtn.position.y = 0.3 + Math.sin(time) * 0.03;
+	btnLabel.position.y = 0.45 + Math.sin(time) * 0.03;
+	if (prevPageBtn) {
+		prevPageBtn.position.y = 0.15 + Math.sin(time + 1) * 0.02;
+		prevPageLabel.position.y = prevPageBtn.position.y - 0.2;
+		nextPageBtn.position.y = 0.15 + Math.sin(time + 1) * 0.02;
+		nextPageLabel.position.y = nextPageBtn.position.y - 0.2;
+	}
+}
+
 		
 		// --- 动画与物体特效 ---
 		let lastTime = performance.now();
@@ -954,6 +1155,7 @@ renderer.domElement.addEventListener('touchstart', (e) => {
 			ringParticlesAdVideo.rotation.y -= 0.8 * deltaTime;
 		}
 		
+		
 		function animate() {
 			const now = performance.now();
 			let delta = Math.min(0.033, (now - lastTime) / 1000);
@@ -962,6 +1164,8 @@ renderer.domElement.addEventListener('touchstart', (e) => {
 			
 			updateMovementByTouch(delta);
 			animateObjects(delta);
+			
+			animateButton();   // 添加这一行
 			
 			if (videoTexture && videoElement.readyState >= videoElement.HAVE_CURRENT_DATA) {
 				videoTexture.needsUpdate = true;
