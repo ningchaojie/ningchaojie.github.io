@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+	<title>文档编辑器扩展模块 · 表格与图表功能详解</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+			background: #f5f7fb;
+			color: #1e293b;
+			line-height: 1.5;
+			padding: 2rem 1rem;
+		}
+
+		.container {
+			max-width: 1280px;
+			margin: 0 auto;
+		}
+
+		/* 头部 */
+		.header {
+			text-align: center;
+			margin-bottom: 3rem;
+			position: relative;
+		}
+		.header h1 {
+			font-size: 2.5rem;
+			font-weight: 700;
+			background: linear-gradient(135deg, #1e293b, #3b82f6);
+			background-clip: text;
+			-webkit-background-clip: text;
+			color: transparent;
+			margin-bottom: 0.5rem;
+		}
+		.header p {
+			font-size: 1.1rem;
+			color: #475569;
+			max-width: 700px;
+			margin: 0 auto;
+		}
+		.download-btn {
+			display: inline-block;
+			background: #10b981;
+			color: white;
+			border: none;
+			border-radius: 40px;
+			padding: 12px 28px;
+			font-size: 1.1rem;
+			font-weight: 600;
+			margin-top: 20px;
+			cursor: pointer;
+			text-decoration: none;
+			transition: background 0.2s, transform 0.1s;
+			box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+		}
+		.download-btn:hover {
+			background: #059669;
+			transform: translateY(-2px);
+		}
+		.download-btn i {
+			margin-right: 8px;
+		}
+
+		/* 卡片通用样式 */
+		.card {
+			background: white;
+			border-radius: 1.5rem;
+			box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
+			overflow: hidden;
+			margin-bottom: 2.5rem;
+			transition: transform 0.2s ease, box-shadow 0.2s ease;
+		}
+		.card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 20px 30px -12px rgba(0,0,0,0.1);
+		}
+
+		.card-header {
+			padding: 1.5rem 2rem;
+			border-bottom: 1px solid #eef2ff;
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			flex-wrap: wrap;
+		}
+		.card-header h2 {
+			font-size: 1.8rem;
+			font-weight: 600;
+			letter-spacing: -0.01em;
+		}
+		.badge {
+			background: #eef2ff;
+			color: #1e40af;
+			padding: 0.25rem 0.75rem;
+			border-radius: 2rem;
+			font-size: 0.8rem;
+			font-weight: 500;
+		}
+
+		.card-body {
+			padding: 2rem;
+		}
+
+		.feature-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: 1.5rem;
+			margin-bottom: 2rem;
+		}
+		.feature-item {
+			background: #f8fafc;
+			border-radius: 1rem;
+			padding: 1.2rem;
+			border-left: 4px solid #3b82f6;
+		}
+		.feature-item h3 {
+			font-size: 1.2rem;
+			margin-bottom: 0.5rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+		.feature-item p {
+			color: #334155;
+			font-size: 0.95rem;
+		}
+
+		.code-sample {
+			background: #0f172a;
+			color: #e2e8f0;
+			padding: 1rem 1.5rem;
+			border-radius: 1rem;
+			font-family: 'SF Mono', 'Fira Code', monospace;
+			font-size: 0.85rem;
+			overflow-x: auto;
+			margin: 1.5rem 0;
+		}
+
+		.step-list {
+			list-style: none;
+			counter-reset: step-counter;
+			margin: 1.5rem 0;
+		}
+		.step-list li {
+			counter-increment: step-counter;
+			margin-bottom: 1rem;
+			padding-left: 2.2rem;
+			position: relative;
+		}
+		.step-list li::before {
+			content: counter(step-counter);
+			background: #3b82f6;
+			color: white;
+			width: 1.6rem;
+			height: 1.6rem;
+			border-radius: 2rem;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 0.8rem;
+			font-weight: bold;
+			position: absolute;
+			left: 0;
+			top: 0;
+		}
+
+		.tech-note {
+			background: #fef9e3;
+			border-left: 4px solid #f59e0b;
+			padding: 1rem 1.5rem;
+			border-radius: 0.75rem;
+			margin-top: 1.5rem;
+		}
+
+		hr {
+			margin: 2rem 0;
+			border: none;
+			height: 1px;
+			background: linear-gradient(to right, #e2e8f0, transparent);
+		}
+
+		.footer {
+			text-align: center;
+			color: #64748b;
+			font-size: 0.85rem;
+			margin-top: 3rem;
+			border-top: 1px solid #e2e8f0;
+			padding-top: 2rem;
+		}
+
+		@media (max-width: 640px) {
+			.card-header {
+				flex-direction: column;
+				align-items: flex-start;
+			}
+			.card-body {
+				padding: 1.5rem;
+			}
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+	<div class="header">
+		<h1>📦 高级扩展模块</h1>
+		<p>为 LaTeX 文章编辑器深度集成的表格处理与数据可视化工具<br>独立模块化设计，即插即用，完美兼容 Quill 编辑器</p>
+		<a href="https://ningchaojie.github.io/文档编辑器v2.4.apk" class="download-btn" download>
+			⬇️ 下载 APK 安装包
+		</a>
+	</div>
+
+	<!-- ================= 表格模块 ================= -->
+	<div class="card">
+		<div class="card-header">
+			<h2>📊 表格制作与分析模块</h2>
+			<span class="badge">可视化编辑 · 通用数据分析 · 一键图表</span>
+		</div>
+		<div class="card-body">
+			<div class="feature-grid">
+				<div class="feature-item">
+					<h3>✏️ 所见即所得表格设计</h3>
+					<p>支持任意行列的增删，单元格内容可直接编辑（文本、数字、公式），双击表格即可重新打开设计器修改。</p>
+				</div>
+				<div class="feature-item">
+					<h3>📈 通用数据分析</h3>
+					<p>自动识别第一行为表头、第一列为行标签，其余列为数值数据。一键计算每行的“合计值”，自动找出最高/最低合计项，并支持按合计值排序替换表格。</p>
+				</div>
+				<div class="feature-item">
+					<h3>📊 无缝生成图表</h3>
+					<p>基于表格中的数值数据（如销售额、产量、成绩等），直接调用图表模块生成柱状图/饼图/折线图，并插入编辑器。</p>
+				</div>
+				<div class="feature-item">
+					<h3>🔁 持久化与再编辑</h3>
+					<p>使用自定义 Blot 保存表格 HTML 结构，插入后仍可双击表格进入编辑器，完全保留格式与数据。</p>
+				</div>
+			</div>
+
+			<h3 style="margin: 1.5rem 0 1rem 0;">🚀 快速使用流程</h3>
+			<ul class="step-list">
+				<li>点击工具栏「表格」按钮，打开表格设计器。</li>
+				<li>使用上方按钮增加/删除行列，双击单元格编辑内容（支持任意文字、数字）。</li>
+				<li>点击「分析表格」自动计算每行的合计值、最高/最低、排名，点击「按合计值排序并替换表格」可重新排列数据行。</li>
+				<li>点击「生成图表」自动将当前表格的合计数据传入图表模块，生成柱状图后可进一步编辑样式再插入。</li>
+				<li>点击「插入表格」将当前设计的表格写入编辑器，之后随时双击表格即可再次编辑。</li>
+			</ul>
+
+			<div class="tech-note">
+				💡 <strong>通用性设计</strong>：表格分析不预设“科目”“分数”等词汇，所有提示使用“合计值”“数值数据”等通用术语，适用于任何数值型表格（财务、统计、成绩等）。
+			</div>
+		</div>
+	</div>
+
+	<!-- ================= 图表模块 ================= -->
+	<div class="card">
+		<div class="card-header">
+			<h2>📈 图表生成模块</h2>
+			<span class="badge">数据模式 · 函数曲线 · 多曲线 · 缩放编辑</span>
+		</div>
+		<div class="card-body">
+			<div class="feature-grid">
+				<div class="feature-item">
+					<h3>📋 数据列表模式</h3>
+					<p>手动编辑标签、数值及每个数据点的颜色，支持柱状图、折线图、饼图、环形图，实时预览。</p>
+				</div>
+				<div class="feature-item">
+					<h3>🧮 函数曲线模式</h3>
+					<p>输入数学表达式（如 sin(x), x^2, exp(-x)），支持多条曲线独立颜色，自动采样绘制折线图。</p>
+				</div>
+				<div class="feature-item">
+					<h3>🎨 直观颜色设置</h3>
+					<p>每个数据系列（或每条函数曲线）均配有独立颜色选择器，修改即实时更新图表预览。</p>
+				</div>
+				<div class="feature-item">
+					<h3>🖼️ 插入后可编辑</h3>
+					<p>图表以自定义图片 Blot 形式存储配置信息，双击图表即可重新打开设计器，修改后原位置更新。</p>
+				</div>
+				<div class="feature-item">
+					<h3>↔️ 完美缩放</h3>
+					<p>利用 <code>quill-image-resize-module</code>，插入后的图表图片支持拖拽缩放，保持宽高比。</p>
+				</div>
+				<div class="feature-item">
+					<h3>📤 从表格导入数据</h3>
+					<p>表格模块中的“生成图表”按钮可自动将合计值数据传递给图表模块，实现数据无缝流转。</p>
+				</div>
+			</div>
+
+			<h3 style="margin: 1.5rem 0 1rem 0;">⚙️ 核心功能说明</h3>
+			<ul class="step-list">
+				<li><strong>数据列表模式</strong>：直接编辑标签和数值，可任意增删数据点，每个数据独立颜色。</li>
+				<li><strong>函数曲线模式</strong>：设定 X 范围、采样点数，输入表达式（支持 sin, cos, tan, log, sqrt, ^ 幂运算等），可添加多条曲线，每条曲线独立颜色。</li>
+				<li><strong>图表类型切换</strong>：柱状图、折线图、饼图、环形图即时切换，所有数据实时响应。</li>
+				<li><strong>插入与编辑</strong>：点击“插入/更新图表”将预览图片及配置保存到编辑器；双击已插入的图表图片，自动打开设计器并载入原有配置，修改后可覆盖更新。</li>
+				<li><strong>图例优化</strong>：图例默认显示数据集名称（或函数表达式），并使用圆形颜色标识，清晰区分多曲线。</li>
+			</ul>
+
+			<div class="code-sample">
+				// 示例：函数表达式输入
+				sin(x)          // 正弦曲线
+				cos(x)          // 余弦曲线
+				x^2 - 2*x + 1   // 抛物线
+				exp(-x/5)*sin(x) // 衰减振荡
+			</div>
+
+			<div class="tech-note">
+				🔧 <strong>技术实现</strong>：图表模块不依赖任何第三方绘图库（仅使用 Chart.js 渲染），所有配置保存在图片的 <code>data-chart-config</code> 属性中。表达式求值使用安全的 <code>Function</code> 构造器，支持常见数学函数，无需额外解析器。模块通过 <code>ChartModule.init(quill)</code> 挂载到编辑器，并暴露 <code>showModal(config)</code> 供外部调用（如表格模块生成图表时自动填充数据）。
+			</div>
+		</div>
+	</div>
+
+	<!-- 模块集成说明 -->
+	<div class="card" style="background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);">
+		<div class="card-header">
+			<h2>🔌 模块化集成指南</h2>
+			<span class="badge">像手写模块一样简单</span>
+		</div>
+		<div class="card-body">
+			<p>两个模块均采用独立文件结构，只需在 HTML 中引入样式与脚本，并在 Quill 初始化后调用对应模块的 <code>init</code> 方法即可。</p>
+			<div class="code-sample" style="background: #1e293b;">
+&lt;!-- 在 &lt;body&gt; 末尾引入 --&gt;<br>
+&lt;link rel="stylesheet" href="table-module/table-module.css"&gt;<br>
+&lt;script src="table-module/table-module.js"&gt;&lt;/script&gt;<br>
+&lt;link rel="stylesheet" href="chart-module/chart-module.css"&gt;<br>
+&lt;script src="chart-module/chart-module.js"&gt;&lt;/script&gt;<br>
+<br>
+&lt;script&gt;<br>
+&nbsp;&nbsp;var quill = new Quill('#editor', { ... });<br>
+&nbsp;&nbsp;TableModule.init(quill);<br>
+&nbsp;&nbsp;ChartModule.init(quill);<br>
+&lt;/script&gt;
+			</div>
+			<p>表格模块会自动在编辑器工具栏添加「表格」按钮，图表模块添加「图表」按钮。两个模块之间可通过 <code>ChartModule.showModal(chartConfig)</code> 进行数据互通（例如表格生成图表功能）。</p>
+			<hr>
+			<p style="margin-top: 1rem;">✅ <strong>完全兼容</strong>：与公式模块、手写模块、笔记系统等无缝协作，所有插入的内容均支持撤销/重做、保存到 IndexedDB、打印 PDF 等已有功能。</p>
+		</div>
+	</div>
+
+	<div class="footer">
+		<p>📌 表格模块 v1.3（通用数据分析） | 图表模块 v2.0（支持函数曲线）<br>基于 Quill.js + Chart.js + KaTeX 构建，为科学写作与数据展示提供强大工具链。</p>
+	</div>
+</div>
+</body>
+</html>
