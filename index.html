@@ -534,7 +534,68 @@ billboards.push(iconBorder);
 makeTextBillboard('⬇️ 文档编辑器v2.3.apk', '#ffaa88', 'rgba(0,0,0,0.6)', 12, iconPlane.position, -0.6);
 		
 
+// ========== 新增：第三个网页展示板（表格图表演示，视频+网页链接） ==========
+// 视频内容：表格图表演示.mp4，自适应比例，高度固定1.8，宽度按比例
+const webPlane3Height = 1.8;
+let webPlane3Width = 3.2; // 临时宽度，视频元数据加载后更新
 
+const webVideo3 = document.createElement('video');
+webVideo3.src = 'https://ningchaojie.github.io/表格图表演示.mp4';
+webVideo3.loop = true;
+webVideo3.muted = true;
+webVideo3.playsInline = true;
+webVideo3.crossOrigin = 'anonymous';
+webVideo3.load();
+
+const webVideoTexture3 = new THREE.VideoTexture(webVideo3);
+const webPlaneMat3 = new THREE.MeshStandardMaterial({ map: webVideoTexture3, side: THREE.DoubleSide });
+const webPlane3 = new THREE.Mesh(new THREE.PlaneGeometry(webPlane3Width, webPlane3Height), webPlaneMat3);
+webPlane3.position.set(4.5, 1.5, -6.5);  // 放置在场景右侧前方，避免重叠
+webPlane3.castShadow = true;
+scene.add(webPlane3);
+billboards.push(webPlane3);
+
+// 添加边框（临时尺寸，后续根据视频比例调整）
+let webBorder3 = createBillboardBorder(webPlane3Width + 0.1, webPlane3Height + 0.1, 0.05, 0x44aaff);
+webBorder3.position.copy(webPlane3.position);
+scene.add(webBorder3);
+billboards.push(webBorder3);
+
+// 等待视频元数据加载后，调整宽度以适应比例
+webVideo3.addEventListener('loadedmetadata', () => {
+	const vw = webVideo3.videoWidth;
+	const vh = webVideo3.videoHeight;
+	if (vw && vh) {
+		const ratio = vw / vh;
+		const newWidth = webPlane3Height * ratio;
+		// 更新平面几何体
+		webPlane3.geometry.dispose();
+		webPlane3.geometry = new THREE.PlaneGeometry(newWidth, webPlane3Height);
+		// 更新边框
+		scene.remove(webBorder3);
+		const idx = billboards.indexOf(webBorder3);
+		if (idx !== -1) billboards.splice(idx, 1);
+		webBorder3 = createBillboardBorder(newWidth + 0.1, webPlane3Height + 0.1, 0.05, 0x44aaff);
+		webBorder3.position.copy(webPlane3.position);
+		scene.add(webBorder3);
+		billboards.push(webBorder3);
+		console.log(`表格图表视频板自适应完成: 宽=${newWidth.toFixed(2)} 高=${webPlane3Height}, 比例=${ratio.toFixed(2)}`);
+	}
+});
+
+// 添加文字标签：“表格图表功能展示.html”
+makeTextBillboard('📊 表格图表功能展示.html', '#ffffff', 'rgba(0,0,0,0.7)', 14, webPlane3.position, -1.0);
+
+// 将当前新增的网页板添加到可点击对象中（在点击事件监听的 clickableObjects 数组里增加 webPlane3）
+// 注意：原有代码中的 clickableObjects 数组需要更新，找到 onCanvasClick 函数，修改如下：
+// 原代码：
+// const clickableObjects = [webPlane, webPlane2, iconPlane, fetchBtn, prevPageBtn, nextPageBtn];
+// 修改为：
+// const clickableObjects = [webPlane, webPlane2, webPlane3, iconPlane, fetchBtn, prevPageBtn, nextPageBtn];
+// 并在点击判断中添加：
+// else if (hit === webPlane3) {
+//     window.open('https://ningchaojie.github.io/表格图表功能展示.html', '_blank');
+// }
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -547,7 +608,7 @@ function onCanvasClick(event) {
 	raycaster.setFromCamera(mouse, camera);
 	// 检测网页板和图标
 	//const clickableObjects = [webPlane,webPlane2,iconPlane];
-	const clickableObjects = [webPlane, webPlane2, iconPlane, fetchBtn, prevPageBtn, nextPageBtn];
+	const clickableObjects = [webPlane, webPlane2, webPlane3, iconPlane, fetchBtn, prevPageBtn, nextPageBtn];
 	const intersects = raycaster.intersectObjects(clickableObjects);
 	
 	if (intersects.length > 0) {
@@ -573,8 +634,10 @@ function onCanvasClick(event) {
 				currentPage++;
 				updateScreenDisplay(currentFileList, false);
 			}
+		}else if (hit === webPlane3) {
+			window.open('https://ningchaojie.github.io/表格图表功能展示.html', '_blank');
 		}
-		
+				
 	}
 }
 
@@ -754,6 +817,7 @@ renderer.domElement.addEventListener('touchstart', (e) => {
 				});
 			}
 			if (webVideo) webVideo.play();   // 新增：播放网页板视频
+			if (webVideo3) webVideo3.play();  // 新增这一行
 			
 		}
 		
