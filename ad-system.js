@@ -245,12 +245,64 @@
 		fetchRemoteAds: function() {
 			debugLog('使用本地广告数据');
 			this.ads = [
-				{ id: 1, title: "下载站", description: "应用资料免费下载", image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80", link: "https://ningchaojie.github.io", aspectRatio: 1.7777777777777777 },
-				{ id: 2, title: "天猫触屏电容笔", description: "iPad/平板通用，免运费", image: "https://raw.githubusercontent.com/ningchaojie/ningchaojie.github.io/main/%E8%A7%A6%E6%91%B8%E7%AC%94.png", link: "https://e.tb.cn/h.7quPuKtqo7oBgPT", aspectRatio: 0.75 },
-				{ id: 3, title: "触摸笔", description: "iPad/平板通用，免运费", image: "https://images.unsplash.com/photo-1509228468518-180dd4864904?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80", link: "https://e.tb.cn/h.7OBJNA3SnYFXa2z", aspectRatio: 1.7777777777777777 },
-				{ id: 4, title: "三星 Note8 手机", description: "国行双卡note9全网通4G曲屏手机", image: "https://ningchaojie.github.io/20260220_020302.jpg", link: "https://e.tb.cn/h.7yk7Yxivt4gPMeh?tk=2kPkUoOgzK6", aspectRatio: 0.75 },
-				{ id: 5, title: "文档编辑器v1.1", description: "专业文档编辑器", image: "https://ningchaojie.github.io/文档编辑器APP图标.jpg", link: "https://ningchaojie.github.io/文档编辑器v1.1介绍.html", aspectRatio: 1.0 },
-				{ id: 6, title: "文档编辑器v1.0", description: "专业文档编辑器", image: "https://ningchaojie.github.io/文档编辑器APP图标.jpg", link: "https://ningchaojie.github.io/文档编辑介绍.html", aspectRatio: 1.0 }
+
+						  {
+						    "id": 1,
+						    "title": "下载站",
+						    "description": "应用资料免费下载",
+						    "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80",
+						    "link": "https://ningchaojie.github.io",
+						    "aspectRatio": 1.7777777777777777
+						  },
+						  {
+						    "id": 2,
+						    "title": "天猫触屏电容笔",
+						    "description": "iPad/平板通用，免运费",
+						    "image": "https://raw.githubusercontent.com/ningchaojie/ningchaojie.github.io/main/%E8%A7%A6%E6%91%B8%E7%AC%94.png",
+						    "link": "https://e.tb.cn/h.7quPuKtqo7oBgPT",
+						    "aspectRatio": 0.75
+						  },
+						  {
+						    "id": 3,
+						    "title": "文档编辑器v2.4",
+						    "description": "专业文档编辑器",
+						    "image": "https://ningchaojie.github.io/文档编辑器APP图标.jpg",
+						    "link": "https://ningchaojie.github.io/表格图表功能展示.html",
+						    "aspectRatio": 1.0
+						  },
+						  {
+						    "id": 4,
+						    "title": "彩屏5G_wifi",
+						    "description": "无限速流量全国通用高速宽带",
+						    "image": "https://ningchaojie.github.io/wifi.png",
+						    "link": " https://e.tb.cn/h.irVKikdU38X0bwX?tk=xEBB5il399f tG-#22>lD ",
+						    "aspectRatio": 0.75
+						  },
+						  {
+						    "id": 5,
+						    "title": "文档编辑器v1.1",
+						    "description": "专业文档编辑器",
+						    "image": "https://ningchaojie.github.io/文档编辑器APP图标.jpg",
+						    "link": "https://ningchaojie.github.io/文档编辑器v1.1介绍.html",
+						    "aspectRatio": 1.0
+						  },
+						  {
+						    "id": 6,
+						    "title": "文档编辑器v1.0",
+						    "description": "专业文档编辑器",
+						    "image": "https://ningchaojie.github.io/文档编辑器APP图标.jpg",
+						    "link": "https://ningchaojie.github.io/文档编辑介绍.html",
+						    "aspectRatio": 1.0
+						  },
+						  {
+						    "id": 7,
+						    "title": "文档编辑器v2.3",
+						    "description": "专业文档编辑器",
+						    "image": "https://ningchaojie.github.io/文档编辑器APP图标.jpg",
+						    "link": "https://ningchaojie.github.io/文档编辑器v2.3手写模块功能展示.html",
+						    "aspectRatio": 1.0
+						  }
+
 			];
 			this.initAdQueue();
 			debugLog(`✅ 本地广告加载完成，共 ${this.ads.length} 个`);
