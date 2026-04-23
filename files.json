@@ -1,0 +1,20 @@
+[
+  {
+    "name": "招聘申请表",
+    "url": "https://ningchaojie.github.io/模板1.json",
+    "type": "table",
+    "description": "人员招聘申请表格"
+  },
+  {
+    "name": "波动方程",
+    "url": "https://ningchaojie.github.io/波动方程.json",
+    "type": "note",
+    "description": "波动方程"
+  }
+  {
+    "name": "表格例子",
+    "url": "https://ningchaojie.github.io/表格例子.json",
+    "type": "note",
+    "description": "表格例子"
+  }
+]
