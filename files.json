@@ -1,11 +1,5 @@
 [
   {
-    "name": "招工申请表",
-    "url": "https://ningchaojie.github.io/模板1.json",
-    "type": "table",
-    "description": "人员招聘申请表格"
-  },
-  {
     "name": "波动方程",
     "url": "https://ningchaojie.github.io/波动方程.json",
     "type": "note",
@@ -22,5 +16,11 @@
     "url": "https://ningchaojie.github.io/模板1.json",
     "type": "note",
     "description": "人员招聘申请表格"
+  },
+  {
+    "name": "课程成绩统计表（复杂模板）",
+    "url": "https://ningchaojie.github.io/复杂表格.json",
+    "type": "table",
+    "description": "多层级表头、合并单元格、成绩统计分析"
   }
 ]
