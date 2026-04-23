@@ -1,6 +1,6 @@
 [
   {
-    "name": "招聘申请表",
+    "name": "招工申请表",
     "url": "https://ningchaojie.github.io/模板1.json",
     "type": "table",
     "description": "人员招聘申请表格"
@@ -16,5 +16,11 @@
     "url": "https://ningchaojie.github.io/表格例子.json",
     "type": "note",
     "description": "表格例子"
+  },
+  {
+    "name": "招聘申请表",
+    "url": "https://ningchaojie.github.io/模板1.json",
+    "type": "note",
+    "description": "人员招聘申请表格"
   }
 ]
