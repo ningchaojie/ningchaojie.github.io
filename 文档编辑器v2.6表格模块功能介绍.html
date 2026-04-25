@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+	<title>智能表格模块 - 完整功能说明文档</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+			background: #f6f9fc;
+			color: #1a2c3e;
+			line-height: 1.5;
+			padding: 48px 24px;
+		}
+
+		.container {
+			max-width: 1280px;
+			margin: 0 auto;
+		}
+
+		/* 头部 */
+		.header {
+			text-align: center;
+			margin-bottom: 48px;
+		}
+
+		.header h1 {
+			font-size: 2.8rem;
+			background: linear-gradient(135deg, #1e3c72, #2a5298);
+			background-clip: text;
+			-webkit-background-clip: text;
+			color: transparent;
+			margin-bottom: 16px;
+			display: inline-flex;
+			align-items: center;
+			gap: 16px;
+		}
+
+		.header p {
+			font-size: 1.2rem;
+			color: #4a627a;
+			max-width: 720px;
+			margin: 0 auto;
+		}
+
+		.badge-container {
+			display: flex;
+			justify-content: center;
+			gap: 12px;
+			flex-wrap: wrap;
+			margin-top: 24px;
+		}
+
+		.badge {
+			background: #e9ecef;
+			padding: 6px 16px;
+			border-radius: 40px;
+			font-size: 0.85rem;
+			font-weight: 500;
+			color: #2c5f8a;
+		}
+
+		/* 功能网格 */
+		.section {
+			margin-bottom: 56px;
+		}
+
+		.section-title {
+			font-size: 1.8rem;
+			font-weight: 600;
+			margin-bottom: 24px;
+			border-left: 6px solid #2a5298;
+			padding-left: 20px;
+			color: #0f2b3d;
+		}
+
+		.feature-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+			gap: 28px;
+		}
+
+		.feature-card {
+			background: white;
+			border-radius: 24px;
+			padding: 24px;
+			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+			transition: all 0.2s ease;
+			border: 1px solid #e2edf2;
+		}
+
+		.feature-card:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 16px 28px -8px rgba(0, 0, 0, 0.1);
+			border-color: #cbdde6;
+		}
+
+		.card-icon {
+			font-size: 2rem;
+			color: #2a5298;
+			margin-bottom: 16px;
+		}
+
+		.feature-card h3 {
+			font-size: 1.35rem;
+			margin-bottom: 12px;
+			font-weight: 600;
+		}
+
+		.feature-card p {
+			color: #3e5a76;
+			margin-bottom: 12px;
+		}
+
+		.feature-list {
+			list-style: none;
+			padding-left: 0;
+		}
+
+		.feature-list li {
+			padding: 6px 0;
+			border-bottom: 1px dashed #e9ecef;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			font-size: 0.9rem;
+		}
+
+		.feature-list i {
+			width: 22px;
+			color: #2a9d6e;
+		}
+
+		.inline-code {
+			background: #f0f2f5;
+			padding: 2px 8px;
+			border-radius: 12px;
+			font-family: 'SF Mono', monospace;
+			font-size: 0.85rem;
+		}
+
+		hr {
+			margin: 40px 0;
+			border: none;
+			height: 1px;
+			background: linear-gradient(to right, #e2edf2, transparent);
+		}
+
+		.tip-note {
+			background: #eef4ff;
+			padding: 18px 24px;
+			border-radius: 24px;
+			margin-top: 32px;
+			border-left: 4px solid #2a5298;
+		}
+
+		.footer {
+			text-align: center;
+			padding-top: 48px;
+			color: #6c86a3;
+			font-size: 0.85rem;
+		}
+
+		@media (max-width: 700px) {
+			body {
+				padding: 24px 16px;
+			}
+			.header h1 {
+				font-size: 2rem;
+			}
+			.section-title {
+				font-size: 1.5rem;
+			}
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+	<div class="header">
+		<h1><i class="fas fa-table"></i> 智能表格模块</h1>
+		<p>一款专为富文本编辑器打造的轻量级表格插件 · 全功能 · 可拖拽工具栏 · 支持数据分析与图表</p>
+		<div class="badge-container">
+			<span class="badge"><i class="fas fa-mouse-pointer"></i> 可视化编辑</span>
+			<span class="badge"><i class="fas fa-arrows-alt-v"></i> 拖拽工具栏</span>
+			<span class="badge"><i class="fas fa-chart-line"></i> 智能分析</span>
+			<span class="badge"><i class="fas fa-layer-group"></i> 多选批量</span>
+			<span class="badge"><i class="fas fa-undo-alt"></i> 撤销/重做</span>
+		</div>
+	</div>
+
+	<!-- 1. 核心交互 -->
+	<div class="section">
+		<div class="section-title"><i class="fas fa-cogs"></i> 核心编辑能力</div>
+		<div class="feature-grid">
+			<div class="feature-card">
+				<div class="card-icon"><i class="fas fa-rows"></i></div>
+				<h3>行列精细操作</h3>
+				<ul class="feature-list">
+					<li><i class="fas fa-plus-circle"></i> 在末尾添加行 / 列</li>
+					<li><i class="fas fa-arrow-up"></i> 当前行上方/下方插入行</li>
+					<li><i class="fas fa-arrow-left"></i> 当前列左侧/右侧插入列</li>
+					<li><i class="fas fa-trash-alt"></i> 删除当前行或当前列</li>
+					<li><i class="fas fa-cut"></i> 表格尺寸一键重置 (行列重设)</li>
+				</ul>
+			</div>
+			<div class="feature-card">
+				<div class="card-icon"><i class="fas fa-object-group"></i></div>
+				<h3>合并 & 拆分</h3>
+				<ul class="feature-list">
+					<li><i class="fas fa-merge"></i> 合并右侧单元格 / 合并下方单元格</li>
+					<li><i class="fas fa-cut"></i> 拆分已合并的单元格（还原行列）</li>
+					<li><i class="fas fa-divide"></i> 左右分割单元格（flex内分左右两栏）</li>
+					<li><i class="fas fa-divide"></i> 上下分割单元格（垂直灵活分区）</li>
+					<li><i class="fas fa-palette"></i> 分割后保留原有样式 + 独立编辑</li>
+				</ul>
+			</div>
+			<div class="feature-card">
+				<div class="card-icon"><i class="fas fa-edit"></i></div>
+				<h3>内容格式丰富</h3>
+				<ul class="feature-list">
+					<li><i class="fas fa-bold"></i> 粗体 / <i class="fas fa-italic"></i> 斜体 / <i class="fas fa-underline"></i> 下划线</li>
+					<li><i class="fas fa-font"></i> 字号调整 (任意数值, 自动包裹span)</li>
+					<li><i class="fas fa-palette"></i> 字体颜色 (拾色器实时生效)</li>
+					<li><i class="fas fa-align-left"></i> 左/中/右 对齐 (光标单元格或全表)</li>
+					<li><i class="fas fa-eraser"></i> 一键清除单元格格式</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<!-- 2. 高级特性 -->
+	<div class="section">
+		<div class="section-title"><i class="fas fa-rocket"></i> 高级特性与生产力工具</div>
+		<div class="feature-grid">
+			<div class="feature-card">
+				<div class="card-icon"><i class="fas fa-check-double"></i></div>
+				<h3>多选批量模式</h3>
+				<p>单击“多选批量操作”按钮进入多选状态，随意点选单元格（支持跨行跨列），可批量进行：</p>
+				<ul class="feature-list">
+					<li><i class="fas fa-align-center"></i> 统一对齐方式</li>
+					<li><i class="fas fa-font"></i> 统一字号 / 文字颜色 / 粗斜体</li>
+					<li><i class="fas fa-trash-alt"></i> 批量清除格式</li>
+				</ul>
+				<p style="margin-top: 8px;">选中单元格有明显的<span class="inline-code">蓝色外框 + 浅蓝背景</span>，操作后自动退出多选模式。</p>
+			</div>
+			<div class="feature-card">
+				<div class="card-icon"><i class="fas fa-history"></i></div>
+				<h3>撤销 / 重做 (完整历史)</h3>
+				<p>内置记录栈，自动保存表格每次结构或内容变动（<span class="inline-code">MutationObserver</span> 监听）。支持快捷键：</p>
+				<ul class="feature-list">
+					<li><i class="fas fa-undo-alt"></i> <kbd>Ctrl+Z</kbd> 撤销</li>
+					<li><i class="fas fa-redo-alt"></i> <kbd>Ctrl+Y</kbd> / <kbd>Ctrl+Shift+Z</kbd> 重做</li>
+					<li><i class="fas fa-database"></i> 最大保存 50 步历史快照</li>
+				</ul>
+			</div>
+			<div class="feature-card">
+				<div class="card-icon"><i class="fas fa-chalkboard"></i></div>
+				<h3>表格分析 & 图表生成</h3>
+				<p>智能识别数字数据，自动计算总分、排名并生成统计报告：</p>
+				<ul class="feature-list">
+					<li><i class="fas fa-chart-simple"></i> 分析表格：展示总分最高/最低 + 降序排名</li>
+					<li><i class="fas fa-sort-amount-down"></i> 按合计排序并替换原表格</li>
+					<li><i class="fas fa-chart-bar"></i> 一键生成柱状图（需图表模块配合）</li>
+				</ul>
+				<p>支持任意多行多列，自动过滤非数值单元格。</p>
+			</div>
+		</div>
+	</div>
+
+	<!-- 3. 工具栏 & 布局适配 -->
+	<div class="section">
+		<div class="section-title"><i class="fas fa-tools"></i> 工具栏交互与自适应</div>
+		<div class="feature-grid">
+			<div class="feature-card">
+				<div class="card-icon"><i class="fas fa-arrows-alt-v"></i></div>
+				<h3>可拖拽工具栏</h3>
+				<p>工具栏下方带有 <strong>↕️ ⋮⋮</strong> 拖拽条，支持鼠标或手指拖拽调整工具栏区域高度：</p>
+				<ul class="feature-list">
+					<li><i class="fas fa-expand-alt"></i> 调高工具栏查看更多按钮</li>
+					<li><i class="fas fa-compress-alt"></i> 收缩为紧凑模式，自动显示滚动条</li>
+					<li><i class="fas fa-mobile-alt"></i> 移动端友好，触摸拖拽生效</li>
+				</ul>
+				<p>每次打开编辑器，工具栏高度自适应内容，上限为视口高度 40% 。</p>
+			</div>
+			<div class="feature-card">
+				<div class="card-icon"><i class="fas fa-print"></i></div>
+				<h3>纸张尺寸限制 & 缩放</h3>
+				<ul class="feature-list">
+					<li><i class="fas fa-file-alt"></i> 可选 A3 / A4 / A5 / Letter 纸张宽度</li>
+					<li><i class="fas fa-magnifying-glass-plus"></i> 表格放大/缩小按钮 (zoom 0.5~2倍)</li>
+					<li><i class="fas fa-arrows-left-right"></i> 超出最大宽度时自动缩放表格，适配打印样式</li>
+					<li><i class="fas fa-border-all"></i> 表格本身无硬性宽度限制，由内容撑开</li>
+				</ul>
+			</div>
+			<div class="feature-card">
+				<div class="card-icon"><i class="fas fa-highlighter"></i></div>
+				<h3>智能格式光标感知</h3>
+				<p>实时从光标所在位置读取字号并更新工具栏输入框值；若在空白单元格输入，自动包裹<span class="inline-code">span</span>并应用默认字号 (16px)，避免格式丢失。</p>
+				<ul class="feature-list">
+					<li><i class="fas fa-eye"></i> 全局默认字号可动态更新</li>
+					<li><i class="fas fa-code"></i> 支持混合内联样式与<span class="inline-code">document.execCommand</span></li>
+					<li><i class="fas fa-sync-alt"></i> 光标切换时字号输入框实时同步</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<!-- 4. 技术细节与集成 -->
+	<div class="section">
+		<div class="section-title"><i class="fas fa-cubes"></i> 集成方式与设计亮点</div>
+		<div class="feature-grid">
+			<div class="feature-card">
+				<div class="card-icon"><i class="fab fa-quill"></i></div>
+				<h3>Quill Blot 嵌入</h3>
+				<p>基于 Quill 的自定义 Blot（<span class="inline-code">CustomTableBlot</span>），将表格作为独立嵌入式模块，支持双击编辑、保留原始HTML。</p>
+				<ul class="feature-list">
+					<li><i class="fas fa-code-branch"></i> 注册自定义标签 <span class="inline-code">div.ql-table-container</span></li>
+					<li><i class="fas fa-exchange-alt"></i> 表格内容与富文本无缝混合</li>
+					<li><i class="fas fa-save"></i> 序列化为标准HTML，支持持久化</li>
+				</ul>
+			</div>
+			<div class="feature-card">
+				<div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+				<h3>历史快照与防抖保存</h3>
+				<p>每次表格变动（内容/结构）延迟保存快照，避免高频写入。撤销/重做采用替换整表DOM方式，确保一致性。</p>
+				<p>同时支持独立于 Quill 的撤销栈，不干扰编辑器自身历史。</p>
+			</div>
+			<div class="feature-card">
+				<div class="card-icon"><i class="fas fa-globe"></i></div>
+				<h3>跨平台与兼容</h3>
+				<ul class="feature-list">
+					<li><i class="fab fa-chrome"></i> 现代浏览器 + 移动端触摸优化</li>
+					<li><i class="fas fa-mobile-alt"></i> 多选模式阻止软键盘弹出（防干扰）</li>
+					<li><i class="fas fa-file-code"></i> 独立CSS类名，可自定义样式覆盖</li>
+					<li><i class="fas fa-plug"></i> 图表模块解耦，未加载时友好降级提示</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<!-- 5. 界面操作示意（纯文字说明） -->
+	<div class="tip-note">
+		<i class="fas fa-info-circle" style="font-size: 1.4rem; margin-right: 12px; float: left;"></i>
+		<strong>快捷操作指南</strong><br/>
+		• <strong>对齐模式切换</strong>：<span class="inline-code">📍 光标处对齐</span> → 仅对当前选区所在单元格应用；<span class="inline-code">📊 所有单元格对齐</span> → 一次性作用于全表。<br/>
+		• <strong>多选模式</strong>：开启后点击任意单元格即可高亮选中，支持批量操作（对齐、颜色、字号、清除）。再次点击按钮完成选择并自动退出模式。<br/>
+		• <strong>单元格内左右/上下分割</strong>：将原单元格划分为两个独立编辑区，各自内容可单独编辑，中间带分隔线。<br/>
+		• <strong>纸张尺寸+缩放</strong>：先选择纸张(如A4)，点击“应用纸张尺寸”，根据表格宽度自动计算缩放比例，保持横向不溢出。<br/>
+		• <strong>撤销/重做</strong>：支持所有行列增删、合并拆分、文字格式变更、内容修改等操作，误操作毫秒级恢复。
+	</div>
+
+	<!-- 6. 开发者集成示例（伪代码/说明） -->
+	<div class="section">
+		<div class="section-title"><i class="fas fa-code"></i> 快速集成（开发者参考）</div>
+		<div class="feature-grid" style="grid-template-columns: 1fr;">
+			<div class="feature-card" style="background: #fafcfd;">
+				<h3><i class="fab fa-js"></i> 在 Quill 中加载表格模块</h3>
+				<pre style="background: #1e2a36; color: #e2e8f0; padding: 16px; border-radius: 20px; overflow-x: auto; font-size: 0.85rem;">
+// 1. 引入 table-module.js 文件 (全局挂载 window.TableModule)
+// 2. 初始化 Quill 后调用
+var quill = new Quill('#editor', { theme: 'snow' });
+window.TableModule.init(quill);
+
+// 3. 手动打开表格编辑器 (例如工具栏按钮触发)
+window.TableModule.showModal(null);
+// 或编辑已有表格: showModal(htmlString)
+
+// 4. 可选: 自定义图表模块 (需与 TableModule 配合)
+window.ChartModule = { showModal: function(config){ ... } };</pre>
+				<p style="margin-top: 12px;">模块完全独立，不依赖任何第三方 UI 库。工具栏全部功能均绑定原生事件，可轻松嵌入任何后台管理系统。</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="footer">
+		<i class="fas fa-copyright"></i> 智能表格模块 — 专为复杂表格编辑场景设计 | 支持行列操作、合并分割、多选批量、数据分析、纸张约束<br/>
+		版本特性：拖拽工具栏高度、撤销重做、实时字号感知、单元格内部分割、图表扩展接口。
+	</div>
+</div>
+</body>
+</html>
