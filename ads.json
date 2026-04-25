@@ -54,5 +54,21 @@
     "image": "https://ningchaojie.github.io/文档编辑器APP图标.jpg",
     "link": "https://ningchaojie.github.io/文档编辑器v2.3手写模块功能展示.html",
     "aspectRatio": 1.0
+  },
+  {
+    "id": 8,
+    "title": "文档编辑器v2.6",
+    "description": "专业文档编辑器",
+    "image": "https://ningchaojie.github.io/文档编辑器APP图标.jpg",
+    "link": "https://ningchaojie.github.io/文档编辑器v2.6.apk",
+    "aspectRatio": 1.0
+  },
+  {
+    "id": 9,
+    "title": "文档编辑器v2.6表格模块",
+    "description": "功能介绍",
+    "image": "https://ningchaojie.github.io/文档编辑器APP图标.jpg",
+    "link": "https://ningchaojie.github.io/文档编辑器v2.6表格模块功能介绍.html",
+    "aspectRatio": 1.0
   }
 ]
