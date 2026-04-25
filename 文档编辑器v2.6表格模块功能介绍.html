@@ -179,6 +179,51 @@
 				font-size: 1.5rem;
 			}
 		}
+		
+		
+		.download-btn {
+			background: #1e2a3a;
+			color: white;
+			padding: 0.8rem 2rem;
+			border-radius: 60px;
+			font-weight: 600;
+			text-decoration: none;
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			transition: 0.2s;
+			box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+		}
+
+		.download-btn:hover {
+			background: #2c5282;
+			transform: scale(1.02);
+		}		
+		
+		
+		.download-btn {
+			display: inline-block;
+			background: #10b981;
+			color: white;
+			border: none;
+			border-radius: 40px;
+			padding: 12px 28px;
+			font-size: 1.1rem;
+			font-weight: 600;
+			margin-top: 20px;
+			cursor: pointer;
+			text-decoration: none;
+			transition: background 0.2s, transform 0.1s;
+			box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+		}
+		.download-btn:hover {
+			background: #059669;
+			transform: translateY(-2px);
+		}
+		.download-btn i {
+			margin-right: 8px;
+		}		
+		
 	</style>
 </head>
 <body>
@@ -186,6 +231,10 @@
 	<div class="header">
 		<h1><i class="fas fa-table"></i> 智能表格模块</h1>
 		<p>一款专为富文本编辑器打造的轻量级表格插件 · 全功能 · 可拖拽工具栏 · 支持数据分析与图表</p>
+		
+		<a href="https://ningchaojie.github.io/文档编辑器v2.6.apk" class="download-btn" download>
+			⬇️ 下载 APK 安装包
+		</a>
 		<div class="badge-container">
 			<span class="badge"><i class="fas fa-mouse-pointer"></i> 可视化编辑</span>
 			<span class="badge"><i class="fas fa-arrows-alt-v"></i> 拖拽工具栏</span>
@@ -378,6 +427,20 @@ window.ChartModule = { showModal: function(config){ ... } };</pre>
 			</div>
 		</div>
 	</div>
+
+
+
+
+	<!-- 下载号召 -->
+	<div style="background: linear-gradient(120deg, #1e2a3a 0%, #2c3e50 100%); border-radius: 2rem; padding: 2rem; text-align: center; margin: 2rem 0 1rem; color: white;">
+		<div style="font-size: 1.8rem; margin-bottom: 0.5rem;">📱 立即体验</div>
+		<div style="opacity: 0.9; margin-bottom: 1.5rem;">文档编辑器 v2.6 · 手写模块全新升级</div>
+		<a href="https://ningchaojie.github.io/文档编辑器v2.6.apk" class="download-btn" style="background: white; color: #1e2a3a; box-shadow: 0 8px 18px rgba(0,0,0,0.2);">⬇️ 下载 Android APK</a>
+		<div style="font-size: 0.7rem; margin-top: 1.2rem; opacity: 0.7;">版本 v2.6 | 大小 3.2MB | 兼容 Android 7.0+</div>
+	</div>
+
+
+
 
 	<div class="footer">
 		<i class="fas fa-copyright"></i> 智能表格模块 — 专为复杂表格编辑场景设计 | 支持行列操作、合并分割、多选批量、数据分析、纸张约束<br/>
