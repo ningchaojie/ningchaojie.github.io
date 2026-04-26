@@ -608,7 +608,7 @@ function onCanvasClick(event) {
 	raycaster.setFromCamera(mouse, camera);
 	// 检测网页板和图标
 	//const clickableObjects = [webPlane,webPlane2,iconPlane];
-	const clickableObjects = [webPlane, webPlane2, webPlane3, iconPlane, fetchBtn, prevPageBtn, nextPageBtn];
+	const clickableObjects = [webPlane, webPlane2, webPlane3, iconPlane, fetchBtn, prevPageBtn, nextPageBtn,floatBtn];
 	const intersects = raycaster.intersectObjects(clickableObjects);
 	
 	if (intersects.length > 0) {
@@ -636,8 +636,10 @@ function onCanvasClick(event) {
 			}
 		}else if (hit === webPlane3) {
 			window.open('https://ningchaojie.github.io/表格图表功能展示.html', '_blank');
+		}else if (hit === floatBtn) {
+			window.open('https://ningchaojie.github.io/apk_html.html', '_blank');
 		}
-				
+						
 	}
 }
 
@@ -832,6 +834,7 @@ const ITEMS_PER_PAGE = 8;       // 每页显示数量
 let prevPageBtn, nextPageBtn;   // 上下翻页按钮
 let prevPageLabel, nextPageLabel;
 let x=5;
+let gdc=2;
 		
 // 操作台基座
 const baseGeo = new THREE.BoxGeometry(3, 0.2, 2.5);
@@ -856,6 +859,70 @@ const screenPlane = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 1.2), screenMat)
 screenPlane.position.set(x, 1.5, -2.83); // 放到更近、更高的位置
 screenPlane.rotation.y = Math.PI; // 旋转180度
 scene.add(screenPlane);
+
+
+
+// ---------- 新增：悬浮进入独立界面按钮（位于屏幕上方） ----------
+// ---------- 悬浮按钮（缩小酷炫版） ----------
+ 	
+const floatBtnGeo = new THREE.SphereGeometry(0.15, 32, 32);
+const floatBtnMat = new THREE.MeshStandardMaterial({
+	color: 0xff44aa, emissive: 0x881155, metalness: 0.85, roughness: 0.15
+});
+const floatBtn = new THREE.Mesh(floatBtnGeo, floatBtnMat);
+//floatBtn.position.set(x, 2.05, -2.83);
+floatBtn.position.set(x, 2.05+gdc, -2.83);
+floatBtn.castShadow = true;
+floatBtn.userData = { type: 'openApkHtml' };
+scene.add(floatBtn);
+
+// 内环 - 粉色，快速旋转
+const halo1Geo = new THREE.TorusGeometry(0.24, 0.012, 16, 64);
+const halo1Mat = new THREE.MeshStandardMaterial({
+	color: 0xff88cc, emissive: 0x883355, transparent: true, opacity: 0.85
+});
+const halo1 = new THREE.Mesh(halo1Geo, halo1Mat);
+halo1.position.copy(floatBtn.position);
+halo1.rotation.x = Math.PI / 2;
+scene.add(halo1);
+
+// 外环 - 紫色，反向慢旋
+const halo2Geo = new THREE.TorusGeometry(0.30, 0.008, 16, 64);
+const halo2Mat = new THREE.MeshStandardMaterial({
+	color: 0xaa55ff, emissive: 0x442266, transparent: true, opacity: 0.55
+});
+const halo2 = new THREE.Mesh(halo2Geo, halo2Mat);
+halo2.position.copy(floatBtn.position);
+halo2.rotation.x = Math.PI / 3;
+scene.add(halo2);
+
+// 轨道微粒
+const orbitCount = 20;
+const orbitGeo = new THREE.BufferGeometry();
+const orbitArr = new Float32Array(orbitCount * 3);
+for (let i = 0; i < orbitCount; i++) {
+	const a = (i / orbitCount) * Math.PI * 2;
+	orbitArr[i * 3]     = Math.cos(a) * 0.33;
+	orbitArr[i * 3 + 1] = 0;
+	orbitArr[i * 3 + 2] = Math.sin(a) * 0.33;
+}
+orbitGeo.setAttribute('position', new THREE.BufferAttribute(orbitArr, 3));
+const orbitPts = new THREE.Points(orbitGeo, new THREE.PointsMaterial({
+	color: 0xffbbff, size: 0.025, transparent: true, opacity: 0.75
+}));
+orbitPts.position.copy(floatBtn.position);
+scene.add(orbitPts);
+
+// 标签 - 缩小字号，半透明暗底
+const floatLabelDiv = document.createElement('div');
+floatLabelDiv.textContent = '✨ 应用中心';
+floatLabelDiv.style.cssText = 'color:#ffccff;background:rgba(30,8,35,0.72);padding:2px 9px;border-radius:16px;font-size:11px;font-weight:bold;border:1px solid rgba(255,136,204,0.5);backdrop-filter:blur(4px);white-space:nowrap;letter-spacing:0.5px;';
+const floatLabel = new CSS2DObject(floatLabelDiv);
+//floatLabel.position.set(x, 2.3, -2.83);
+floatLabel.position.set(x, 2.3+gdc, -2.83);
+scene.add(floatLabel);
+
+
 
 // 3D 按钮（圆形或方形）
 const btnGeo = new THREE.BoxGeometry(0.6, 0.2, 0.6);
@@ -907,6 +974,10 @@ nextPageLabel = new CSS2DObject(nextLabelDiv);
 nextPageLabel.position.copy(nextPageBtn.position);
 nextPageLabel.position.y -= 0.2;
 scene.add(nextPageLabel);
+
+
+
+
 	
 
 
@@ -1178,6 +1249,33 @@ function animateButton() {
 		prevPageLabel.position.y = prevPageBtn.position.y - 0.2;
 		nextPageBtn.position.y = 0.15 + Math.sin(time + 1) * 0.02;
 		nextPageLabel.position.y = nextPageBtn.position.y - 0.2;
+	}
+	
+	// 新增：悬浮按钮上下浮动 + 光环旋转
+	// 悬浮按钮：浮动 + 双环反转 + 轨道粒子 + 呼吸脉冲
+	if (floatBtn) {
+		const baseY = 2.05+gdc;
+		
+		floatBtn.position.y = baseY + Math.sin(time * 2) * 0.04;
+		halo1.position.y = floatBtn.position.y;
+		halo2.position.y = floatBtn.position.y;
+		orbitPts.position.y = floatBtn.position.y;
+		floatLabel.position.y = floatBtn.position.y + 0.25;
+	
+		// 双环反向旋转 + 摇摆
+		halo1.rotation.z += 0.035;
+		halo1.rotation.x = Math.PI / 2 + Math.sin(time * 0.9) * 0.18;
+		halo2.rotation.z -= 0.025;
+		halo2.rotation.x = Math.PI / 3 + Math.cos(time * 0.7) * 0.22;
+	
+		// 轨道粒子自转
+		orbitPts.rotation.y += 0.02;
+	
+		// 呼吸脉冲
+		const pulse = 0.6 + Math.sin(time * 3) * 0.4;
+		floatBtnMat.emissiveIntensity = pulse;
+		halo1Mat.opacity = 0.55 + Math.sin(time * 2.5) * 0.3;
+		halo2Mat.opacity = 0.35 + Math.cos(time * 2) * 0.2;
 	}
 }
 
