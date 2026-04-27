@@ -22,5 +22,17 @@
     "url": "https://ningchaojie.github.io/复杂表格.json",
     "type": "table",
     "description": "多层级表头、合并单元格、成绩统计分析"
+  },
+  {
+    "name": "个人简历",
+    "url": "https://ningchaojie.github.io/个人简历.json",
+    "type": "note",
+    "description": "个人简历"
+  },
+  {
+    "name": "停工报告表",
+    "url": "https://ningchaojie.github.io/停工报告表.json",
+    "type": "note",
+    "description": "停工报告表"
   }
 ]
